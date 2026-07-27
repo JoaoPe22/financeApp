@@ -1,0 +1,23 @@
+{
+  "name": "@projeto-saas/api",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "tsx watch src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@fastify/autoload": "^6.5.0",
+    "@projeto-saas/tsconfig": "workspace:*",
+    "@types/node": "^26.1.1",
+    "tsx": "^4.23.1",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "fastify": "^5.10.0",
+    "zod": "^4.4.3"
+  }
+}

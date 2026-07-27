@@ -1,0 +1,7 @@
+{
+  "name": "@projeto-saas/eslint-config",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "type": "module"
+}
