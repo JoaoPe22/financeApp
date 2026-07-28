@@ -3,21 +3,26 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch --env-file .env src/http/server.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
+  "prettier": "@projeto-saas/prettier-config",
   "devDependencies": {
     "@fastify/autoload": "^6.5.0",
+    "@projeto-saas/eslint-config": "workspace:*",
+    "@projeto-saas/prettier-config": "workspace:*",
     "@projeto-saas/tsconfig": "workspace:*",
     "@types/node": "^26.1.1",
     "drizzle-kit": "^0.31.10",
+    "eslint": "^9.0.0",
     "tsx": "^4.23.1",
     "typescript": "^5"
   },
   "dependencies": {
+    "better-auth": "1.6.25",
     "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.8.3",
     "fastify": "^5.10.0",
