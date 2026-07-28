@@ -4,6 +4,7 @@
   "description": "Projeto SaaS de estudo",
   "author": "",
   "private": true,
+  "packageManager": "pnpm@10.32.1",
   "scripts": {
     "dev:api": "pnpm --filter @projeto-saas/api dev",
     "lint": "eslint .",
