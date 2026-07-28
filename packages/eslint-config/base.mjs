@@ -1,3 +1,4 @@
+import stylistic from "@stylistic/eslint-plugin";
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
@@ -22,6 +23,7 @@ export default [
   }),
   {
     plugins: {
+      "@stylistic": stylistic,
       import: importPlugin,
       "simple-import-sort": simpleImportSort,
     },
