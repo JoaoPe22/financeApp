@@ -1,12 +1,21 @@
 import z from 'zod'
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
   PORT: z.coerce.number().default(3333),
   DATABASE_URL: z.url(),
   BETTER_AUTH_SECRET: z.string().nonempty(),
   BETTER_AUTH_URL: z.url(),
   FRONTEND_URL: z.url().default('http://localhost:3000'),
+  SMTP_HOST: z.string(),
+  SMTP_PORT: z.coerce.number().default(587),
+  SMTP_USER: z.string().nonempty(),
+  SMTP_PASS: z.string().nonempty(),
+  SMTP_FROM_NAME: z.string(),
+  SMTP_FROM_EMAIL: z.email(),
+  APPLICATION_TIMEZONE: z.string().default('America/Cuiaba'),
 })
 
 const env = envSchema.parse(process.env)
