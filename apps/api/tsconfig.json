@@ -9,5 +9,11 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "drizzle/schema", "drizzle/database", "drizzle/client.ts", "drizzle/index.ts"]
+  "include": [
+    "src",
+    "drizzle/schema",
+    "drizzle/database",
+    "drizzle/client.ts",
+    "drizzle/index.ts"
+  ]
 }
