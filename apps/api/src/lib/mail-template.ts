@@ -2,7 +2,7 @@
 // Responsabilidades:
 // - Gerar HTML responsivo e estilizado para emails
 // - Fornecer versões em texto plano (fallback)
-// - Manter identidade visual da BSY Consultoria
+// - Manter identidade visual
 //
 // Templates disponíveis:
 // 1. Reset de senha
@@ -114,9 +114,9 @@ const resetPasswordTemplate = (data: ResetPasswordTemplateData) => {
 </head>
 <body>
   <div class="container">
-    <!-- Logotipo da BSY Consultoria -->
+    <!-- Logotipo da   -->
     <div class="logo">
-      <img src="${env.FRONTEND_URL}/logotipo.png" alt="BSY Consultoria" />
+      <img src="${env.FRONTEND_URL}/logotipo.png" alt=" " />
     </div>
     
     <h1>Redefinição de Senha</h1>
@@ -146,7 +146,7 @@ const resetPasswordTemplate = (data: ResetPasswordTemplateData) => {
     <!-- Rodapé com copyright -->
     <div class="footer">
       <p>Este é um email automático, por favor não responda.</p>
-      <p>&copy; ${new Date().getFullYear()} BSY Consultoria. Todos os direitos reservados.</p>
+      <p>&copy; ${new Date().getFullYear()}  . Todos os direitos reservados.</p>
     </div>
   </div>
 </body>
@@ -177,7 +177,7 @@ Se você não solicitou a redefinição de senha, pode ignorar este email com se
 
 ---
 Este é um email automático, por favor não responda.
-© ${new Date().getFullYear()} BSY Consultoria. Todos os direitos reservados.
+© ${new Date().getFullYear()}  . Todos os direitos reservados.
   `
 }
 
