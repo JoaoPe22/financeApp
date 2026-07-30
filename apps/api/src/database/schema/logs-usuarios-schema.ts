@@ -25,7 +25,7 @@ export const logsUsuarios = pgTable(
     index('logs_usuarios_usuarioAfetado_idx').on(table.usuarioAfetadoId),
     index('logs_usuarios_usuarioExecutor_idx').on(table.usuarioExecutorId),
     index('logs_usuarios_createdAt_idx').on(table.createdAt),
-  ]
+  ],
 )
 
 export const logsUsuariosRelations = relations(logsUsuarios, ({ one }) => ({

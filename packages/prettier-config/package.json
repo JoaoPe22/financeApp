@@ -1,7 +1,0 @@
-{
-  "name": "@projeto-saas/prettier-config",
-  "version": "1.0.0",
-  "description": "",
-  "type": "module",
-  "exports": "./prettier.config.json"
-}

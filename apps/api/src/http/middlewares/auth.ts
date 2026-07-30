@@ -50,8 +50,7 @@ const auth = fastifyPlugin(async (app: FastifyInstance) => {
 
     if (currentUser.banned) {
       throw new UnauthorizedError(
-        // eslint-disable-next-line @stylistic/multiline-ternary
-        `Usuário banido${currentUser.banReason ? `: ${currentUser.banReason}` : ''}`
+        `Usuário banido${currentUser.banReason ? `: ${currentUser.banReason}` : ''}`,
       )
     }
 

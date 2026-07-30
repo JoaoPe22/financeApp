@@ -45,7 +45,7 @@ dayjs.locale(ptBR)
 const parseGoogleCalendarDate = (
   dateString: string,
   isAllDayEvent: boolean,
-  isEndDate: boolean = false
+  isEndDate: boolean = false,
 ) => {
   // Eventos de dia inteiro precisam de tratamento especial
   if (isAllDayEvent) {

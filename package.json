@@ -4,18 +4,8 @@
   "description": "Projeto SaaS de estudo",
   "author": "",
   "private": true,
-  "packageManager": "pnpm@10.32.1",
-  "scripts": {
-    "dev:api": "pnpm --filter @projeto-saas/api dev",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier . --write",
-    "format:check": "prettier . --check",
-    "typecheck": "pnpm -r typecheck"
-  },
-  "prettier": "@projeto-saas/prettier-config",
-  "devDependencies": {
-    "@projeto-saas/prettier-config": "workspace:*",
-    "prettier": "^3.9.6"
-  }
+  "workspaces": [
+    "apps/*"
+  ],
+  "packageManager": "pnpm@10.32.1"
 }
