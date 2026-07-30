@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "exports": "./prettier.config.mjs"
+  "exports": "./prettier.config.json"
 }

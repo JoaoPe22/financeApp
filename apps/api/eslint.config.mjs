@@ -1,3 +1,3 @@
-import nodeConfig from "@projeto-saas/eslint-config/node";
+import nodeConfig from '@projeto-saas/eslint-config/node'
 
-export default [...nodeConfig];
+export default [...nodeConfig]
