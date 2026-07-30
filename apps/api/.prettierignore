@@ -1,0 +1,29 @@
+# Directories
+node_modules
+dist
+build
+.next
+.turbo
+coverage
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Non-JS/TS file types
+**/*.json
+**/*.jsonc
+**/*.yaml
+**/*.yml
+**/*.md
+**/*.mdx
+**/*.css
+**/*.scss
+**/*.less
+**/*.html
+**/*.graphql
+**/*.gql
+**/*.sql
+**/*.env
+**/*.env.*
