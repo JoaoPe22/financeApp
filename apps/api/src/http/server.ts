@@ -1,6 +1,6 @@
 import fastifyCors from '@fastify/cors'
 import fastifyMultipart from '@fastify/multipart'
-import Fastify from 'fastify'
+import fastify from 'fastify'
 import fastifyBetterAuth from 'fastify-better-auth'
 import {
   serializerCompiler,
@@ -8,12 +8,14 @@ import {
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
 
+import { auth } from '@/auth'
+import { auth as authMiddleware } from '@/http/middlewares'
 import { env } from '@/lib/env'
 
 import { errorHandler } from './error-handler'
 import { dashboardRoutes } from './routes/dashboard'
 
-const app = Fastify({
+const app = fastify({
   logger:
     process.env.NODE_ENV === 'production'
       ? {
@@ -38,8 +40,6 @@ const app = Fastify({
   connectionTimeout: 0,
   bodyLimit: 10485760,
   requestIdHeader: 'x-request-id',
-  requestIdLogLabel: 'reqId',
-  disableRequestLogging: false,
   return503OnClosing: true,
 }).withTypeProvider<ZodTypeProvider>()
 
@@ -59,10 +59,11 @@ app.register(fastifyCors, {
 app.register(fastifyBetterAuth, { auth })
 app.register(fastifyMultipart)
 
+app.register(authMiddleware)
+app.register(dashboardRoutes)
+
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log(`Server está rodando no host http://0.0.0.0:${env.PORT}`)
 })
-
-app.register(dashboardRoutes)
 
 export { app }
