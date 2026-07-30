@@ -1,5 +1,6 @@
 import fastifyCors from '@fastify/cors'
 import fastifyHelmet from '@fastify/helmet'
+import fastifyRateLimit from '@fastify/rate-limit'
 import fastify from 'fastify'
 import {
   serializerCompiler,
@@ -64,6 +65,8 @@ app.register(fastifyCors, {
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Content-Disposition'],
 })
+
+app.register(fastifyHelmet)
 
 app.register(dashboardRoutes)
 

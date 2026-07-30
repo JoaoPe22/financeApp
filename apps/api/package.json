@@ -34,6 +34,7 @@
     "@fastify/cors": "11.3.0",
     "@fastify/helmet": "13.1.0",
     "@fastify/multipart": "10.1.0",
+    "@fastify/rate-limit": "11.2.0",
     "better-auth": "1.6.25",
     "dayjs": "1.11.21",
     "drizzle-orm": "0.45.2",
