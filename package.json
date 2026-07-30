@@ -13,7 +13,9 @@
     "format:check": "prettier . --check",
     "typecheck": "pnpm -r typecheck"
   },
+  "prettier": "@projeto-saas/prettier-config",
   "devDependencies": {
+    "@projeto-saas/prettier-config": "workspace:*",
     "prettier": "^3.9.6"
   }
 }
