@@ -1,3 +1,7 @@
+// Instância do better-auth usada pelo middleware src/http/middlewares/auth.ts
+// para validar sessões (auth.api.getSession) nas rotas Fastify autenticadas.
+// Quem cria/loga usuários de fato é o Next.js (apps/web/src/auth/index.ts) —
+// esta instância aqui só lê a mesma tabela de sessão para confirmar quem é o usuário.
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { admin } from 'better-auth/plugins'
@@ -13,6 +17,9 @@ const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
+  emailAndPassword: {
+    enabled: true,
+  },
   plugins: [
     admin({
       defaultRole: 'AUXILIAR',
