@@ -1,3 +1,5 @@
+// Tipos usados por src/lib/error-handler.ts para normalizar erros de rede/HTTP
+// em algo consistente para exibir nos toasts das telas.
 export interface ApiErrorResponse {
   message: string;
   statusCode?: number;

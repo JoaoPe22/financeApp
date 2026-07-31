@@ -1,3 +1,7 @@
+// Três utilitários para lidar com erros de chamadas HTTP (usando `ky`) de forma
+// consistente: extractErrorMessage (texto amigável pro toast), handleApiError
+// (normaliza qualquer erro em ApiError) e shouldRetry (usado pelo QueryProvider
+// para decidir se vale a pena tentar de novo automaticamente).
 import { HTTPError, TimeoutError } from 'ky'
 
 import {
@@ -6,6 +10,7 @@ import {
   ErrorMessageConfig,
 } from '@/types/api-error'
 
+// Mensagem padrão exibida por status HTTP quando a API não manda uma mensagem própria
 const DEFAULT_ERROR_MESSAGES: Required<ErrorMessageConfig> = {
   400: 'Requisição inválida. Verifique os dados informados.',
   401: 'Sua sessão expirou. Faça login novamente.',
@@ -24,6 +29,7 @@ const DEFAULT_ERROR_MESSAGES: Required<ErrorMessageConfig> = {
   default: 'Ocorreu um erro inesperado. Tente novamente.',
 }
 
+// Retorna uma mensagem de erro pronta para mostrar ao usuário (ex.: em um toast.error)
 export const extractErrorMessage = async (
   error: unknown,
   customMessages?: ErrorMessageConfig,
@@ -73,6 +79,7 @@ export const extractErrorMessage = async (
   return messages.default
 }
 
+// Transforma qualquer erro (de rede, timeout, HTTP...) num ApiError padronizado
 export const handleApiError = async (error: unknown): Promise<ApiError> => {
   if (error instanceof ApiError) {
     return error
@@ -132,6 +139,8 @@ export const handleApiError = async (error: unknown): Promise<ApiError> => {
   })
 }
 
+// Diz se vale a pena tentar a requisição de novo: só para erros passageiros
+// (timeout, "muitas requisições", instabilidade do servidor) — nunca para erro de validação/auth
 export const shouldRetry = (error: unknown): boolean => {
   if (error instanceof ApiError) {
     return [408, 429, 500, 502, 503, 504].includes(error.statusCode)

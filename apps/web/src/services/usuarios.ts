@@ -1,3 +1,6 @@
+// Camada de acesso ao plugin admin do better-auth (authClient.admin.*): gestão
+// de usuários feita por um ADMIN/SUPERVISOR (banir, trocar role, resetar senha...).
+// Diferente do /sign-up, que é autoatendimento sem precisar de admin.
 import { authClient } from '@/auth/client'
 import type {
   BanUserInput,
@@ -10,6 +13,8 @@ import type {
   User,
 } from '@/types/usuario'
 
+// O client do better-auth não lança exceção sozinho — ele retorna { data, error }.
+// Esse helper converte o campo `error` em exceção para o useMutation do React Query capturar.
 const throwIfError = (error: { message?: string } | null) => {
   if (error) throw new Error(error.message || 'Erro inesperado')
 }
@@ -63,6 +68,8 @@ const usuariosService = {
     throwIfError(error)
   },
 
+  // O fluxo de reset de senha do better-auth pede o email, não o id — por isso
+  // primeiro busca o usuário pelo id (ação de admin) para depois disparar o email
   requestPasswordReset: async (userId: string): Promise<void> => {
     const { data: userData, error: userError } = await authClient.admin.getUser(
       { query: { id: userId } },

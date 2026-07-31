@@ -28,6 +28,9 @@ const useUsuarios = () => {
       ...options,
     })
 
+  // Padrão repetido em todas as mutações abaixo: onMutate atualiza a lista na tela
+  // ANTES da API responder (otimista) e guarda o estado anterior; onError desfaz
+  // essa mudança se a API falhar; onSettled sempre revalida com o servidor no final.
   const create = useMutation<User, Error, CreateUserInput, UserContext>({
     mutationFn: usuariosService.create,
     async onMutate(newUser) {

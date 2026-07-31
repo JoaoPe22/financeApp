@@ -1,3 +1,5 @@
+// Tipos do domínio "usuário", usados por src/services/usuarios.ts e src/hooks/use-usuarios.ts
+// (gestão de usuários feita por um admin via authClient.admin.*)
 import type { UserRole } from '@projeto-saas/api/src/auth/permissions'
 
 type User = {
