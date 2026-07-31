@@ -1,3 +1,5 @@
+// Configuração do Next.js: build standalone (para Docker) e headers de segurança
+// aplicados a toda rota (helmet equivalente do lado do front-end).
 import type { NextConfig } from 'next'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3333'
@@ -38,6 +40,8 @@ const nextConfig: NextConfig = {
             value: 'max-age=63072000; includeSubDomains; preload',
           },
           {
+            // connect-src precisa liberar a API Fastify (apiUrl) — sem isso o
+            // browser bloqueia as chamadas de fetch feitas pelo authClient/services
             key: 'Content-Security-Policy',
             value: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ${apiUrl}${
               geoApiUrl

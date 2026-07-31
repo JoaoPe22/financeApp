@@ -1,3 +1,4 @@
+// Provider de tema claro/escuro (next-themes) — ainda não está montado no layout raiz.
 'use client'
 
 import { ThemeProvider as NextThemesProvider } from 'next-themes'

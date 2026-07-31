@@ -1,3 +1,5 @@
+// Barra de progresso no topo da tela durante navegação (@bprogress/next) —
+// ainda não está montado no layout raiz.
 'use client'
 
 import { AppProgressProvider } from '@bprogress/next'

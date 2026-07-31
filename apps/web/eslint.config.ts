@@ -1,3 +1,5 @@
+// Configuração de lint do projeto: regras base do Next.js + neostandard (estilo)
+// + ordenação automática de imports (simple-import-sort).
 import eslint from '@eslint/js'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
@@ -60,6 +62,8 @@ const eslintConfig = defineConfig([
     },
   },
   {
+    // Hooks custom (ex.: useUsuarios) expõem métodos como `list`/`create` que chamam
+    // useQuery/useMutation internamente; a regra padrão barraria esse padrão por nome.
     files: ['src/hooks/**/*.ts'],
     rules: {
       'react-hooks/rules-of-hooks': 'off',

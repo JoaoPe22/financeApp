@@ -1,3 +1,6 @@
+// Configura o React Query (usado pelos hooks em src/hooks, ex.: useUsuarios).
+// O retry só acontece para erros "temporários" (ver shouldRetry em
+// src/lib/error-handler.ts) e para de tentar depois de poucas tentativas.
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
