@@ -1,3 +1,5 @@
+// Configuração do logger do Fastify (pino): JSON estruturado em produção,
+// e uma linha legível por requisição em desenvolvimento.
 import type { FastifyServerOptions } from 'fastify'
 
 // Rótulo e cor (ANSI) de cada nível de log padrão do pino

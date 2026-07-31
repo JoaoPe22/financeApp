@@ -1,3 +1,4 @@
+// Conexão única do Drizzle com o Postgres, usada por toda a API (rotas e middleware de auth).
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 

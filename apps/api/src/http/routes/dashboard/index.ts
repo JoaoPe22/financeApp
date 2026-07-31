@@ -1,12 +1,11 @@
+// Placeholder de rotas do dashboard — ainda sem regras de negócio reais.
 import type { FastifyInstance } from 'fastify'
 
-import { auth } from '@/http/middlewares'
-
 const dashboardRoutes = async (app: FastifyInstance) => {
-  app.register(auth)
-
-  app.get('/', async (_request, _reply) => {
-    return { message: 'Dashboard route' }
+  app.register(async (app) => {
+    app.get('/', async (request, reply) => {
+      return { message: 'Dashboard route is working!' }
+    })
   })
 }
 
