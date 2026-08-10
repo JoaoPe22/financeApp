@@ -1,24 +1,10 @@
-// Aumenta a tipagem do FastifyRequest com os campos que o middleware de auth
-// (src/http/middlewares/auth.ts) injeta em toda rota que registrar esse middleware.
-import 'fastify'
+import type { auth } from '@/auth'
 
-import type { Role } from '@/@types/enums'
+type BetterAuthSession = typeof auth.$Infer.Session
 
 declare module 'fastify' {
   interface FastifyRequest {
-    // Lê a sessão do better-auth e retorna o id do usuário logado (lança se não houver sessão)
-    getCurrentUserId(): Promise<string>
-    // Atalho para a role do usuário já carregado em `currentUser`
-    getCurrentUserRole(): Promise<Role>
-    // Dados do usuário logado, carregados uma vez por requisição pelo middleware de auth
-    currentUser?: {
-      id: string
-      role: Role
-      banned: boolean | null
-      banReason: string | null
-      banExpires: Date | null
-      email: string
-      name: string
-    }
+    user?: BetterAuthSession['user']
+    session?: BetterAuthSession['session']
   }
 }
