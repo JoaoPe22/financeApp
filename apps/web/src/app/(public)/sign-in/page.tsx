@@ -71,7 +71,7 @@ const Page = () => {
   }
 
   return (
-    <main className="grid w-full min-h-screen lg:grid-cols-2">
+    <main className="grid min-h-screen w-full lg:grid-cols-2">
       <section className="relative hidden overflow-hidden bg-gray-300 lg:flex" />
 
       <section className="flex items-center justify-center bg-zinc-100 p-10">
@@ -86,16 +86,25 @@ const Page = () => {
             <form onSubmit={handleSubmit(handleLogin)} method="post">
               <FieldSet>
                 <FieldGroup>
-
                   <Field>
                     <FieldLabel htmlFor="email">Email</FieldLabel>
-                    <Input id="email" type="email" {...register('email')} disabled={isSubmitting} />
+                    <Input
+                      id="email"
+                      type="email"
+                      {...register('email')}
+                      disabled={isSubmitting}
+                    />
                     {errors.email && <span>{errors.email.message}</span>}
                   </Field>
 
                   <Field>
                     <FieldLabel htmlFor="password">Senha</FieldLabel>
-                    <Input id="password" type="password" {...register('password')} disabled={isSubmitting} />
+                    <Input
+                      id="password"
+                      type="password"
+                      {...register('password')}
+                      disabled={isSubmitting}
+                    />
                     {errors.password && <span>{errors.password.message}</span>}
                   </Field>
 
@@ -112,9 +121,7 @@ const Page = () => {
                         />
                       )}
                     />
-                    <FieldLabel htmlFor="rememberMe">
-                      Lembrar-me
-                    </FieldLabel>
+                    <FieldLabel htmlFor="rememberMe">Lembrar-me</FieldLabel>
                   </Field>
                   {errors.rememberMe && (
                     <span>{errors.rememberMe.message}</span>

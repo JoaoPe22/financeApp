@@ -1,7 +1,3 @@
-// Tela de cadastro (rota pública /sign-up) — autoatendimento, não precisa de admin.
-// Fluxo: valida o formulário -> authClient.signUp.email cria o usuário no banco
-// (com a role padrão "AUXILIAR", definida em src/auth/index.ts) e já efetua o login
-// automaticamente -> redireciona para "/" (Home).
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
