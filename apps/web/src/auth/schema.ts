@@ -1,21 +1,16 @@
 // Schema de autenticação (Better Auth) e relações com logs
 // Responsabilidades:
 // - Definir tabelas de usuário, sessão, contas e verificações
-// - Registrar roles e campos de bloqueio de usuário
 // - Mapear relações com logs do sistema
 
 import { relations } from 'drizzle-orm'
 import {
   boolean,
   index,
-  pgEnum,
   pgTable,
   text,
   timestamp,
 } from 'drizzle-orm/pg-core'
-
-// Enum de roles do sistema
-const roleEnum = pgEnum('user_role', ['ADMIN', 'SUPERVISOR', 'AUXILIAR'])
 
 // Tabela de usuários do Better Auth
 const user = pgTable('user', {
@@ -29,10 +24,6 @@ const user = pgTable('user', {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
-  role: roleEnum().default('AUXILIAR').notNull(),
-  banned: boolean().default(false),
-  banReason: text(),
-  banExpires: timestamp({ withTimezone: true }),
 })
 
 // Tabela de sessões ativas
@@ -127,7 +118,6 @@ const accountRelations = relations(account, ({ one }) => ({
 export {
   account,
   accountRelations,
-  roleEnum,
   session,
   sessionRelations,
   user,
