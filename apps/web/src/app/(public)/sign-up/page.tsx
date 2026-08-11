@@ -54,7 +54,7 @@ const Page = () => {
       }
 
       toast.success('Conta criada com sucesso!')
-      router.push('/')
+      router.push('/perfil')
       router.refresh()
     } catch (error) {
       console.error('Erro ao criar conta:', error)
