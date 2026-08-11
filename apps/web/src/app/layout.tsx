@@ -4,9 +4,11 @@
 import './globals.css'
 
 import { Outfit } from 'next/font/google'
-import { Toaster } from 'sonner'
 
+import { Toaster } from '@/components/ui/sonner'
+import { ProgressProvider } from '@/providers/progress'
 import { QueryProvider } from '@/providers/query'
+import { ThemeProvider } from '@/providers/theme'
 
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' })
 
@@ -21,8 +23,13 @@ export default function RootLayout({
         className={`${outfit.variable} bg-muted text-primary-foreground overflow-x-hidden antialiased`}
       >
         <QueryProvider>
-          {children}
-          <Toaster richColors position="top-right" />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ProgressProvider>
+              <Toaster richColors />
+              {children}
+            </ProgressProvider>
+            <Toaster richColors position="top-right" />
+          </ThemeProvider>
         </QueryProvider>
       </body>
     </html>
