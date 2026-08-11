@@ -1,57 +1,40 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { HTTPError } from 'ky'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { apiClient } from '@/lib/api-client'
 import { extractErrorMessage } from '@/lib/error-handler'
+import { tipoRendaEnum } from '@/types/perfil'
 
-const tipoRendaEnum = z.enum(['SALARIO', 'AUTONOMO', 'RENDIMENTO', 'OUTRO'])
+const ufEnum = z.enum([
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
+  'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC',
+  'SP', 'SE', 'TO',
+])
 
 const perfilSchema = z.object({
-  dataNascimento: z.iso.date(),
+  dataNascimento: z.iso.date({ message: 'Data de nascimento inválida' }),
   cep: z.string().regex(/^\d{8}$/, 'CEP deve conter 8 dígitos'),
-  estado: z.string().length(2),
-  cidade: z.string().min(1),
-  bairro: z.string().min(1),
-  logradouro: z.string().min(1),
-  numero: z.string().min(1),
-  complemento: z.string().optional(),
+  estado: ufEnum,
+  cidade: z.string().min(1, 'Cidade é obrigatória'),
+  bairro: z.string().min(1, 'Bairro é obrigatório'),
+  logradouro: z.string().min(1, 'Logradouro é obrigatório'),
+  numero: z.string().min(1, 'Número é obrigatório'),
+  complemento: z.string().max(255).optional(),
   tipoRenda: tipoRendaEnum,
-  salarioFixo: z.number().min(0).optional(),
+  salarioFixo: z.coerce.number().min(0).optional(),
 }).refine((data) => {
-  const eighteenYearsAgo = new Date()
-  eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)
-  return new Date(data.dataNascimento) <= eighteenYearsAgo
+  const maiorDeIdade = new Date()
+  maiorDeIdade.setFullYear(maiorDeIdade.getFullYear() - 18)
+  return new Date(data.dataNascimento) <= maiorDeIdade
 }, { message: 'É necessário ter pelo menos 18 anos', path: ['dataNascimento'] })
 
 type PerfilFormData = z.infer<typeof perfilSchema>
-type Perfil = PerfilFormData & { userId: string; createdAt: string; updatedAt: string }
 
-const PERFIL_QUERY_KEY = ['perfil'] as const
-
-const usePerfil = () =>
-  useQuery<Perfil | null>({
-    queryKey: PERFIL_QUERY_KEY,
-    queryFn: async () => {
-      try {
-        return await apiClient.get('perfil').json<Perfil>()
-      } catch (error) {
-        if (error instanceof HTTPError && error.response.status === 404) {
-          return null
-        }
-        throw error
-      }
-    },
-  })
-
-const useSavePerfil = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation<Perfil, Error, PerfilFormData>({
-    mutationFn: (data) => apiClient.put('perfil', { json: data }).json<Perfil>(),
+const useSavePerfil = () =>
+  useMutation<void, Error, PerfilFormData>({
+    mutationFn: (data) => apiClient.post('perfil', { json: data }).json(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PERFIL_QUERY_KEY })
       toast.success('Perfil salvo com sucesso!')
     },
     async onError(error) {
@@ -59,7 +42,6 @@ const useSavePerfil = () => {
       toast.error(message)
     },
   })
-}
 
-export { perfilSchema, usePerfil, useSavePerfil }
+export { perfilSchema, useSavePerfil }
 export type { PerfilFormData }
