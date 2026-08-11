@@ -85,6 +85,7 @@ const cadastrarPerfil = async (app: FastifyInstance) => {
           usuarioId: userId,
           entidade: 'perfil',
           entidadeId: novoPerfil.id,
+          acao: 'CADASTRAR',
           descricao: 'Perfil cadastrado com sucesso',
         })
 

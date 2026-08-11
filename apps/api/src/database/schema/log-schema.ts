@@ -3,6 +3,7 @@ import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { v7 as uuidv7 } from 'uuid'
 
 import { user } from './auth-schema'
+import type { AcaoLog } from './enums'
 
 const log = pgTable('log', {
   id: uuid()
@@ -11,6 +12,7 @@ const log = pgTable('log', {
   usuarioId: text().references(() => user.id),
   entidade: text().notNull(),
   entidadeId: text().notNull(),
+  acao: text().$type<AcaoLog>(),
   descricao: text().notNull(),
   createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp({ withTimezone: true })
