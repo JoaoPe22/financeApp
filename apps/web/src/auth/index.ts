@@ -75,6 +75,10 @@ const auth = betterAuth({
   secret: envServer.BETTER_AUTH_SECRET,
   baseURL: envServer.BETTER_AUTH_URL,
   database: drizzleAdapter(db, { provider: 'pg' }),
+  session: {
+    expiresIn: 60 * 60 * 4,
+    updateAge: 60 * 5,
+  },
   emailAndPassword: {
     enabled: true,
     resetPasswordTokenExpiresIn: 3600,

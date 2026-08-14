@@ -11,6 +11,10 @@ const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
+  session: {
+    expiresIn: 60 * 60 * 4,
+    updateAge: 60 * 5,
+  },
   advanced: {
     database: {
       generateId: () => uuidv7(),
