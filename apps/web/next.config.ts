@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
             // connect-src precisa liberar a API Fastify (apiUrl) — sem isso o
             // browser bloqueia as chamadas de fetch feitas pelo authClient/services
             key: 'Content-Security-Policy',
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ${apiUrl}${
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ${apiUrl} https://viacep.com.br${
               geoApiUrl
 ? ` ${geoApiUrl}`
 : ''

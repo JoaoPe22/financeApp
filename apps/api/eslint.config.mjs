@@ -44,7 +44,7 @@ export default [
       ],
       '@stylistic/jsx-quotes': ['error', 'prefer-double'],
       '@stylistic/comma-dangle': ['error', 'always-multiline'],
-      '@stylistic/multiline-ternary': ['error', 'never'],
+      '@stylistic/multiline-ternary': ['error', 'always-multiline'],
       'react/jsx-handler-names': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',

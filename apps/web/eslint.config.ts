@@ -1,10 +1,10 @@
 // Configuração de lint do projeto: regras base do Next.js + neostandard (estilo)
 // + ordenação automática de imports (simple-import-sort).
 import eslint from '@eslint/js'
+import { defineConfig, globalIgnores } from 'eslint/config'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
-import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
 
@@ -19,9 +19,7 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   eslint.configs.recommended,
-  ...neostandard({
-    ignores: false,
-  }),
+  ...neostandard(),
   {
     plugins: {
       'simple-import-sort': simpleImportSort,
@@ -41,7 +39,7 @@ const eslintConfig = defineConfig([
       ],
       '@stylistic/jsx-quotes': ['error', 'prefer-double'],
       '@stylistic/comma-dangle': ['error', 'always-multiline'],
-      '@stylistic/multiline-ternary': ['error', 'always'],
+      '@stylistic/multiline-ternary': ['error', 'always-multiline'],
       'react/jsx-handler-names': 'off',
     },
     languageOptions: {
