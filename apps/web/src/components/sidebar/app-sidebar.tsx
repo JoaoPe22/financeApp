@@ -18,11 +18,14 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
 } from '@/components/ui/sidebar'
+import { usePerfil } from '@/hooks/use-perfil'
 
 import { AppSidebarHeader } from './sidebar-header'
 import { SideBarMenuItemSimple } from './sidebar-menu-item-simple'
 
 const AppSidebar = () => {
+  const { data: perfil, isLoading } = usePerfil()
+
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <AppSidebarHeader />
@@ -66,7 +69,9 @@ const AppSidebar = () => {
             label="Relatorios"
           />
 
-          <SideBarMenuItemSimple href="/perfil" icon={User} label="Perfil" />
+          {!isLoading && !perfil && (
+            <SideBarMenuItemSimple href="/perfil" icon={User} label="Perfil" />
+          )}
         </SidebarMenu>
       </SidebarContent>
     </Sidebar>

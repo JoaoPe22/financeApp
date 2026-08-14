@@ -25,10 +25,9 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <ProgressProvider>
-              <Toaster richColors />
+              <Toaster richColors position="top-right" />
               {children}
             </ProgressProvider>
-            <Toaster richColors position="top-right" />
           </ThemeProvider>
         </QueryProvider>
       </body>
