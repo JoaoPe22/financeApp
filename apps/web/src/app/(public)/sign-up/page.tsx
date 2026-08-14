@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -24,6 +25,7 @@ type SignUpFormData = z.infer<typeof signUpSchema>
 
 const Page = () => {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const {
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -50,6 +52,8 @@ const Page = () => {
         toast.error(response.error.message || 'Erro ao criar conta. Tente novamente.')
         return
       }
+
+      queryClient.clear()
 
       toast.success('Conta criada com sucesso!')
       router.push('/perfil')

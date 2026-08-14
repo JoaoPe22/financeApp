@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -25,6 +26,7 @@ type SignInFormData = z.infer<typeof signInSchema>
 
 const Page = () => {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const {
     control,
     handleSubmit,
@@ -52,6 +54,8 @@ const Page = () => {
         toast.error('Erro ao fazer login. Verifique suas credenciais.')
         return
       }
+
+      queryClient.clear()
 
       toast.success('Login realizado com sucesso!')
       router.push('/')
