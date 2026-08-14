@@ -14,7 +14,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-// Nome vira obrigatório aqui (diferente do login) porque é campo do cadastro
 const signUpSchema = z.object({
   name: z.string().min(1, 'O nome é obrigatório'),
   email: z.email('Formato de e-mail inválido').min(1, 'O e-mail é obrigatório'),
@@ -40,7 +39,6 @@ const Page = () => {
 
   const handleSignUp = async (data: SignUpFormData) => {
     try {
-      // Cria o usuário no banco e já autentica (better-auth define o cookie de sessão)
       const response = await authClient.signUp.email({
         name: data.name,
         email: data.email,
@@ -102,6 +100,7 @@ const Page = () => {
                 <Button
                   className="w-full"
                   type="submit"
+                  variant="secondary"
                   disabled={isSubmitting}
                 >
                   {isSubmitting && <Loader2 className="animate-spin" />}

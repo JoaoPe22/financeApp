@@ -1,8 +1,3 @@
-// Tela de login (rota pública /sign-in).
-// Fluxo: valida o formulário com zod -> chama authClient.signIn.email (better-auth)
-// -> se der certo, cria a sessão (cookie) e redireciona para "/" (Home)
-// -> se der errado, mostra um toast de erro sem sair da tela.
-// Quem decide se essa rota pode ser acessada é o middleware em src/proxy.ts.
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -20,7 +15,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-// Regras de validação do formulário (mesma senha mínima usada no cadastro)
 const signInSchema = z.object({
   email: z.email('Formato de e-mail inválido').min(1, 'O e-mail é obrigatório'),
   password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres'),
@@ -47,7 +41,6 @@ const Page = () => {
 
   const handleLogin = async (data: SignInFormData) => {
     try {
-      // better-auth valida a senha e, se estiver correta, define o cookie de sessão
       const response = await authClient.signIn.email({
         email: data.email,
         password: data.password,
@@ -61,7 +54,6 @@ const Page = () => {
       }
 
       toast.success('Login realizado com sucesso!')
-      // router.refresh() força o middleware a rodar de novo já com a sessão criada
       router.push('/')
       router.refresh()
     } catch (error) {
@@ -105,7 +97,11 @@ const Page = () => {
                       {...register('password')}
                       disabled={isSubmitting}
                     />
-                    {errors.password && <span>{errors.password.message}</span>}
+                    {errors.password && (
+                      <span className="text-sm text-red-500 dark:text-red-700">
+                        {errors.password.message}
+                      </span>
+                    )}
                   </Field>
 
                   <Field orientation="horizontal">
@@ -133,6 +129,7 @@ const Page = () => {
                 <Button
                   className="w-full"
                   type="submit"
+                  variant="secondary"
                   disabled={isSubmitting}
                 >
                   {isSubmitting && <Loader2 className="animate-spin" />}
