@@ -21,6 +21,8 @@ import { STATUS_DESPESA_MENSAL } from '@/types/planejamento-mensal'
 import { DespesaMensalFormDialog } from './despesa-mensal-form-dialog'
 import { DespesaMensalItem } from './despesa-mensal-item'
 import { MesAnoSelect } from './mes-ano-select'
+import { ReceitaFormDialog } from './receita-form-dialog'
+import { ReceitaItem } from './receita-item'
 import { SalarioSection } from './salario-section'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
@@ -40,6 +42,7 @@ const PageContent = () => {
 
   const planejamento = data?.planejamento ?? null
   const despesas = data?.despesas ?? []
+  const receitas = data?.receitas ?? []
 
   const totalDespesas = despesas.reduce(
     (soma, despesa) => soma + despesa.valor,
@@ -48,8 +51,13 @@ const PageContent = () => {
   const totalPago = despesas
     .filter((despesa) => despesa.status === STATUS_DESPESA_MENSAL.PAGA)
     .reduce((soma, despesa) => soma + despesa.valor, 0)
+  const totalReceitas = receitas.reduce(
+    (soma, receita) => soma + receita.valorLiquido,
+    0,
+  )
   const saldo =
-    (planejamento?.salarioRecebido ?? planejamento?.salarioPrevisto ?? 0) -
+    (planejamento?.salarioRecebido ?? planejamento?.salarioPrevisto ?? 0) +
+    totalReceitas -
     totalDespesas
 
   return (
@@ -93,6 +101,33 @@ const PageContent = () => {
             <SalarioSection planejamento={planejamento} mes={mes} ano={ano} />
 
             <div className="flex items-center justify-between">
+              <p className="text-muted-foreground text-sm">Outras receitas do mês</p>
+              <ReceitaFormDialog
+                planejamentoMensalId={planejamento.id}
+                mes={mes}
+                ano={ano}
+              />
+            </div>
+
+            {receitas.length === 0 && (
+              <p className="text-muted-foreground text-sm">
+                Nenhuma receita além do salário neste mês.
+              </p>
+            )}
+
+            <div className="space-y-3">
+              {receitas.map((receita) => (
+                <ReceitaItem
+                  key={receita.id}
+                  receita={receita}
+                  planejamentoMensalId={planejamento.id}
+                  mes={mes}
+                  ano={ano}
+                />
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between">
               <p className="text-muted-foreground text-sm">Despesas do mês</p>
               <DespesaMensalFormDialog
                 planejamentoMensalId={planejamento.id}
@@ -124,6 +159,12 @@ const PageContent = () => {
 
       {planejamento && (
         <CardFooter className="flex flex-wrap gap-6 border-t pt-4">
+          <div>
+            <p className="text-muted-foreground text-sm">Total de receitas</p>
+            <p className="font-medium">
+              {currencyFormatter.format(totalReceitas)}
+            </p>
+          </div>
           <div>
             <p className="text-muted-foreground text-sm">Total de despesas</p>
             <p className="font-medium">

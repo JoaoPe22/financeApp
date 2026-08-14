@@ -18,7 +18,7 @@ import {
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { useSalvarCategoria } from '@/hooks/use-categorias'
-import { TIPOCATEGORIA } from '@/types/categoria'
+import { TipoCategoria } from '@/types/categoria'
 
 const categoriaSchema = z.object({
   nome: z.string().nonempty('Nome é obrigatório'),
@@ -28,10 +28,12 @@ const categoriaSchema = z.object({
 type CategoriaFormData = z.infer<typeof categoriaSchema>
 
 interface CategoriaDialogProps {
+  tipo: TipoCategoria
+  label: string
   onCreated: (categoriaId: string) => void
 }
 
-const CategoriaDialog = ({ onCreated }: CategoriaDialogProps) => {
+const CategoriaDialog = ({ tipo, label, onCreated }: CategoriaDialogProps) => {
   const [open, setOpen] = useState(false)
   const {
     register,
@@ -47,7 +49,7 @@ const CategoriaDialog = ({ onCreated }: CategoriaDialogProps) => {
   const onSubmit = async (data: CategoriaFormData) => {
     const categoria = await salvarCategoria({
       nome: data.nome,
-      tipo: TIPOCATEGORIA.DESPESA,
+      tipo,
       cor: data.cor,
       // ponytail: sem seletor de ícone ainda, categoria assume um ícone
       // padrão até a UI de escolha de ícone ser pedida
@@ -69,13 +71,13 @@ const CategoriaDialog = ({ onCreated }: CategoriaDialogProps) => {
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Nova categoria de despesa *</DialogTitle>
+          <DialogTitle>Nova categoria de {label}</DialogTitle>
         </DialogHeader>
 
         <form
           onSubmit={(event) => {
-            // Este form fica dentro do <form> de despesa fixa na árvore React
-            // (ambos os <DialogContent> são portais para o body, então não há
+            // Este form fica dentro do <form> pai na árvore React (ambos os
+            // <DialogContent> são portais para o body, então não há
             // aninhamento no DOM) — sem stopPropagation, o evento de submit
             // sobe pela árvore React via portal e também dispara o form pai.
             event.stopPropagation()

@@ -4,7 +4,7 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 import { db } from '@/database'
-import { categoria, despesaMensal, planejamentoMensal } from '@/database/schema'
+import { categoria, despesaMensal, planejamentoMensal, receita } from '@/database/schema'
 import { authenticate } from '@/http/middlewares/auth'
 
 const planejamentoResponseSchema = z.object({
@@ -30,6 +30,18 @@ const despesaMensalResponseSchema = z.object({
   observacao: z.string().nullable(),
 })
 
+const receitaResponseSchema = z.object({
+  id: z.uuid(),
+  categoriaId: z.uuid(),
+  categoriaNome: z.string(),
+  categoriaCor: z.string(),
+  descricao: z.string(),
+  valorBruto: z.number().nullable(),
+  valorLiquido: z.number(),
+  dataRecebimento: z.string(),
+  observacao: z.string().nullable(),
+})
+
 const listarPlanejamentoMensal = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().get(
     '/planejamentos-mensais/:mes/:ano',
@@ -48,6 +60,7 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
           200: z.object({
             planejamento: planejamentoResponseSchema.nullable(),
             despesas: z.array(despesaMensalResponseSchema),
+            receitas: z.array(receitaResponseSchema),
           }),
         },
       },
@@ -69,7 +82,7 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
         .limit(1)
 
       if (!planejamento) {
-        return { planejamento: null, despesas: [] }
+        return { planejamento: null, despesas: [], receitas: [] }
       }
 
       const despesas = await db
@@ -91,6 +104,23 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
         .where(eq(despesaMensal.planejamentoMensalId, planejamento.id))
         .orderBy(despesaMensal.dataVencimento)
 
+      const receitas = await db
+        .select({
+          id: receita.id,
+          categoriaId: receita.categoriaId,
+          categoriaNome: categoria.nome,
+          categoriaCor: categoria.cor,
+          descricao: receita.descricao,
+          valorBruto: receita.valorBruto,
+          valorLiquido: receita.valorLiquido,
+          dataRecebimento: receita.dataRecebimento,
+          observacao: receita.observacao,
+        })
+        .from(receita)
+        .innerJoin(categoria, eq(categoria.id, receita.categoriaId))
+        .where(eq(receita.planejamentoMensalId, planejamento.id))
+        .orderBy(receita.dataRecebimento)
+
       return {
         planejamento: {
           id: planejamento.id,
@@ -107,6 +137,11 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
         despesas: despesas.map((despesa) => ({
           ...despesa,
           valor: Number(despesa.valor),
+        })),
+        receitas: receitas.map((receitaItem) => ({
+          ...receitaItem,
+          valorBruto: receitaItem.valorBruto ? Number(receitaItem.valorBruto) : null,
+          valorLiquido: Number(receitaItem.valorLiquido),
         })),
       }
     },

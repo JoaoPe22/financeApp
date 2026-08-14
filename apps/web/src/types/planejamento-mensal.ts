@@ -30,7 +30,20 @@ export interface DespesaMensal {
   observacao: string | null
 }
 
+export interface Receita {
+  id: string
+  categoriaId: string
+  categoriaNome: string
+  categoriaCor: string
+  descricao: string
+  valorBruto: number | null
+  valorLiquido: number
+  dataRecebimento: string
+  observacao: string | null
+}
+
 export interface PlanejamentoMensalResponse {
   planejamento: Planejamento | null
   despesas: DespesaMensal[]
+  receitas: Receita[]
 }

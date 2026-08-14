@@ -18,6 +18,7 @@ import { despesasFixasRoutes } from './routes/despesas-fixas'
 import { despesasMensaisRoutes } from './routes/despesas-mensais'
 import { perfilRoutes } from './routes/perfil'
 import { planejamentosMensaisRoutes } from './routes/planejamentos-mensais'
+import { receitasRoutes } from './routes/receitas'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -50,6 +51,7 @@ app.register(categoriasRoutes)
 app.register(despesasFixasRoutes)
 app.register(planejamentosMensaisRoutes)
 app.register(despesasMensaisRoutes)
+app.register(receitasRoutes)
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log(`Server está rodando no host http://0.0.0.0:${env.PORT}`)

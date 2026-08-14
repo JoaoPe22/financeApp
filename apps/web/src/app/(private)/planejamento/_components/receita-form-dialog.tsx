@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import dayjs from 'dayjs'
 import { Loader2, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -8,7 +9,7 @@ import { z } from 'zod'
 
 import { CategoriaDialog } from '@/components/categoria-dialog'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   Dialog,
   DialogContent,
@@ -28,39 +29,52 @@ import {
 } from '@/components/ui/select'
 import { useCategorias } from '@/hooks/use-categorias'
 import {
-  useAtualizarDespesaFixa,
-  useSalvarDespesaFixa,
-} from '@/hooks/use-despesas-fixas'
+  useAtualizarReceita,
+  useSalvarReceita,
+} from '@/hooks/use-planejamento-mensal'
+import { parseDateOnly } from '@/lib/dayjs'
 import { TIPOCATEGORIA } from '@/types/categoria'
-import { DespesaFixa } from '@/types/despesa-fixa'
+import { Receita } from '@/types/planejamento-mensal'
 
-const despesaFixaSchema = z.object({
+const receitaSchema = z.object({
   categoriaId: z.string().nonempty('Categoria é obrigatória'),
   descricao: z.string().nonempty('Descrição é obrigatória'),
-  valor: z.coerce.number().min(0, 'Valor deve ser maior ou igual a 0'),
-  diaVencimento: z.coerce
+  valorBruto: z.coerce
     .number()
-    .int()
-    .min(1, 'Dia deve ser entre 1 e 31')
-    .max(31, 'Dia deve ser entre 1 e 31'),
-  obrigatoria: z.boolean(),
-  ativa: z.boolean(),
+    .min(0, 'Valor bruto deve ser maior ou igual a 0')
+    .nullable()
+    .optional(),
+  valorLiquido: z.coerce.number().min(0, 'Valor líquido deve ser maior ou igual a 0'),
+  dataRecebimento: z.iso.date({ message: 'Data de recebimento é obrigatória' }),
+  observacao: z
+    .string()
+    .nullable()
+    .optional()
+    .transform((val) => val || null),
 })
 
-type DespesaFixaFormData = z.infer<typeof despesaFixaSchema>
+type ReceitaFormData = z.infer<typeof receitaSchema>
 
-interface DespesaFixaFormDialogProps {
-  despesaFixa?: DespesaFixa
+interface ReceitaFormDialogProps {
+  planejamentoMensalId: string
+  mes: number
+  ano: number
+  receita?: Receita
 }
 
-const DespesaFixaFormDialog = ({ despesaFixa }: DespesaFixaFormDialogProps) => {
+const ReceitaFormDialog = ({
+  planejamentoMensalId,
+  mes,
+  ano,
+  receita,
+}: ReceitaFormDialogProps) => {
   const [open, setOpen] = useState(false)
-  const isEditing = !!despesaFixa
-  const { data: categorias } = useCategorias('DESPESA')
-  const { mutateAsync: salvarDespesaFixa, isPending: isSaving } =
-    useSalvarDespesaFixa()
-  const { mutateAsync: atualizarDespesaFixa, isPending: isUpdating } =
-    useAtualizarDespesaFixa()
+  const [dataRecebimento, setDataRecebimento] = useState<Date | undefined>(() =>
+    receita?.dataRecebimento ? parseDateOnly(receita.dataRecebimento) ?? undefined : undefined)
+  const isEditing = !!receita
+  const { data: categorias } = useCategorias('RECEITA')
+  const { mutateAsync: salvarReceita, isPending: isSaving } = useSalvarReceita(mes, ano)
+  const { mutateAsync: atualizarReceita, isPending: isUpdating } = useAtualizarReceita(mes, ano)
   const isPending = isSaving || isUpdating
 
   const {
@@ -70,37 +84,37 @@ const DespesaFixaFormDialog = ({ despesaFixa }: DespesaFixaFormDialogProps) => {
     control,
     setValue,
     formState: { errors },
-  } = useForm<DespesaFixaFormData>({
-    resolver: zodResolver(despesaFixaSchema),
+  } = useForm<ReceitaFormData>({
+    resolver: zodResolver(receitaSchema),
     defaultValues: {
-      categoriaId: despesaFixa?.categoriaId ?? '',
-      descricao: despesaFixa?.descricao ?? '',
-      valor: despesaFixa?.valor ?? 0,
-      diaVencimento: despesaFixa?.diaVencimento ?? 1,
-      obrigatoria: despesaFixa?.obrigatoria ?? true,
-      ativa: despesaFixa?.ativa ?? true,
+      categoriaId: receita?.categoriaId ?? '',
+      descricao: receita?.descricao ?? '',
+      valorBruto: receita?.valorBruto ?? null,
+      valorLiquido: receita?.valorLiquido ?? 0,
+      dataRecebimento: receita?.dataRecebimento ?? '',
+      observacao: receita?.observacao ?? '',
     },
   })
 
   useEffect(() => {
     if (open) {
       reset({
-        categoriaId: despesaFixa?.categoriaId ?? '',
-        descricao: despesaFixa?.descricao ?? '',
-        valor: despesaFixa?.valor ?? 0,
-        diaVencimento: despesaFixa?.diaVencimento ?? 1,
-        obrigatoria: despesaFixa?.obrigatoria ?? true,
-        ativa: despesaFixa?.ativa ?? true,
+        categoriaId: receita?.categoriaId ?? '',
+        descricao: receita?.descricao ?? '',
+        valorBruto: receita?.valorBruto ?? null,
+        valorLiquido: receita?.valorLiquido ?? 0,
+        dataRecebimento: receita?.dataRecebimento ?? '',
+        observacao: receita?.observacao ?? '',
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  const onSubmit = async (data: DespesaFixaFormData) => {
+  const onSubmit = async (data: ReceitaFormData) => {
     if (isEditing) {
-      await atualizarDespesaFixa({ id: despesaFixa.id, ...data })
+      await atualizarReceita({ id: receita.id, ...data })
     } else {
-      await salvarDespesaFixa(data)
+      await salvarReceita({ planejamentoMensalId, ...data })
     }
     setOpen(false)
   }
@@ -117,7 +131,7 @@ const DespesaFixaFormDialog = ({ despesaFixa }: DespesaFixaFormDialogProps) => {
           : (
             <Button type="button" variant="secondary">
               <Plus />
-              Nova despesa fixa
+              Nova receita
             </Button>
             )}
       </DialogTrigger>
@@ -125,7 +139,7 @@ const DespesaFixaFormDialog = ({ despesaFixa }: DespesaFixaFormDialogProps) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Editar despesa fixa' : 'Nova despesa fixa'}
+            {isEditing ? 'Editar receita' : 'Nova receita'}
           </DialogTitle>
         </DialogHeader>
 
@@ -139,10 +153,7 @@ const DespesaFixaFormDialog = ({ despesaFixa }: DespesaFixaFormDialogProps) => {
                     name="categoriaId"
                     control={control}
                     render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
+                      <Select value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Selecione a categoria" />
                         </SelectTrigger>
@@ -161,10 +172,9 @@ const DespesaFixaFormDialog = ({ despesaFixa }: DespesaFixaFormDialogProps) => {
                     )}
                   />
                   <CategoriaDialog
-                    tipo={TIPOCATEGORIA.DESPESA}
-                    label="despesa"
-                    onCreated={(categoriaId) =>
-                      setValue('categoriaId', categoriaId)}
+                    tipo={TIPOCATEGORIA.RECEITA}
+                    label="receita"
+                    onCreated={(categoriaId) => setValue('categoriaId', categoriaId)}
                   />
                 </div>
                 {errors.categoriaId && (
@@ -185,71 +195,61 @@ const DespesaFixaFormDialog = ({ despesaFixa }: DespesaFixaFormDialogProps) => {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="valor">Valor *</FieldLabel>
+                <FieldLabel htmlFor="valorBruto">Valor bruto</FieldLabel>
                 <Input
-                  id="valor"
+                  id="valorBruto"
                   type="number"
                   step="0.01"
                   min="0"
-                  {...register('valor')}
+                  {...register('valorBruto')}
                 />
-                {errors.valor && (
+                {errors.valorBruto && (
                   <p className="text-destructive text-sm">
-                    {errors.valor.message}
+                    {errors.valorBruto.message}
                   </p>
                 )}
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="diaVencimento">
-                  Dia do vencimento *
-                </FieldLabel>
+                <FieldLabel htmlFor="valorLiquido">Valor líquido *</FieldLabel>
                 <Input
-                  id="diaVencimento"
+                  id="valorLiquido"
                   type="number"
-                  min="1"
-                  max="31"
-                  {...register('diaVencimento')}
+                  step="0.01"
+                  min="0"
+                  {...register('valorLiquido')}
                 />
-                {errors.diaVencimento && (
+                {errors.valorLiquido && (
                   <p className="text-destructive text-sm">
-                    {errors.diaVencimento.message}
+                    {errors.valorLiquido.message}
                   </p>
                 )}
               </Field>
 
-              <Field orientation="horizontal">
-                <Controller
-                  name="obrigatoria"
-                  control={control}
-                  render={({ field }) => (
-                    <Checkbox
-                      id="obrigatoria"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  )}
-                />
-                <FieldLabel htmlFor="obrigatoria">
-                  Obrigatória (não pode deixar de pagar)
+              <Field>
+                <FieldLabel htmlFor="dataRecebimento">
+                  Data de recebimento *
                 </FieldLabel>
+                <DatePicker
+                  date={dataRecebimento}
+                  setDate={(date) => {
+                    setDataRecebimento(date)
+                    if (date) {
+                      setValue('dataRecebimento', dayjs(date).format('YYYY-MM-DD'))
+                    }
+                  }}
+                  placeholder="Selecione a data de recebimento"
+                />
+                {errors.dataRecebimento && (
+                  <p className="text-destructive text-sm">
+                    {errors.dataRecebimento.message}
+                  </p>
+                )}
               </Field>
 
-              <Field orientation="horizontal">
-                <Controller
-                  name="ativa"
-                  control={control}
-                  render={({ field }) => (
-                    <Checkbox
-                      id="ativa"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  )}
-                />
-                <FieldLabel htmlFor="ativa">
-                  Ativa (entra no planejamento dos próximos meses)
-                </FieldLabel>
+              <Field>
+                <FieldLabel htmlFor="observacao">Observação</FieldLabel>
+                <Input id="observacao" {...register('observacao')} />
               </Field>
             </FieldGroup>
           </FieldSet>
@@ -266,4 +266,4 @@ const DespesaFixaFormDialog = ({ despesaFixa }: DespesaFixaFormDialogProps) => {
   )
 }
 
-export { DespesaFixaFormDialog }
+export { ReceitaFormDialog }

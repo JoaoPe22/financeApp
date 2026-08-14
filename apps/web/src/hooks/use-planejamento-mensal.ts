@@ -16,6 +16,15 @@ interface DespesaMensalPayload {
   observacao?: string | null
 }
 
+interface ReceitaPayload {
+  categoriaId: string
+  descricao: string
+  valorBruto?: number | null
+  valorLiquido: number
+  dataRecebimento: string
+  observacao?: string | null
+}
+
 const planejamentoMensalQueryKey = (mes: number, ano: number) => [
   'planejamento-mensal',
   mes,
@@ -149,12 +158,68 @@ const useDeletarDespesaMensal = (mes: number, ano: number) => {
   })
 }
 
+const useSalvarReceita = (mes: number, ano: number) => {
+  const invalidar = useInvalidarPlanejamentoMensal(mes, ano)
+
+  return useMutation<
+    void,
+    Error,
+    ReceitaPayload & { planejamentoMensalId: string }
+  >({
+    mutationFn: (data) => apiClient.post('receitas', { json: data }).json(),
+    onSuccess: () => {
+      toast.success('Receita adicionada com sucesso!')
+      invalidar()
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
+const useAtualizarReceita = (mes: number, ano: number) => {
+  const invalidar = useInvalidarPlanejamentoMensal(mes, ano)
+
+  return useMutation<void, Error, ReceitaPayload & { id: string }>({
+    mutationFn: ({ id, ...data }) =>
+      apiClient.patch(`receitas/${id}`, { json: data }).json(),
+    onSuccess: () => {
+      toast.success('Receita atualizada com sucesso!')
+      invalidar()
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
+const useDeletarReceita = (mes: number, ano: number) => {
+  const invalidar = useInvalidarPlanejamentoMensal(mes, ano)
+
+  return useMutation<void, Error, string>({
+    mutationFn: (id) => apiClient.delete(`receitas/${id}`).json(),
+    onSuccess: () => {
+      toast.success('Receita removida com sucesso!')
+      invalidar()
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
 export {
   useAbrirPlanejamentoMensal,
   useAtualizarDespesaMensal,
+  useAtualizarReceita,
   useAtualizarSalarioRecebido,
   useAtualizarStatusDespesaMensal,
   useDeletarDespesaMensal,
+  useDeletarReceita,
   usePlanejamentoMensal,
   useSalvarDespesaMensal,
+  useSalvarReceita,
 }
