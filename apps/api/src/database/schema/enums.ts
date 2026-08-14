@@ -18,9 +18,30 @@ type StatusParcela = z.infer<typeof statusParcelaEnum>
 const statusObjetivoEnum = z.enum(['ATIVO', 'CONCLUIDO', 'CANCELADO'])
 type StatusObjetivo = z.infer<typeof statusObjetivoEnum>
 
-const acaoLogSchemaEnum = z.enum(['CADASTRAR', 'ATUALIZAR', 'DELETAR', 'SISTEMA', 'CRON', 'AUTENTICACAO'])
+const acaoLogSchemaEnum = z.enum([
+  'CADASTRAR',
+  'ATUALIZAR',
+  'DELETAR',
+  'SISTEMA',
+  'CRON',
+  'AUTENTICACAO',
+])
 type AcaoLog = z.infer<typeof acaoLogSchemaEnum>
 
-export { tipoCategoriaEnum, tipoRendaEnum, statusPlanejamentoEnum, statusParcelaEnum, statusObjetivoEnum, acaoLogSchemaEnum }
+export {
+  tipoCategoriaEnum,
+  tipoRendaEnum,
+  statusPlanejamentoEnum,
+  statusParcelaEnum,
+  statusObjetivoEnum,
+  acaoLogSchemaEnum,
+}
 
-export type { TipoCategoria, TipoRenda, StatusPlanejamento, StatusParcela, StatusObjetivo, AcaoLog }
+export type {
+  TipoCategoria,
+  TipoRenda,
+  StatusPlanejamento,
+  StatusParcela,
+  StatusObjetivo,
+  AcaoLog,
+}
