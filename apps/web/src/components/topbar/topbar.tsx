@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Loader2, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 
@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useSignOut } from '@/hooks/use-sign-out'
 
 const iniciais = (nome?: string) =>
   nome
@@ -32,6 +33,7 @@ const iniciais = (nome?: string) =>
 const Topbar = () => {
   const { data: session } = authClient.useSession()
   const { theme, setTheme } = useTheme()
+  const { signOut, isSigningOut } = useSignOut()
 
   const user = session?.user
 
@@ -84,6 +86,22 @@ const Topbar = () => {
               </SelectContent>
             </Select>
           </div>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem
+            variant="destructive"
+            disabled={isSigningOut}
+            onSelect={(event) => {
+              event.preventDefault()
+              signOut()
+            }}
+          >
+            {isSigningOut
+              ? <Loader2 className="animate-spin" />
+              : <LogOut />}
+            Sair
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

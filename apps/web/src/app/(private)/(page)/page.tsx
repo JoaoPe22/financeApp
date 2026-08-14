@@ -5,35 +5,16 @@
 'use client'
 
 import { Loader2, LogOut } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { toast } from 'sonner'
 
 import { authClient } from '@/auth/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useSignOut } from '@/hooks/use-sign-out'
 
 const Home = () => {
-  const router = useRouter()
   // isPending: true enquanto a sessão ainda está sendo lida do cookie
   const { data, isPending } = authClient.useSession()
-  const [isSigningOut, setIsSigningOut] = useState(false)
-
-  const handleSignOut = async () => {
-    setIsSigningOut(true)
-    try {
-      // Remove o cookie de sessão no better-auth
-      await authClient.signOut()
-      toast.success('Conta desvinculada com sucesso!')
-      // router.refresh() garante que o middleware rode de novo sem a sessão
-      router.push('/sign-in')
-      router.refresh()
-    } catch (error) {
-      console.error('Erro ao desvincular conta:', error)
-      toast.error('Erro ao desvincular conta. Tente novamente.')
-      setIsSigningOut(false)
-    }
-  }
+  const { signOut, isSigningOut } = useSignOut()
 
   return (
     <main className="flex min-h-screen items-center justify-center p-10">
@@ -66,13 +47,13 @@ const Home = () => {
           <Button
             className="w-full"
             variant="destructive"
-            onClick={handleSignOut}
+            onClick={signOut}
             disabled={isSigningOut}
           >
             {isSigningOut
               ? <Loader2 className="animate-spin" />
               : <LogOut />}
-            Desvincular da conta
+            Sair
           </Button>
         </CardContent>
       </Card>
