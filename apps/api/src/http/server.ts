@@ -15,7 +15,9 @@ import { env } from '@/lib/env'
 import { errorHandler } from './error-handler'
 import { categoriasRoutes } from './routes/categorias'
 import { despesasFixasRoutes } from './routes/despesas-fixas'
+import { despesasMensaisRoutes } from './routes/despesas-mensais'
 import { perfilRoutes } from './routes/perfil'
+import { planejamentosMensaisRoutes } from './routes/planejamentos-mensais'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -46,6 +48,8 @@ app.register(fastifyRateLimit, {
 app.register(perfilRoutes)
 app.register(categoriasRoutes)
 app.register(despesasFixasRoutes)
+app.register(planejamentosMensaisRoutes)
+app.register(despesasMensaisRoutes)
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log(`Server está rodando no host http://0.0.0.0:${env.PORT}`)

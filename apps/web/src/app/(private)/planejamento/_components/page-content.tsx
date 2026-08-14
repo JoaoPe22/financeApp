@@ -1,0 +1,149 @@
+'use client'
+
+import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
+
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  useAbrirPlanejamentoMensal,
+  usePlanejamentoMensal,
+} from '@/hooks/use-planejamento-mensal'
+import { STATUS_DESPESA_MENSAL } from '@/types/planejamento-mensal'
+
+import { DespesaMensalFormDialog } from './despesa-mensal-form-dialog'
+import { DespesaMensalItem } from './despesa-mensal-item'
+import { MesAnoSelect } from './mes-ano-select'
+import { SalarioSection } from './salario-section'
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
+
+const hoje = new Date()
+
+const PageContent = () => {
+  const [mes, setMes] = useState(hoje.getMonth() + 1)
+  const [ano, setAno] = useState(hoje.getFullYear())
+
+  const { data, isLoading } = usePlanejamentoMensal(mes, ano)
+  const { mutate: abrirPlanejamentoMensal, isPending: isAbrindo } =
+    useAbrirPlanejamentoMensal(mes, ano)
+
+  const planejamento = data?.planejamento ?? null
+  const despesas = data?.despesas ?? []
+
+  const totalDespesas = despesas.reduce(
+    (soma, despesa) => soma + despesa.valor,
+    0,
+  )
+  const totalPago = despesas
+    .filter((despesa) => despesa.status === STATUS_DESPESA_MENSAL.PAGA)
+    .reduce((soma, despesa) => soma + despesa.valor, 0)
+  const saldo =
+    (planejamento?.salarioRecebido ?? planejamento?.salarioPrevisto ?? 0) -
+    totalDespesas
+
+  return (
+    <Card className="w-full max-w-3xl rounded-xl shadow-xl">
+      <CardHeader className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardTitle className="text-2xl">Planejamento mensal</CardTitle>
+        <MesAnoSelect
+          mes={mes}
+          ano={ano}
+          onChangeMes={setMes}
+          onChangeAno={setAno}
+        />
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {isLoading && (
+          <>
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+          </>
+        )}
+
+        {!isLoading && !planejamento && (
+          <div className="flex flex-col items-center gap-3 py-8 text-center">
+            <p className="text-muted-foreground text-sm">
+              Este mês ainda não foi aberto.
+            </p>
+            <Button
+              type="button"
+              disabled={isAbrindo}
+              onClick={() => abrirPlanejamentoMensal()}
+            >
+              {isAbrindo && <Loader2 className="animate-spin" />}
+              Puxar despesas fixas
+            </Button>
+          </div>
+        )}
+
+        {planejamento && (
+          <>
+            <SalarioSection planejamento={planejamento} mes={mes} ano={ano} />
+
+            <div className="flex items-center justify-between">
+              <p className="text-muted-foreground text-sm">Despesas do mês</p>
+              <DespesaMensalFormDialog
+                planejamentoMensalId={planejamento.id}
+                mes={mes}
+                ano={ano}
+              />
+            </div>
+
+            {despesas.length === 0 && (
+              <p className="text-muted-foreground text-sm">
+                Nenhuma despesa neste mês ainda.
+              </p>
+            )}
+
+            <div className="space-y-3">
+              {despesas.map((despesa) => (
+                <DespesaMensalItem
+                  key={despesa.id}
+                  despesaMensal={despesa}
+                  planejamentoMensalId={planejamento.id}
+                  mes={mes}
+                  ano={ano}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </CardContent>
+
+      {planejamento && (
+        <CardFooter className="flex flex-wrap gap-6 border-t pt-4">
+          <div>
+            <p className="text-muted-foreground text-sm">Total de despesas</p>
+            <p className="font-medium">
+              {currencyFormatter.format(totalDespesas)}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground text-sm">Total pago</p>
+            <p className="font-medium">{currencyFormatter.format(totalPago)}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground text-sm">Saldo</p>
+            <p className={`font-medium ${saldo < 0 ? 'text-destructive' : ''}`}>
+              {currencyFormatter.format(saldo)}
+            </p>
+          </div>
+        </CardFooter>
+      )}
+    </Card>
+  )
+}
+
+export { PageContent }
