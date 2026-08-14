@@ -2,12 +2,16 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
 
+import { CidadeSelect } from '@/components/cidade-select'
+import { EstadoSelect } from '@/components/estado-select'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
@@ -17,217 +21,356 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { type PerfilFormData, perfilSchema, useSavePerfil } from '@/hooks/use-perfil'
+import { Skeleton } from '@/components/ui/skeleton'
+import { usePerfil, useSavePerfil, useUpdatePerfil } from '@/hooks/use-perfil'
 import { buscaCep } from '@/lib/cep'
+import { dayjs, parseDateOnly } from '@/lib/dayjs'
 import { extractErrorMessage } from '@/lib/error-handler'
+import { TIPORENDA } from '@/types/perfil'
 
-const ESTADOS_BR = [
-  { value: 'AC', label: 'Acre' },
-  { value: 'AL', label: 'Alagoas' },
-  { value: 'AP', label: 'Amapá' },
-  { value: 'AM', label: 'Amazonas' },
-  { value: 'BA', label: 'Bahia' },
-  { value: 'CE', label: 'Ceará' },
-  { value: 'DF', label: 'Distrito Federal' },
-  { value: 'ES', label: 'Espírito Santo' },
-  { value: 'GO', label: 'Goiás' },
-  { value: 'MA', label: 'Maranhão' },
-  { value: 'MT', label: 'Mato Grosso' },
-  { value: 'MS', label: 'Mato Grosso do Sul' },
-  { value: 'MG', label: 'Minas Gerais' },
-  { value: 'PA', label: 'Pará' },
-  { value: 'PB', label: 'Paraíba' },
-  { value: 'PR', label: 'Paraná' },
-  { value: 'PE', label: 'Pernambuco' },
-  { value: 'PI', label: 'Piauí' },
-  { value: 'RJ', label: 'Rio de Janeiro' },
-  { value: 'RN', label: 'Rio Grande do Norte' },
-  { value: 'RS', label: 'Rio Grande do Sul' },
-  { value: 'RO', label: 'Rondônia' },
-  { value: 'RR', label: 'Roraima' },
-  { value: 'SC', label: 'Santa Catarina' },
-  { value: 'SP', label: 'São Paulo' },
-  { value: 'SE', label: 'Sergipe' },
-  { value: 'TO', label: 'Tocantins' },
-]
+const TIPO_RENDA_LABELS: Record<string, string> = {
+  [TIPORENDA.SALARIO]: 'Salário',
+  [TIPORENDA.AUTONOMO]: 'Autônomo',
+  [TIPORENDA.RENDIMENTO]: 'Rendimento',
+  [TIPORENDA.OUTRO]: 'Outro',
+}
 
-const TIPOS_RENDA = [
-  { value: 'SALARIO', label: 'Salário (CLT)' },
-  { value: 'AUTONOMO', label: 'Autônomo' },
-  { value: 'RENDIMENTO', label: 'Rendimento' },
-  { value: 'OUTRO', label: 'Outro' },
-]
+const perfilSchema = z
+  .object({
+    dataNascimento: z.iso.date({ message: 'Data de nascimento inválida' }),
+    cep: z.string().nonempty('CEP é obrigatório'),
+    estado: z.string().nonempty('Estado é obrigatório'),
+    cidade: z.string().nonempty('Cidade é obrigatória'),
+    bairro: z.string().nonempty('Bairro é obrigatório'),
+    logradouro: z.string().nonempty('Logradouro é obrigatório'),
+    numero: z.string().nonempty('Número é obrigatório'),
+    complemento: z
+      .string()
+      .nullable()
+      .transform((val) => val || null),
+    tipoRenda: z.enum(
+      [
+        TIPORENDA.SALARIO,
+        TIPORENDA.AUTONOMO,
+        TIPORENDA.RENDIMENTO,
+        TIPORENDA.OUTRO,
+      ],
+      { error: 'Tipo de renda inválido' },
+    ),
+    salarioFixo: z.coerce.number().min(0).optional(),
+  })
+  .refine(
+    (data) => {
+      const maiorDeIdade = new Date()
+      maiorDeIdade.setFullYear(maiorDeIdade.getFullYear() - 18)
+      return new Date(data.dataNascimento) <= maiorDeIdade
+    },
+    {
+      message: 'É necessário ter pelo menos 18 anos',
+      path: ['dataNascimento'],
+    },
+  )
+
+type PerfilFormInput = z.input<typeof perfilSchema>
+type PerfilFormData = z.output<typeof perfilSchema>
 
 const PageContent = () => {
-  const router = useRouter()
-  const { mutateAsync: savePerfil, isPending } = useSavePerfil()
-
   const {
-    control,
-    handleSubmit,
     register,
+    handleSubmit,
+    formState: { errors },
+    reset,
     setValue,
     watch,
-    formState: { errors },
-  } = useForm<PerfilFormData>({
+    control,
+  } = useForm<PerfilFormInput, unknown, PerfilFormData>({
     resolver: zodResolver(perfilSchema),
   })
+  const [dataNascimento, setDataNascimento] = useState<Date | undefined>()
+  const [isLoadingCEP, setIsLoadingCEP] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
+  const { data: perfil, isLoading: isLoadingPerfil } = usePerfil()
+  const { mutateAsync: savePerfil, isPending: isSaving } = useSavePerfil()
+  const { mutateAsync: updatePerfil, isPending: isUpdating } = useUpdatePerfil()
+  const isPending = isSaving || isUpdating
 
-  const cepValue = watch('cep')
+  const onSubmit = (data: PerfilFormData) =>
+    perfil ? updatePerfil(data) : savePerfil(data)
+
+  const onInvalid = () => {
+    toast.error('Verifique os campos obrigatórios do formulário')
+  }
+
+  const estadoValue = watch('estado')
+
+  useEffect(() => {
+    if (isLoadingPerfil) return
+
+    if (perfil) {
+      const parsedDate = parseDateOnly(perfil.dataNascimento)
+      reset({
+        dataNascimento: parsedDate
+          ? dayjs(parsedDate).format('YYYY-MM-DD')
+          : perfil.dataNascimento,
+        cep: perfil.cep,
+        estado: perfil.estado,
+        cidade: perfil.cidade,
+        bairro: perfil.bairro,
+        logradouro: perfil.logradouro,
+        numero: perfil.numero,
+        complemento: perfil.complemento || '',
+        tipoRenda: perfil.tipoRenda,
+        salarioFixo: perfil.salarioFixo ?? undefined,
+      })
+      setDataNascimento(parsedDate || undefined)
+    } else {
+      reset()
+    }
+    setIsInitialized(true)
+  }, [perfil, isLoadingPerfil, reset])
 
   const consultarCEP = async () => {
-    if (!/^\d{8}$/.test(cepValue ?? '')) {
-      toast.error('CEP inválido')
-      return
-    }
-
+    const cep = watch('cep')
     try {
-      const data = await buscaCep(cepValue)
-      setValue('estado', data.uf, { shouldValidate: true })
-      setValue('cidade', data.localidade, { shouldValidate: true })
-      setValue('bairro', data.bairro, { shouldValidate: true })
-      setValue('logradouro', data.logradouro, { shouldValidate: true })
-      toast.success('Endereço preenchido automaticamente!')
+      const cepRegex = z.object({
+        cep: z.string().regex(/^\d{5}-?\d{3}$/),
+      })
+
+      if (!cepRegex.safeParse({ cep }).success) {
+        return toast.error('CEP inválido')
+      }
+
+      toast.info('Consultando CEP...')
+      setIsLoadingCEP(true)
+
+      await buscaCep(cep).then((data) => {
+        setValue('logradouro', data.logradouro)
+        setValue('bairro', data.bairro)
+        setValue('cidade', data.localidade)
+        setValue('estado', data.uf)
+        setValue('complemento', data.complemento)
+      })
+
+      toast.success('Informações de endereço atualizadas com sucesso!')
     } catch (error) {
       const message = await extractErrorMessage(error)
       toast.error(message)
+    } finally {
+      setIsLoadingCEP(false)
     }
   }
 
-  const onSubmit = async (data: PerfilFormData) => {
-    await savePerfil(data)
-    router.push('/')
-    router.refresh()
+  if (isLoadingPerfil || !isInitialized) {
+    return (
+      <Card className="w-full max-w-2xl rounded-xl shadow-xl">
+        <CardContent className="space-y-4 pt-6">
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full" />
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-10">
-      <Card className="w-full max-w-2xl rounded-xl shadow-xl">
-        <CardHeader className="space-y-6 text-center" />
+    <Card className="w-full max-w-2xl rounded-xl shadow-xl">
+      <CardHeader className="text-center" />
 
-        <CardTitle className="text-center text-3xl">Meu perfil</CardTitle>
+      <CardTitle className="text-center text-3xl">Meu perfil</CardTitle>
 
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} method="post">
-            <FieldSet>
-              <FieldGroup className="@container grid grid-cols-1 gap-4 @md:grid-cols-2">
-                <Field>
-                  <FieldLabel htmlFor="dataNascimento">Data de nascimento</FieldLabel>
-                  <Input id="dataNascimento" type="date" {...register('dataNascimento')} disabled={isPending} />
-                  {errors.dataNascimento && <span>{errors.dataNascimento.message}</span>}
-                </Field>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} method="post">
+          <FieldSet>
+            <FieldGroup className="@container grid grid-cols-1 gap-4 @md:grid-cols-2">
+              <Field>
+                <FieldLabel htmlFor="dataNascimento">
+                  Data de nascimento *
+                </FieldLabel>
+                <DatePicker
+                  date={dataNascimento}
+                  setDate={(date) => {
+                    setDataNascimento(date)
+                    if (date) {
+                      setValue(
+                        'dataNascimento',
+                        dayjs(date).format('YYYY-MM-DD'),
+                      )
+                    }
+                  }}
+                  placeholder="Selecione a data de nascimento"
+                />
+                {errors.dataNascimento && (
+                  <p className="text-destructive text-sm">
+                    {errors.dataNascimento.message}
+                  </p>
+                )}
+              </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="tipoRenda">Tipo de renda</FieldLabel>
-                  <Controller
-                    name="tipoRenda"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
-                        <SelectTrigger id="tipoRenda" className="w-full">
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {TIPOS_RENDA.map((tipo) => (
-                            <SelectItem key={tipo.value} value={tipo.value}>
-                              {tipo.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.tipoRenda && <span>{errors.tipoRenda.message}</span>}
-                </Field>
+              <Field>
+                <FieldLabel htmlFor="tipoRenda">Tipo de renda *</FieldLabel>
+                <Controller
+                  name="tipoRenda"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger id="tipoRenda" className="w-full">
+                        <SelectValue placeholder="Selecione o tipo de renda">
+                          {field.value && TIPO_RENDA_LABELS[field.value]}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={TIPORENDA.SALARIO}>
+                          Salário
+                        </SelectItem>
+                        <SelectItem value={TIPORENDA.AUTONOMO}>
+                          Autônomo
+                        </SelectItem>
+                        <SelectItem value={TIPORENDA.RENDIMENTO}>
+                          Rendimento
+                        </SelectItem>
+                        <SelectItem value={TIPORENDA.OUTRO}>Outro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.tipoRenda && (
+                  <p className="text-destructive text-sm">
+                    {errors.tipoRenda.message}
+                  </p>
+                )}
+              </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="salarioFixo">Salário fixo (se houver)</FieldLabel>
+              <Field>
+                <FieldLabel htmlFor="salarioFixo">
+                  Salário fixo (se houver)
+                </FieldLabel>
+                <Input
+                  id="salarioFixo"
+                  type="number"
+                  step="0.01"
+                  {...register('salarioFixo')}
+                />
+                {errors.salarioFixo && (
+                  <p className="text-destructive text-sm">
+                    {errors.salarioFixo.message}
+                  </p>
+                )}
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="">CEP *</FieldLabel>
+                <div className="flex gap-2">
                   <Input
-                    id="salarioFixo"
-                    type="number"
-                    step="0.01"
-                    {...register('salarioFixo')}
-                    disabled={isPending}
+                    id="cep"
+                    placeholder="00000-000"
+                    {...register('cep')}
+                    aria-invalid={!!errors.cep}
                   />
-                  {errors.salarioFixo && <span>{errors.salarioFixo.message}</span>}
-                </Field>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    disabled={isLoadingCEP || !watch('cep')}
+                    onClick={() => consultarCEP()}
+                  >
+                    {isLoadingCEP && <Loader2 className="animate-spin" />}
+                    Consultar CEP
+                  </Button>
+                </div>
+                {errors.cep && (
+                  <p className="text-destructive text-sm">
+                    {errors.cep.message}
+                  </p>
+                )}
+              </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="cep">CEP</FieldLabel>
-                  <div className="flex gap-2">
-                    <Input id="cep" {...register('cep')} disabled={isPending} />
-                    <Button type="button" variant="outline" onClick={consultarCEP} disabled={isPending}>
-                      Buscar
-                    </Button>
-                  </div>
-                  {errors.cep && <span>{errors.cep.message}</span>}
-                </Field>
+              <Field>
+                <FieldLabel>Estado *</FieldLabel>
+                <EstadoSelect
+                  value={estadoValue || ''}
+                  onChange={(v) => {
+                    setValue('estado', v)
+                    setValue('cidade', '')
+                  }}
+                />
+                {errors.estado && (
+                  <p className="text-destructive text-sm">
+                    {errors.estado.message}
+                  </p>
+                )}
+              </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="estado">Estado</FieldLabel>
-                  <Controller
-                    name="estado"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
-                        <SelectTrigger id="estado" className="w-full">
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ESTADOS_BR.map((estado) => (
-                            <SelectItem key={estado.value} value={estado.value}>
-                              {estado.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.estado && <span>{errors.estado.message}</span>}
-                </Field>
+              <Field>
+                <FieldLabel>Cidade *</FieldLabel>
+                <CidadeSelect
+                  value={watch('cidade') || ''}
+                  onChange={(v) => setValue('cidade', v)}
+                  uf={estadoValue || ''}
+                />
+                {errors.cidade && (
+                  <p className="text-destructive text-sm">
+                    {errors.cidade.message}
+                  </p>
+                )}
+              </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="cidade">Cidade</FieldLabel>
-                  <Input id="cidade" {...register('cidade')} disabled={isPending} />
-                  {errors.cidade && <span>{errors.cidade.message}</span>}
-                </Field>
+              <Field>
+                <FieldLabel htmlFor="bairro">Bairro *</FieldLabel>
+                <Input id="bairro" {...register('bairro')} />
+                {errors.bairro && (
+                  <p className="text-destructive text-sm">
+                    {errors.bairro.message}
+                  </p>
+                )}
+              </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="bairro">Bairro</FieldLabel>
-                  <Input id="bairro" {...register('bairro')} disabled={isPending} />
-                  {errors.bairro && <span>{errors.bairro.message}</span>}
-                </Field>
+              <Field>
+                <FieldLabel htmlFor="logradouro">Logradouro *</FieldLabel>
+                <Input id="logradouro" {...register('logradouro')} />
+                {errors.logradouro && (
+                  <p className="text-destructive text-sm">
+                    {errors.logradouro.message}
+                  </p>
+                )}
+              </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="logradouro">Logradouro</FieldLabel>
-                  <Input id="logradouro" {...register('logradouro')} disabled={isPending} />
-                  {errors.logradouro && <span>{errors.logradouro.message}</span>}
-                </Field>
+              <Field>
+                <FieldLabel htmlFor="numero">Número *</FieldLabel>
+                <Input id="numero" {...register('numero')} />
+                {errors.numero && (
+                  <p className="text-destructive text-sm">
+                    {errors.numero.message}
+                  </p>
+                )}
+              </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="numero">Número</FieldLabel>
-                  <Input id="numero" {...register('numero')} disabled={isPending} />
-                  {errors.numero && <span>{errors.numero.message}</span>}
-                </Field>
+              <Field>
+                <FieldLabel htmlFor="complemento">Complemento</FieldLabel>
+                <Input id="complemento" {...register('complemento')} />
+                {errors.complemento && (
+                  <p className="text-destructive text-sm">
+                    {errors.complemento.message}
+                  </p>
+                )}
+              </Field>
+            </FieldGroup>
+          </FieldSet>
 
-                <Field>
-                  <FieldLabel htmlFor="complemento">Complemento</FieldLabel>
-                  <Input id="complemento" {...register('complemento')} disabled={isPending} />
-                  {errors.complemento && <span>{errors.complemento.message}</span>}
-                </Field>
-              </FieldGroup>
-            </FieldSet>
-
-            <div className="pt-5">
-              <Button className="w-full" type="submit" disabled={isPending}>
-                {isPending && <Loader2 className="animate-spin" />}
-                Salvar perfil
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </main>
+          <div className="pt-5">
+            <Button
+              className="w-full"
+              type="submit"
+              variant="secondary"
+              disabled={isPending}
+            >
+              {isPending && <Loader2 className="animate-spin" />}
+              Salvar perfil
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
 
