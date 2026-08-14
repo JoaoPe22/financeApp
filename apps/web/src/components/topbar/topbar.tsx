@@ -40,7 +40,7 @@ const Topbar = () => {
   return (
     <header className="flex justify-end p-2">
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2 rounded-md p-1.5 outline-none hover:bg-accent">
+        <DropdownMenuTrigger className="hover:bg-accent flex items-center gap-2 rounded-md p-1.5 outline-none">
           <Avatar className="size-7">
             <AvatarImage src={user?.image ?? undefined} alt={user?.name} />
             <AvatarFallback className="text-xs">
@@ -97,9 +97,7 @@ const Topbar = () => {
               signOut()
             }}
           >
-            {isSigningOut
-              ? <Loader2 className="animate-spin" />
-              : <LogOut />}
+            {isSigningOut ? <Loader2 className="animate-spin" /> : <LogOut />}
             Sair
           </DropdownMenuItem>
         </DropdownMenuContent>

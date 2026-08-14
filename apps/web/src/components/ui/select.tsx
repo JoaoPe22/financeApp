@@ -25,7 +25,7 @@ function SelectTrigger({
   size = 'default',
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: 'sm' | 'default';
+  size?: 'sm' | 'default'
 }) {
   return (
     <SelectPrimitive.Trigger
@@ -140,10 +140,4 @@ function SelectScrollDownButton({
   )
 }
 
-export {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-}
+export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue }

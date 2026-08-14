@@ -6,7 +6,7 @@ import { AppProgressProvider } from '@bprogress/next'
 import type { ReactNode } from 'react'
 
 interface ProgressProviderProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 const ProgressProvider = ({ children }: ProgressProviderProps) => {

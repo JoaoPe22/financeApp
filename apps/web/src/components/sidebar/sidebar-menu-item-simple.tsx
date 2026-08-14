@@ -7,9 +7,9 @@ import { usePathname } from 'next/navigation'
 import { SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 
 interface SideBarMenuItemSimpleProps {
-  href: string;
-  icon: LucideIcon;
-  label: string;
+  href: string
+  icon: LucideIcon
+  label: string
 }
 
 const SideBarMenuItemSimple = ({

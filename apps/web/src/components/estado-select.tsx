@@ -20,9 +20,9 @@ import {
 import { useEstados } from '@/hooks/use-geo'
 
 interface EstadoSelectProps {
-  value: string;
-  onChange: (sigla: string) => void;
-  disabled?: boolean;
+  value: string
+  onChange: (sigla: string) => void
+  disabled?: boolean
 }
 
 const EstadoSelect = ({ value, onChange, disabled }: EstadoSelectProps) => {
@@ -66,9 +66,7 @@ const EstadoSelect = ({ value, onChange, disabled }: EstadoSelectProps) => {
                 >
                   <Check
                     className={`mr-2 size-4 ${
-                      value === estado.sigla
-? 'opacity-100'
-: 'opacity-0'
+                      value === estado.sigla ? 'opacity-100' : 'opacity-0'
                     }`}
                   />
                   {estado.sigla} — {estado.nome}

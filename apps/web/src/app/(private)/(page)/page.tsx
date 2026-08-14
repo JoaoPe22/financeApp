@@ -50,9 +50,7 @@ const Home = () => {
             onClick={signOut}
             disabled={isSigningOut}
           >
-            {isSigningOut
-              ? <Loader2 className="animate-spin" />
-              : <LogOut />}
+            {isSigningOut ? <Loader2 className="animate-spin" /> : <LogOut />}
             Sair
           </Button>
         </CardContent>

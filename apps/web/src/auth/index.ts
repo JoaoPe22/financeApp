@@ -29,14 +29,14 @@ const pool = (globalThis._bsyPool ??= new Pool({
 const db = drizzle(pool, { schema: authSchema, casing: 'camelCase' })
 
 type LogParams = {
-  acao: string;
-  usuarioAfetadoId?: string;
-  usuarioAfetadoEmail?: string;
-  usuarioExecutorId?: string;
-  usuarioExecutorEmail?: string;
-  detalhes?: string;
-  ipAddress?: string;
-  userAgent?: string;
+  acao: string
+  usuarioAfetadoId?: string
+  usuarioAfetadoEmail?: string
+  usuarioExecutorId?: string
+  usuarioExecutorEmail?: string
+  detalhes?: string
+  ipAddress?: string
+  userAgent?: string
 }
 
 const logUsuario = async (params: LogParams) => {

@@ -20,10 +20,10 @@ import {
 import { useCidades } from '@/hooks/use-geo'
 
 interface CidadeSelectProps {
-  value: string;
-  onChange: (cidade: string) => void;
-  uf: string;
-  disabled?: boolean;
+  value: string
+  onChange: (cidade: string) => void
+  uf: string
+  disabled?: boolean
 }
 
 const CidadeSelect = ({ value, onChange, uf, disabled }: CidadeSelectProps) => {
@@ -42,9 +42,7 @@ const CidadeSelect = ({ value, onChange, uf, disabled }: CidadeSelectProps) => {
         >
           <span className="truncate">
             {value ||
-              (uf
-                ? 'Selecione a cidade'
-                : 'Selecione o estado primeiro')}
+              (uf ? 'Selecione a cidade' : 'Selecione o estado primeiro')}
           </span>
           <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>
@@ -66,9 +64,7 @@ const CidadeSelect = ({ value, onChange, uf, disabled }: CidadeSelectProps) => {
                 >
                   <Check
                     className={`mr-2 size-4 ${
-                      value === cidade
-? 'opacity-100'
-: 'opacity-0'
+                      value === cidade ? 'opacity-100' : 'opacity-0'
                     }`}
                   />
                   {cidade}

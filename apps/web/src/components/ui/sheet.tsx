@@ -51,8 +51,8 @@ function SheetContent({
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
-  side?: 'top' | 'right' | 'bottom' | 'left';
-  showCloseButton?: boolean;
+  side?: 'top' | 'right' | 'bottom' | 'left'
+  showCloseButton?: boolean
 }) {
   return (
     <SheetPortal>

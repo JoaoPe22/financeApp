@@ -39,16 +39,11 @@ const parseDateOnly = (dateString: string) => {
     ? dayjs.tz(dateString, 'YYYY-MM-DD', env.NEXT_PUBLIC_APPLICATION_TIMEZONE)
     : dayjs(dateString).tz(env.NEXT_PUBLIC_APPLICATION_TIMEZONE)
 
-  return parsed.isValid()
-    ? parsed.toDate()
-    : null
+  return parsed.isValid() ? parsed.toDate() : null
 }
 
 const parseDateTime = (dateString: string) => {
-  return dayjs
-    .utc(dateString)
-    .tz(env.NEXT_PUBLIC_APPLICATION_TIMEZONE)
-    .toDate()
+  return dayjs.utc(dateString).tz(env.NEXT_PUBLIC_APPLICATION_TIMEZONE).toDate()
 }
 
 export {

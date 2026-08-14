@@ -39,8 +39,12 @@ const perfilSchema = z
   .object({
     dataNascimento: z.iso.date({ message: 'Data de nascimento inválida' }),
     cep: z.string().nonempty('CEP é obrigatório'),
-    estado: z.string({ error: 'Estado é obrigatório' }).nonempty('Estado é obrigatório'),
-    cidade: z.string({ error: 'Cidade é obrigatória' }).nonempty('Cidade é obrigatória'),
+    estado: z
+      .string({ error: 'Estado é obrigatório' })
+      .nonempty('Estado é obrigatório'),
+    cidade: z
+      .string({ error: 'Cidade é obrigatória' })
+      .nonempty('Cidade é obrigatória'),
     bairro: z.string().nonempty('Bairro é obrigatório'),
     logradouro: z.string().nonempty('Logradouro é obrigatório'),
     numero: z.string().nonempty('Número é obrigatório'),

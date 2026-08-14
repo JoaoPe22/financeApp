@@ -13,10 +13,10 @@ const transporter = nodemailer.createTransport({
 })
 
 type SendEmailOptions = {
-  to: string;
-  subject: string;
-  html: string;
-  text?: string;
+  to: string
+  subject: string
+  html: string
+  text?: string
 }
 
 const sendEmail = async (options: SendEmailOptions) => {

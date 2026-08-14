@@ -15,7 +15,7 @@ const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' })
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>

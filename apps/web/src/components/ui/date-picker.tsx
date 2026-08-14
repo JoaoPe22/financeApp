@@ -14,9 +14,9 @@ import {
 import { cn } from '@/lib/utils'
 
 interface DatePickerProps {
-  date?: Date;
-  setDate: (date: Date | undefined) => void;
-  placeholder?: string;
+  date?: Date
+  setDate: (date: Date | undefined) => void
+  placeholder?: string
 }
 
 const DatePicker = ({ date, setDate, placeholder }: DatePickerProps) => {

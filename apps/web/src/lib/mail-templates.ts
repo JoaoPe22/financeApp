@@ -2,9 +2,9 @@
 import { envServer as env } from './env-server'
 
 type ResetPasswordTemplateData = {
-  userName: string;
-  resetUrl: string;
-  expiresIn: string;
+  userName: string
+  resetUrl: string
+  expiresIn: string
 }
 
 const resetPasswordTemplate = (data: ResetPasswordTemplateData) => {

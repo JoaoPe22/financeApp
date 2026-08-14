@@ -161,7 +161,7 @@ function FieldSeparator({
   className,
   ...props
 }: React.ComponentProps<'div'> & {
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }) {
   return (
     <div
@@ -192,7 +192,7 @@ function FieldError({
   errors,
   ...props
 }: React.ComponentProps<'div'> & {
-  errors?: Array<{ message?: string } | undefined>;
+  errors?: Array<{ message?: string } | undefined>
 }) {
   const content = useMemo(() => {
     if (children) {

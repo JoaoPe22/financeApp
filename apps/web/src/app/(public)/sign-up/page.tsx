@@ -49,7 +49,9 @@ const Page = () => {
 
       if (response.error) {
         console.error('Erro ao criar conta:', response.error)
-        toast.error(response.error.message || 'Erro ao criar conta. Tente novamente.')
+        toast.error(
+          response.error.message || 'Erro ao criar conta. Tente novamente.',
+        )
         return
       }
 
@@ -65,7 +67,7 @@ const Page = () => {
   }
 
   return (
-    <main className="grid w-full min-h-screen lg:grid-cols-2">
+    <main className="grid min-h-screen w-full lg:grid-cols-2">
       <section className="relative hidden overflow-hidden bg-gray-300 lg:flex" />
 
       <section className="flex items-center justify-center bg-zinc-100 p-10">
@@ -82,19 +84,33 @@ const Page = () => {
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="name">Nome</FieldLabel>
-                    <Input id="name" {...register('name')} disabled={isSubmitting} />
+                    <Input
+                      id="name"
+                      {...register('name')}
+                      disabled={isSubmitting}
+                    />
                     {errors.name && <span>{errors.name.message}</span>}
                   </Field>
 
                   <Field>
                     <FieldLabel htmlFor="email">Email</FieldLabel>
-                    <Input id="email" type="email" {...register('email')} disabled={isSubmitting} />
+                    <Input
+                      id="email"
+                      type="email"
+                      {...register('email')}
+                      disabled={isSubmitting}
+                    />
                     {errors.email && <span>{errors.email.message}</span>}
                   </Field>
 
                   <Field>
                     <FieldLabel htmlFor="password">Senha</FieldLabel>
-                    <Input id="password" type="password" {...register('password')} disabled={isSubmitting} />
+                    <Input
+                      id="password"
+                      type="password"
+                      {...register('password')}
+                      disabled={isSubmitting}
+                    />
                     {errors.password && <span>{errors.password.message}</span>}
                   </Field>
                 </FieldGroup>
