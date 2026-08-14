@@ -8,20 +8,21 @@ import { log, perfil } from '@/database/schema'
 import { authenticate } from '@/http/middlewares/auth'
 
 import { BadRequestError } from '../_errors/bad-request-error'
-import { perfilBodySchema as cadastrarPerfilBodySchema } from './schema'
+import { perfilBodySchema } from './schema'
 
-const cadastrarPerfil = async (app: FastifyInstance) => {
-  app.withTypeProvider<ZodTypeProvider>().post(
+const atualizarPerfil = async (app: FastifyInstance) => {
+  app.withTypeProvider<ZodTypeProvider>().patch(
     '/perfil',
     {
       preHandler: authenticate,
       schema: {
         tags: ['Perfil'],
-        summary: 'Cadastrar perfil',
-        description: 'Endpoint para cadastrar um novo perfil de usuário.',
-        body: cadastrarPerfilBodySchema,
+        summary: 'Atualizar perfil',
+        description:
+          'Endpoint para atualizar o perfil já cadastrado do usuário.',
+        body: perfilBodySchema,
         response: {
-          201: z.void(),
+          200: z.void(),
         },
       },
     },
@@ -35,14 +36,13 @@ const cadastrarPerfil = async (app: FastifyInstance) => {
         .where(eq(perfil.userId, userId))
         .limit(1)
 
-      if (perfilExistente) {
-        throw new BadRequestError('Usuário já possui um perfil cadastrado')
+      if (!perfilExistente) {
+        throw new BadRequestError('Usuário ainda não possui perfil cadastrado')
       }
 
-      const [novoPerfil] = await db
-        .insert(perfil)
-        .values({
-          userId,
+      await db
+        .update(perfil)
+        .set({
           dataNascimento: body.dataNascimento,
           cep: body.cep,
           estado: body.estado,
@@ -54,19 +54,19 @@ const cadastrarPerfil = async (app: FastifyInstance) => {
           tipoRenda: body.tipoRenda,
           salarioFixo: body.salarioFixo?.toString() ?? null,
         })
-        .returning({ id: perfil.id })
+        .where(eq(perfil.userId, userId))
 
       await db.insert(log).values({
         usuarioId: userId,
         entidade: 'perfil',
-        entidadeId: novoPerfil.id,
-        acao: 'CADASTRAR',
-        descricao: 'Perfil cadastrado com sucesso',
+        entidadeId: perfilExistente.id,
+        acao: 'ATUALIZAR',
+        descricao: 'Perfil atualizado com sucesso',
       })
 
-      return reply.status(201).send()
+      return reply.status(200).send()
     },
   )
 }
 
-export { cadastrarPerfil }
+export { atualizarPerfil }
