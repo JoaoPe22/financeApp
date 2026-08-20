@@ -15,11 +15,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-const signUpSchema = z.object({
-  name: z.string().min(1, 'O nome é obrigatório'),
-  email: z.email('Formato de e-mail inválido').min(1, 'O e-mail é obrigatório'),
-  password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres'),
-})
+const signUpSchema = z
+  .object({
+    name: z.string().min(1, 'O nome é obrigatório'),
+    email: z
+      .email('Formato de e-mail inválido')
+      .min(1, 'O e-mail é obrigatório'),
+    password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres'),
+    confirmPassword: z
+      .string()
+      .min(1, 'A confirmação de senha é obrigatória'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'As senhas não coincidem',
+    path: ['confirmPassword'],
+  })
 
 type SignUpFormData = z.infer<typeof signUpSchema>
 
@@ -36,6 +46,7 @@ const Page = () => {
       name: '',
       email: '',
       password: '',
+      confirmPassword: '',
     },
   })
 
@@ -112,6 +123,21 @@ const Page = () => {
                       disabled={isSubmitting}
                     />
                     {errors.password && <span>{errors.password.message}</span>}
+                  </Field>
+
+                  <Field>
+                    <FieldLabel htmlFor="confirmPassword">
+                      Confirmar senha
+                    </FieldLabel>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      {...register('confirmPassword')}
+                      disabled={isSubmitting}
+                    />
+                    {errors.confirmPassword && (
+                      <span>{errors.confirmPassword.message}</span>
+                    )}
                   </Field>
                 </FieldGroup>
               </FieldSet>
