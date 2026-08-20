@@ -22,6 +22,8 @@ import {
 } from '@/components/ui/select'
 import { useSignOut } from '@/hooks/use-sign-out'
 
+import { Notificacoes } from './notificacoes'
+
 const iniciais = (nome?: string) =>
   nome
     ?.trim()
@@ -38,7 +40,9 @@ const Topbar = () => {
   const user = session?.user
 
   return (
-    <header className="flex justify-end p-2">
+    <header className="flex items-center justify-end gap-1 p-2">
+      <Notificacoes />
+
       <DropdownMenu>
         <DropdownMenuTrigger className="hover:bg-accent flex items-center gap-2 rounded-md p-1.5 outline-none">
           <Avatar className="size-7">

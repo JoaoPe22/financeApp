@@ -52,7 +52,11 @@ const listarDashboard = async (app: FastifyInstance) => {
         tags: ['Dashboard'],
         summary: 'Buscar dados do dashboard',
         description:
-          'Agrega os dados financeiros do usuário (histórico de saldo, gastos por categoria, parcelamentos, meta de reserva, despesas mais pesadas, lembretes de vencimento e avisos) para o mês atual.',
+          'Agrega os dados financeiros do usuário (histórico de saldo, gastos por categoria, parcelamentos, meta de reserva, despesas mais pesadas, lembretes de vencimento e avisos). Sem mes/ano usa o mês corrente. Os lembretes são sempre relativos a hoje, independente do mês pedido.',
+        querystring: z.object({
+          mes: z.coerce.number().int().min(1).max(12).optional(),
+          ano: z.coerce.number().int().min(2000).max(2100).optional(),
+        }),
         response: {
           200: dashboardResponseSchema,
         },
@@ -60,8 +64,9 @@ const listarDashboard = async (app: FastifyInstance) => {
     },
     async (request) => {
       const userId = request.user!.id
+      const { mes, ano } = request.query
 
-      return montarDashboard(userId)
+      return montarDashboard(userId, mes, ano)
     },
   )
 }

@@ -1,5 +1,4 @@
-import dayjs from 'dayjs'
-import { and, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm'
+import { and, desc, eq, inArray, lte, sql } from 'drizzle-orm'
 
 import { db } from '@/database'
 import {
@@ -10,6 +9,7 @@ import {
   planejamentoMensal,
 } from '@/database/schema'
 
+import { agora, dayjs } from './dayjs'
 import { gerarInsights, type Insight } from './regras-insights'
 import { buscarDadosMes, montarResumoFinanceiro } from './resumo-financeiro'
 
@@ -59,17 +59,22 @@ const buscarHistoricoSaldo = async (
   }))
 }
 
-const montarDashboard = async (userId: string): Promise<Dashboard> => {
-  const agora = new Date()
-  const mes = agora.getMonth() + 1
-  const ano = agora.getFullYear()
+const montarDashboard = async (
+  userId: string,
+  mesReferencia?: number,
+  anoReferencia?: number,
+): Promise<Dashboard> => {
+  const referenciaAtual = agora()
+  const mes = mesReferencia ?? referenciaAtual.month() + 1
+  const ano = anoReferencia ?? referenciaAtual.year()
 
   const resumo = await montarResumoFinanceiro(userId, mes, ano)
   const avisos = gerarInsights(resumo)
   const planejamentoId = resumo.mesAtual.planejamento?.id ?? null
 
-  const hoje = dayjs().format('YYYY-MM-DD')
-  const limiteLembrete = dayjs().add(DIAS_LEMBRETE, 'day').format('YYYY-MM-DD')
+  const limiteLembrete = referenciaAtual
+    .add(DIAS_LEMBRETE, 'day')
+    .format('YYYY-MM-DD')
 
   const [
     historicoSaldo,
@@ -130,7 +135,7 @@ const montarDashboard = async (userId: string): Promise<Dashboard> => {
         and(
           eq(planejamentoMensal.userId, userId),
           inArray(despesaMensal.status, ['PENDENTE', 'ATRASADA']),
-          gte(despesaMensal.dataVencimento, hoje),
+          // Sem piso de data: uma conta já vencida é o lembrete mais urgente
           lte(despesaMensal.dataVencimento, limiteLembrete),
         ),
       ),
@@ -145,8 +150,7 @@ const montarDashboard = async (userId: string): Promise<Dashboard> => {
       .where(
         and(
           eq(parcelamento.userId, userId),
-          eq(parcela.status, 'PENDENTE'),
-          gte(parcela.dataVencimento, hoje),
+          inArray(parcela.status, ['PENDENTE', 'ATRASADA']),
           lte(parcela.dataVencimento, limiteLembrete),
         ),
       ),
