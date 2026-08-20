@@ -6,6 +6,8 @@ import { env } from '@/lib/env'
 import { extractErrorMessage } from '@/lib/error-handler'
 import { CHAT_ROLE, ChatMensagem } from '@/types/chat-mensagem'
 
+const ERRO_CONEXAO = 'Erro de conexão. Verifique sua internet e tente novamente.'
+
 // Diverge de propósito do padrão useQuery/useMutation do resto do app:
 // streaming exige estado manual (não há cache/invalidação envolvidos aqui).
 // Usa fetch puro (não o apiClient/ky) pra ter acesso ao ReadableStream bruto
@@ -14,6 +16,7 @@ const useChatFinanceiro = () => {
   const [mensagens, setMensagens] = useState<ChatMensagem[]>([])
   const [carregandoHistorico, setCarregandoHistorico] = useState(true)
   const [enviando, setEnviando] = useState(false)
+  const [limpando, setLimpando] = useState(false)
 
   useEffect(() => {
     apiClient
@@ -37,6 +40,43 @@ const useChatFinanceiro = () => {
       { id: idAssistente, role: CHAT_ROLE.ASSISTANT, conteudo: '', createdAt: agora },
     ])
     setEnviando(true)
+
+    const escreverNoAssistente = (conteudo: string) =>
+      setMensagens((prev) =>
+        prev.map((item) =>
+          item.id === idAssistente ? { ...item, conteudo } : item))
+
+    // Um evento SSE malformado não pode derrubar o stream inteiro
+    const processarEvento = (evento: string) => {
+      const linhaDeDados = evento
+        .split('\n')
+        .find((linha) => linha.startsWith('data:'))
+
+      if (!linhaDeDados) return
+
+      let payload: { delta?: string, error?: string, done?: boolean }
+
+      try {
+        payload = JSON.parse(linhaDeDados.replace(/^data:\s*/, ''))
+      } catch {
+        return
+      }
+
+      if (payload.error) {
+        toast.error(payload.error)
+        // O servidor persiste esse mesmo texto, então a bolha não fica vazia
+        escreverNoAssistente(payload.error)
+        return
+      }
+
+      if (payload.delta) {
+        setMensagens((prev) =>
+          prev.map((item) =>
+            item.id === idAssistente
+              ? { ...item, conteudo: item.conteudo + payload.delta }
+              : item))
+      }
+    }
 
     try {
       const response = await fetch(
@@ -70,37 +110,43 @@ const useChatFinanceiro = () => {
         const eventos = buffer.split('\n\n')
         buffer = eventos.pop() ?? ''
 
-        for (const evento of eventos) {
-          const linhaDeDados = evento
-            .split('\n')
-            .find((linha) => linha.startsWith('data:'))
+        eventos.forEach(processarEvento)
+      }
 
-          if (!linhaDeDados) continue
-
-          const payload = JSON.parse(linhaDeDados.replace(/^data:\s*/, ''))
-
-          if (payload.error) {
-            toast.error(payload.error)
-            continue
-          }
-
-          if (payload.delta) {
-            setMensagens((prev) =>
-              prev.map((item) =>
-                item.id === idAssistente
-                  ? { ...item, conteudo: item.conteudo + payload.delta }
-                  : item))
-          }
-        }
+      // O último evento pode chegar sem o '\n\n' final e ficaria preso no buffer
+      if (buffer.trim()) {
+        processarEvento(buffer)
       }
     } catch {
-      toast.error('Erro de conexão. Verifique sua internet e tente novamente.')
+      toast.error(ERRO_CONEXAO)
+      escreverNoAssistente(ERRO_CONEXAO)
     } finally {
       setEnviando(false)
     }
   }
 
-  return { mensagens, carregandoHistorico, enviando, enviarMensagem }
+  const limparHistorico = async () => {
+    setLimpando(true)
+
+    try {
+      await apiClient.delete('chat-financeiro/mensagens')
+      setMensagens([])
+      toast.success('Histórico apagado.')
+    } catch (error) {
+      toast.error(await extractErrorMessage(error))
+    } finally {
+      setLimpando(false)
+    }
+  }
+
+  return {
+    mensagens,
+    carregandoHistorico,
+    enviando,
+    limpando,
+    enviarMensagem,
+    limparHistorico,
+  }
 }
 
 export { useChatFinanceiro }

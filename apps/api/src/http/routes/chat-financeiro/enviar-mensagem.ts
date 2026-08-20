@@ -1,12 +1,13 @@
 import { GoogleGenAI } from '@google/genai'
-import { asc, eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 import { db } from '@/database'
-import { chatMensagem } from '@/database/schema'
+import { chatMensagem, log } from '@/database/schema'
 import { authenticate } from '@/http/middlewares/auth'
 import { montarSystemPrompt } from '@/lib/chat-financeiro-prompt'
+import { agora } from '@/lib/dayjs'
 import { env } from '@/lib/env'
 import { montarResumoFinanceiro } from '@/lib/resumo-financeiro'
 
@@ -15,6 +16,7 @@ import { enviarMensagemBodySchema } from './schema'
 
 const MODELO_GEMINI = 'gemini-2.5-flash'
 const LIMITE_HISTORICO = 20
+const ERRO_IA = 'Erro ao consultar a IA. Tente novamente.'
 
 const enviarMensagem = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -45,23 +47,30 @@ const enviarMensagem = async (app: FastifyInstance) => {
         .insert(chatMensagem)
         .values({ userId, role: 'USER', conteudo: mensagem })
 
-      const agora = new Date()
+      const referencia = agora()
       const resumo = await montarResumoFinanceiro(
         userId,
-        agora.getMonth() + 1,
-        agora.getFullYear(),
+        referencia.month() + 1,
+        referencia.year(),
       )
 
-      const historico = await db
+      // As MAIS RECENTES (desc + limit), devolvidas em ordem cronológica. Com
+      // asc + limit o contexto congelava nas primeiras 20 mensagens da conversa.
+      const recentes = await db
         .select({ role: chatMensagem.role, conteudo: chatMensagem.conteudo })
         .from(chatMensagem)
         .where(eq(chatMensagem.userId, userId))
-        .orderBy(asc(chatMensagem.createdAt))
+        .orderBy(desc(chatMensagem.createdAt))
         .limit(LIMITE_HISTORICO)
 
-      // A mensagem recém-inserida já está no fim do histórico acima — ela é o
-      // "message" do sendMessageStream, então o histórico do chat é tudo antes dela.
-      const historicoAnterior = historico.slice(0, -1)
+      // A mensagem recém-inserida é o "message" do sendMessageStream, então o
+      // histórico do chat é tudo antes dela.
+      const historico = recentes.reverse().slice(0, -1)
+
+      // O Gemini exige que o histórico comece com 'user': ao cortar uma janela
+      // no meio da conversa ela pode começar com uma resposta do assistente.
+      const inicioValido = historico.findIndex((item) => item.role === 'USER')
+      const historicoAnterior = inicioValido === -1 ? [] : historico.slice(inicioValido)
 
       const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY })
       const chat = ai.chats.create({
@@ -85,20 +94,30 @@ const enviarMensagem = async (app: FastifyInstance) => {
           respostaCompleta += texto
           await reply.sse.send({ data: { delta: texto } })
         }
-
-        await db.insert(chatMensagem).values({
-          userId,
-          role: 'ASSISTANT',
-          conteudo: respostaCompleta || 'Não foi possível gerar uma resposta.',
-        })
-
-        await reply.sse.send({ data: { done: true } })
       } catch (error) {
         console.error(error)
-        await reply.sse.send({
-          data: { error: 'Erro ao consultar a IA. Tente novamente.' },
-        })
+        await reply.sse.send({ data: { error: ERRO_IA } })
       }
+
+      // Grava a resposta SEMPRE, inclusive quando o stream falhou. Sem isso a
+      // mensagem do usuário ficava órfã no banco e o histórico da próxima
+      // requisição teria dois 'user' seguidos — o Gemini rejeita, e o chat
+      // quebrava em definitivo, sem recuperação nem recarregando a página.
+      await db.insert(chatMensagem).values({
+        userId,
+        role: 'ASSISTANT',
+        conteudo: respostaCompleta || ERRO_IA,
+      })
+
+      await db.insert(log).values({
+        usuarioId: userId,
+        entidade: 'chat_mensagem',
+        entidadeId: userId,
+        acao: 'CADASTRAR',
+        descricao: 'Mensagem enviada ao chat financeiro',
+      })
+
+      await reply.sse.send({ data: { done: true } })
     },
   )
 }
