@@ -11,6 +11,7 @@ import { db } from '@/database'
 import {
   account,
   categoria,
+  chatMensagem,
   despesaFixa,
   despesaMensal,
   investimento,
@@ -19,7 +20,6 @@ import {
   parcelamento,
   perfil,
   planejamentoMensal,
-  recomendacao,
   reserva,
   session,
   user,
@@ -46,7 +46,7 @@ const dropAll = async () => {
     await db.execute(sql`TRUNCATE TABLE ${categoria} CASCADE`)
     await db.execute(sql`TRUNCATE TABLE ${objetivo} CASCADE`)
     await db.execute(sql`TRUNCATE TABLE ${reserva} CASCADE`)
-    await db.execute(sql`TRUNCATE TABLE ${recomendacao} CASCADE`)
+    await db.execute(sql`TRUNCATE TABLE ${chatMensagem} CASCADE`)
     await db.execute(sql`TRUNCATE TABLE ${planejamentoMensal} CASCADE`)
     await db.execute(sql`TRUNCATE TABLE ${perfil} CASCADE`)
     await db.execute(sql`TRUNCATE TABLE ${parcela} CASCADE`)

@@ -9,7 +9,9 @@ const log = pgTable('log', {
   id: uuid()
     .primaryKey()
     .$defaultFn(() => uuidv7()),
-  usuarioId: text().references(() => user.id),
+  // Única FK do schema sem onDelete: sem isso, excluir um usuário falha com
+  // violação de integridade. 'set null' preserva a trilha de auditoria.
+  usuarioId: text().references(() => user.id, { onDelete: 'set null' }),
   entidade: text().notNull(),
   entidadeId: text().notNull(),
   acao: text().$type<AcaoLog>(),
