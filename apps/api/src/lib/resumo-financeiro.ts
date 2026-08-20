@@ -14,6 +14,8 @@ import {
   reserva,
 } from '@/database/schema'
 
+import { marcarVencidos } from './vencimentos'
+
 type DadosMes = {
   planejamento: {
     id: string
@@ -118,6 +120,10 @@ const montarResumoFinanceiro = async (
   mes: number,
   ano: number,
 ): Promise<ResumoFinanceiro> => {
+  // Antes de somar qualquer coisa, promove a ATRASADA o que já venceu — senão
+  // os filtros por status abaixo classificam contas vencidas como PENDENTE.
+  await marcarVencidos(userId)
+
   const proximoMes = mes === 12 ? 1 : mes + 1
   const proximoAno = mes === 12 ? ano + 1 : ano
 
@@ -156,7 +162,12 @@ const montarResumoFinanceiro = async (
       })
       .from(parcela)
       .innerJoin(parcelamento, eq(parcelamento.id, parcela.parcelamentoId))
-      .where(and(eq(parcelamento.userId, userId), eq(parcela.status, 'PENDENTE'))),
+      .where(
+        and(
+          eq(parcelamento.userId, userId),
+          inArray(parcela.status, ['PENDENTE', 'ATRASADA']),
+        ),
+      ),
     db
       .select({
         id: objetivo.id,

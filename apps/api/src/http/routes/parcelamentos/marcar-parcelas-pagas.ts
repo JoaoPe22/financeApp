@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { db } from '@/database'
 import { log, parcela, parcelamento } from '@/database/schema'
 import { authenticate } from '@/http/middlewares/auth'
+import { hoje } from '@/lib/dayjs'
 
 import { BadRequestError } from '../_errors/bad-request-error'
 
@@ -47,7 +48,13 @@ const marcarParcelasPagas = async (app: FastifyInstance) => {
       const parcelasPendentes = await db
         .select({ id: parcela.id })
         .from(parcela)
-        .where(and(eq(parcela.parcelamentoId, params.id), eq(parcela.status, 'PENDENTE')))
+        .where(
+          and(
+            eq(parcela.parcelamentoId, params.id),
+            // ATRASADA também precisa ser pagável, senão parcela vencida trava
+            inArray(parcela.status, ['PENDENTE', 'ATRASADA']),
+          ),
+        )
         .orderBy(asc(parcela.numero))
         .limit(body.quantidade)
 
@@ -63,7 +70,7 @@ const marcarParcelasPagas = async (app: FastifyInstance) => {
         .update(parcela)
         .set({
           status: 'PAGA',
-          dataPagamento: new Date().toISOString().slice(0, 10),
+          dataPagamento: hoje(),
         })
         .where(inArray(parcela.id, idsParaPagar))
 

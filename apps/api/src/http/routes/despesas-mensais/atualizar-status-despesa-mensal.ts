@@ -7,6 +7,7 @@ import { db } from '@/database'
 import { despesaMensal, log, planejamentoMensal } from '@/database/schema'
 import { statusParcelaEnum } from '@/database/schema/enums'
 import { authenticate } from '@/http/middlewares/auth'
+import { hoje } from '@/lib/dayjs'
 
 import { BadRequestError } from '../_errors/bad-request-error'
 
@@ -58,10 +59,7 @@ const atualizarStatusDespesaMensal = async (app: FastifyInstance) => {
         .update(despesaMensal)
         .set({
           status: body.status,
-          dataPagamento:
-            body.status === 'PAGA'
-              ? new Date().toISOString().slice(0, 10)
-              : null,
+          dataPagamento: body.status === 'PAGA' ? hoje() : null,
         })
         .where(eq(despesaMensal.id, params.id))
 
