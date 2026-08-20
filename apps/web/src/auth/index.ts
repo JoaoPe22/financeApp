@@ -14,6 +14,13 @@ import {
 
 import * as authSchema from './schema'
 
+// Esta é a instância "fonte da verdade" do better-auth: emite sessão, cuida de
+// cadastro/login/logout, reset de senha (com envio de e-mail) e rate limit.
+// A API (apps/api/src/auth/index.ts) tem uma segunda instância, mais enxuta,
+// só pra validar a sessão emitida aqui (mesmo banco + mesmo
+// BETTER_AUTH_SECRET) — por isso rateLimit, emailAndPassword e hooks só
+// precisam estar configurados neste lado.
+
 declare global {
   var _bsyPool: Pool | undefined
 }
@@ -97,7 +104,7 @@ const auth = betterAuth({
 
       sendEmail({
         to: user.email,
-        subject: 'Redefinição de Senha - BSY Consultoria',
+        subject: 'Redefinição de Senha - Projeto Saas',
         html: resetPasswordTemplate({
           userName: user.name,
           resetUrl,
@@ -120,7 +127,7 @@ const auth = betterAuth({
 
       sendEmail({
         to: user.email,
-        subject: 'Senha Alterada - BSY Consultoria',
+        subject: 'Senha Alterada - Projeto Saas',
         html: `<p>Olá ${user.name},</p><p>Sua senha foi alterada com sucesso em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' })}.</p><p>Se você não realizou esta alteração, entre em contato conosco imediatamente.</p>`,
         text: `Sua senha foi alterada com sucesso em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' })}.`,
       })
