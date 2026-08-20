@@ -61,7 +61,8 @@ const atualizarReceita = async (app: FastifyInstance) => {
         .set({
           categoriaId: body.categoriaId,
           descricao: body.descricao,
-          valorBruto: body.valorBruto != null ? body.valorBruto.toString() : null,
+          valorBruto:
+            body.valorBruto != null ? body.valorBruto.toString() : null,
           valorLiquido: body.valorLiquido.toString(),
           dataRecebimento: body.dataRecebimento,
           observacao: body.observacao ?? null,

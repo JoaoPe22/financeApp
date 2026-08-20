@@ -32,48 +32,48 @@ const ParcelamentosChart = ({ dados }: ParcelamentosChartProps) => {
         <CardTitle>Parcelamentos</CardTitle>
       </CardHeader>
       <CardContent>
-        {dados.length === 0
-          ? (
-            <p className="text-muted-foreground text-sm">
-              Nenhum parcelamento cadastrado.
-            </p>
-            )
-          : (
-            <ChartContainer config={chartConfig} className="h-55 w-full">
-              <BarChart data={dados} layout="vertical" margin={{ left: 8 }}>
-                <CartesianGrid horizontal={false} />
-                <XAxis type="number" hide />
-                <YAxis
-                  dataKey="descricao"
-                  type="category"
-                  tickLine={false}
-                  axisLine={false}
-                  width={100}
-                />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value) => currencyFormatter.format(Number(value))}
-                    />
-                  }
-                />
-                <Bar
-                  dataKey="totalPago"
-                  stackId="a"
-                  fill="var(--color-totalPago)"
-                  radius={[4, 0, 0, 4]}
-                  isAnimationActive={false}
-                />
-                <Bar
-                  dataKey="totalPendente"
-                  stackId="a"
-                  fill="var(--color-totalPendente)"
-                  radius={[0, 4, 4, 0]}
-                  isAnimationActive={false}
-                />
-              </BarChart>
-            </ChartContainer>
-            )}
+        {dados.length === 0 ? (
+          <p className="text-muted-foreground text-sm">
+            Nenhum parcelamento cadastrado.
+          </p>
+        ) : (
+          <ChartContainer config={chartConfig} className="h-55 w-full">
+            <BarChart data={dados} layout="vertical" margin={{ left: 8 }}>
+              <CartesianGrid horizontal={false} />
+              <XAxis type="number" hide />
+              <YAxis
+                dataKey="descricao"
+                type="category"
+                tickLine={false}
+                axisLine={false}
+                width={100}
+              />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    formatter={(value) =>
+                      currencyFormatter.format(Number(value))
+                    }
+                  />
+                }
+              />
+              <Bar
+                dataKey="totalPago"
+                stackId="a"
+                fill="var(--color-totalPago)"
+                radius={[4, 0, 0, 4]}
+                isAnimationActive={false}
+              />
+              <Bar
+                dataKey="totalPendente"
+                stackId="a"
+                fill="var(--color-totalPendente)"
+                radius={[0, 4, 4, 0]}
+                isAnimationActive={false}
+              />
+            </BarChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   )

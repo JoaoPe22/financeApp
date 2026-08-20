@@ -16,10 +16,18 @@ import { buscarDadosMes, montarResumoFinanceiro } from './resumo-financeiro'
 const MESES_DE_HISTORICO = 6
 const DIAS_LEMBRETE = 7
 
-type PontoHistoricoSaldo = { mes: number, ano: number, saldo: number }
-type GastoPorCategoria = { categoriaNome: string, categoriaCor: string, valor: number }
-type ParcelamentoResumo = { descricao: string, totalPago: number, totalPendente: number }
-type DespesaPesada = { descricao: string, categoriaNome: string, valor: number }
+type PontoHistoricoSaldo = { mes: number; ano: number; saldo: number }
+type GastoPorCategoria = {
+  categoriaNome: string
+  categoriaCor: string
+  valor: number
+}
+type ParcelamentoResumo = {
+  descricao: string
+  totalPago: number
+  totalPendente: number
+}
+type DespesaPesada = { descricao: string; categoriaNome: string; valor: number }
 type Lembrete = {
   descricao: string
   valor: number
@@ -31,9 +39,13 @@ type Dashboard = {
   historicoSaldo: PontoHistoricoSaldo[]
   gastosPorCategoria: GastoPorCategoria[]
   parcelamentos: ParcelamentoResumo[]
-  metaReserva: { totalReservado: number, meta: number } | null
+  metaReserva: { totalReservado: number; meta: number } | null
   despesasPesadas: DespesaPesada[]
-  receitaVsDespesa: { totalReceitas: number, totalDespesas: number, salario: number }
+  receitaVsDespesa: {
+    totalReceitas: number
+    totalDespesas: number
+    salario: number
+  }
   lembretes: Lembrete[]
   avisos: Insight[]
 }
@@ -46,7 +58,8 @@ const buscarHistoricoSaldo = async (
   const referencia = dayjs(`${ano}-${String(mes).padStart(2, '0')}-01`)
 
   const meses = Array.from({ length: MESES_DE_HISTORICO }, (_, indice) =>
-    referencia.subtract(MESES_DE_HISTORICO - 1 - indice, 'month'))
+    referencia.subtract(MESES_DE_HISTORICO - 1 - indice, 'month'),
+  )
 
   const dados = await Promise.all(
     meses.map((data) => buscarDadosMes(userId, data.month() + 1, data.year())),
@@ -59,6 +72,13 @@ const buscarHistoricoSaldo = async (
   }))
 }
 
+// Orquestra tudo que a tela de dashboard precisa num único payload: reaproveita
+// o snapshot de montarResumoFinanceiro (mesmo usado pelos insights e pelo chat)
+// e dispara em paralelo as consultas exclusivas do dashboard (histórico de 6
+// meses, gasto por categoria, maiores despesas, progresso dos parcelamentos e
+// lembretes de vencimento). Cada query "opcional" (que depende de já existir
+// planejamento do mês) usa planejamentoId ? query : Promise.resolve([]) pra
+// poder entrar no mesmo Promise.all sem quebrar quando o mês ainda não foi aberto.
 const montarDashboard = async (
   userId: string,
   mesReferencia?: number,
@@ -87,28 +107,28 @@ const montarDashboard = async (
     buscarHistoricoSaldo(userId, mes, ano),
     planejamentoId
       ? db
-        .select({
-          categoriaNome: categoria.nome,
-          categoriaCor: categoria.cor,
-          valor: sql<string>`sum(${despesaMensal.valor})`,
-        })
-        .from(despesaMensal)
-        .innerJoin(categoria, eq(categoria.id, despesaMensal.categoriaId))
-        .where(eq(despesaMensal.planejamentoMensalId, planejamentoId))
-        .groupBy(categoria.id, categoria.nome, categoria.cor)
+          .select({
+            categoriaNome: categoria.nome,
+            categoriaCor: categoria.cor,
+            valor: sql<string>`sum(${despesaMensal.valor})`,
+          })
+          .from(despesaMensal)
+          .innerJoin(categoria, eq(categoria.id, despesaMensal.categoriaId))
+          .where(eq(despesaMensal.planejamentoMensalId, planejamentoId))
+          .groupBy(categoria.id, categoria.nome, categoria.cor)
       : Promise.resolve([]),
     planejamentoId
       ? db
-        .select({
-          descricao: despesaMensal.descricao,
-          categoriaNome: categoria.nome,
-          valor: despesaMensal.valor,
-        })
-        .from(despesaMensal)
-        .innerJoin(categoria, eq(categoria.id, despesaMensal.categoriaId))
-        .where(eq(despesaMensal.planejamentoMensalId, planejamentoId))
-        .orderBy(desc(despesaMensal.valor))
-        .limit(5)
+          .select({
+            descricao: despesaMensal.descricao,
+            categoriaNome: categoria.nome,
+            valor: despesaMensal.valor,
+          })
+          .from(despesaMensal)
+          .innerJoin(categoria, eq(categoria.id, despesaMensal.categoriaId))
+          .where(eq(despesaMensal.planejamentoMensalId, planejamentoId))
+          .orderBy(desc(despesaMensal.valor))
+          .limit(5)
       : Promise.resolve([]),
     db
       .select({
@@ -174,10 +194,14 @@ const montarDashboard = async (
     parcelamentosPorId.set(item.parcelamentoId, acumulado)
   }
 
-  const totalReservado = resumo.reservas.reduce((soma, item) => soma + item.valor, 0)
-  const metaValor = resumo.mesSeguinte.totalDespesasFixasAtivas > 0
-    ? resumo.mesSeguinte.totalDespesasFixasAtivas * 3
-    : (resumo.perfil?.salarioFixo ?? 0) * 3
+  const totalReservado = resumo.reservas.reduce(
+    (soma, item) => soma + item.valor,
+    0,
+  )
+  const metaValor =
+    resumo.mesSeguinte.totalDespesasFixasAtivas > 0
+      ? resumo.mesSeguinte.totalDespesasFixasAtivas * 3
+      : (resumo.perfil?.salarioFixo ?? 0) * 3
 
   const lembretes: Lembrete[] = [
     ...despesasProximas.map((item) => ({
@@ -208,7 +232,8 @@ const montarDashboard = async (
     })),
     receitaVsDespesa: {
       totalReceitas: resumo.mesAtual.totalReceitas,
-      totalDespesas: resumo.mesAtual.totalDespesas + resumo.mesAtual.totalParcelas,
+      totalDespesas:
+        resumo.mesAtual.totalDespesas + resumo.mesAtual.totalParcelas,
       salario:
         resumo.mesAtual.planejamento?.salarioRecebido ??
         resumo.mesAtual.planejamento?.salarioPrevisto ??

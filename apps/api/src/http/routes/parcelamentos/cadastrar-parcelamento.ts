@@ -63,7 +63,8 @@ const cadastrarParcelamento = async (app: FastifyInstance) => {
             categoriaId: body.categoriaId,
             descricao: body.descricao,
             valorTotal: body.valorTotal.toString(),
-            valorEntrada: body.valorEntrada != null ? body.valorEntrada.toString() : null,
+            valorEntrada:
+              body.valorEntrada != null ? body.valorEntrada.toString() : null,
             quantidadeParcelas: body.quantidadeParcelas,
             dataPrimeiraParcela: body.dataPrimeiraParcela,
           })

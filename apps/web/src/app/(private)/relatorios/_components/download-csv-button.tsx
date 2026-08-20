@@ -25,6 +25,6 @@ const DownloadCsvButton = <T,>({
     <Sheet />
     Baixar CSV
   </Button>
-  )
+)
 
 export { DownloadCsvButton }

@@ -32,7 +32,10 @@ import { PlanejamentoMensalDocumento } from './pdf/planejamento-mensal-documento
 import { RelatorioGeralDocumento } from './pdf/relatorio-geral-documento'
 
 const DownloadRelatorioButton = dynamic(
-  () => import('./download-relatorio-button').then((mod) => mod.DownloadRelatorioButton),
+  () =>
+    import('./download-relatorio-button').then(
+      (mod) => mod.DownloadRelatorioButton,
+    ),
   { ssr: false, loading: () => <Skeleton className="h-9 w-32" /> },
 )
 
@@ -49,7 +52,10 @@ const COLUNAS_DESPESAS: ColunaCsv<DespesaMensal>[] = [
 const COLUNAS_RECEITAS: ColunaCsv<Receita>[] = [
   { cabecalho: 'Descrição', valor: (item) => item.descricao },
   { cabecalho: 'Categoria', valor: (item) => item.categoriaNome },
-  { cabecalho: 'Recebimento', valor: (item) => formatDate(item.dataRecebimento) },
+  {
+    cabecalho: 'Recebimento',
+    valor: (item) => formatDate(item.dataRecebimento),
+  },
   { cabecalho: 'Valor líquido', valor: (item) => item.valorLiquido },
 ]
 
@@ -91,7 +97,10 @@ const PageContent = () => {
     useInvestimentos()
   const { data: objetivos, isLoading: isLoadingObjetivos } = useObjetivos()
   const { data: reservas, isLoading: isLoadingReservas } = useReservas()
-  const { data: dashboard, isLoading: isLoadingDashboard } = useDashboard(mes, ano)
+  const { data: dashboard, isLoading: isLoadingDashboard } = useDashboard(
+    mes,
+    ano,
+  )
 
   const investimentosProntos =
     !isLoadingInvestimentos &&
@@ -135,35 +144,33 @@ const PageContent = () => {
           />
         </CardHeader>
         <CardFooter className="flex flex-wrap gap-2">
-          {isLoadingPlanejamento || !planejamento
-            ? (
-              <Skeleton className="h-9 w-32" />
-              )
-            : (
-              <>
-                <DownloadRelatorioButton
-                  document={
-                    <PlanejamentoMensalDocumento
-                      dados={planejamento}
-                      mes={mes}
-                      ano={ano}
-                      nomeUsuario={nomeUsuario}
-                    />
+          {isLoadingPlanejamento || !planejamento ? (
+            <Skeleton className="h-9 w-32" />
+          ) : (
+            <>
+              <DownloadRelatorioButton
+                document={
+                  <PlanejamentoMensalDocumento
+                    dados={planejamento}
+                    mes={mes}
+                    ano={ano}
+                    nomeUsuario={nomeUsuario}
+                  />
                 }
-                  fileName={`planejamento-mensal-${MESES[mes - 1].toLowerCase()}-${ano}.pdf`}
-                />
-                <DownloadCsvButton
-                  colunas={COLUNAS_DESPESAS}
-                  linhas={planejamento.despesas}
-                  fileName={`despesas-${MESES[mes - 1].toLowerCase()}-${ano}.csv`}
-                />
-                <DownloadCsvButton
-                  colunas={COLUNAS_RECEITAS}
-                  linhas={planejamento.receitas}
-                  fileName={`receitas-${MESES[mes - 1].toLowerCase()}-${ano}.csv`}
-                />
-              </>
-              )}
+                fileName={`planejamento-mensal-${MESES[mes - 1].toLowerCase()}-${ano}.pdf`}
+              />
+              <DownloadCsvButton
+                colunas={COLUNAS_DESPESAS}
+                linhas={planejamento.despesas}
+                fileName={`despesas-${MESES[mes - 1].toLowerCase()}-${ano}.csv`}
+              />
+              <DownloadCsvButton
+                colunas={COLUNAS_RECEITAS}
+                linhas={planejamento.receitas}
+                fileName={`receitas-${MESES[mes - 1].toLowerCase()}-${ano}.csv`}
+              />
+            </>
+          )}
         </CardFooter>
       </Card>
 
@@ -175,28 +182,26 @@ const PageContent = () => {
           </CardDescription>
         </CardHeader>
         <CardFooter className="flex flex-wrap gap-2">
-          {isLoadingParcelamentos || !parcelamentos
-            ? (
-              <Skeleton className="h-9 w-32" />
-              )
-            : (
-              <>
-                <DownloadRelatorioButton
-                  document={
-                    <ParcelamentosDocumento
-                      parcelamentos={parcelamentos}
-                      nomeUsuario={nomeUsuario}
-                    />
+          {isLoadingParcelamentos || !parcelamentos ? (
+            <Skeleton className="h-9 w-32" />
+          ) : (
+            <>
+              <DownloadRelatorioButton
+                document={
+                  <ParcelamentosDocumento
+                    parcelamentos={parcelamentos}
+                    nomeUsuario={nomeUsuario}
+                  />
                 }
-                  fileName="parcelamentos.pdf"
-                />
-                <DownloadCsvButton
-                  colunas={COLUNAS_PARCELAMENTOS}
-                  linhas={parcelamentos}
-                  fileName="parcelamentos.csv"
-                />
-              </>
-              )}
+                fileName="parcelamentos.pdf"
+              />
+              <DownloadCsvButton
+                colunas={COLUNAS_PARCELAMENTOS}
+                linhas={parcelamentos}
+                fileName="parcelamentos.csv"
+              />
+            </>
+          )}
         </CardFooter>
       </Card>
 
@@ -208,30 +213,28 @@ const PageContent = () => {
           </CardDescription>
         </CardHeader>
         <CardFooter className="flex flex-wrap gap-2">
-          {!investimentosProntos
-            ? (
-              <Skeleton className="h-9 w-32" />
-              )
-            : (
-              <>
-                <DownloadRelatorioButton
-                  document={
-                    <InvestimentosDocumento
-                      investimentos={investimentos}
-                      objetivos={objetivos}
-                      reservas={reservas}
-                      nomeUsuario={nomeUsuario}
-                    />
+          {!investimentosProntos ? (
+            <Skeleton className="h-9 w-32" />
+          ) : (
+            <>
+              <DownloadRelatorioButton
+                document={
+                  <InvestimentosDocumento
+                    investimentos={investimentos}
+                    objetivos={objetivos}
+                    reservas={reservas}
+                    nomeUsuario={nomeUsuario}
+                  />
                 }
-                  fileName="investimentos-e-objetivos.pdf"
-                />
-                <DownloadCsvButton
-                  colunas={COLUNAS_INVESTIMENTOS}
-                  linhas={investimentos}
-                  fileName="investimentos.csv"
-                />
-              </>
-              )}
+                fileName="investimentos-e-objetivos.pdf"
+              />
+              <DownloadCsvButton
+                colunas={COLUNAS_INVESTIMENTOS}
+                linhas={investimentos}
+                fileName="investimentos.csv"
+              />
+            </>
+          )}
         </CardFooter>
       </Card>
 
@@ -244,28 +247,26 @@ const PageContent = () => {
           </CardDescription>
         </CardHeader>
         <CardFooter>
-          {!geralPronto
-            ? (
-              <Skeleton className="h-9 w-32" />
-              )
-            : (
-              <DownloadRelatorioButton
-                document={
-                  <RelatorioGeralDocumento
-                    mes={mes}
-                    ano={ano}
-                    dashboard={dashboard}
-                    planejamento={planejamento}
-                    parcelamentos={parcelamentos}
-                    investimentos={investimentos}
-                    objetivos={objetivos}
-                    reservas={reservas}
-                    nomeUsuario={nomeUsuario}
-                  />
+          {!geralPronto ? (
+            <Skeleton className="h-9 w-32" />
+          ) : (
+            <DownloadRelatorioButton
+              document={
+                <RelatorioGeralDocumento
+                  mes={mes}
+                  ano={ano}
+                  dashboard={dashboard}
+                  planejamento={planejamento}
+                  parcelamentos={parcelamentos}
+                  investimentos={investimentos}
+                  objetivos={objetivos}
+                  reservas={reservas}
+                  nomeUsuario={nomeUsuario}
+                />
               }
-                fileName={`relatorio-geral-${MESES[mes - 1].toLowerCase()}-${ano}.pdf`}
-              />
-              )}
+              fileName={`relatorio-geral-${MESES[mes - 1].toLowerCase()}-${ano}.pdf`}
+            />
+          )}
         </CardFooter>
       </Card>
     </div>

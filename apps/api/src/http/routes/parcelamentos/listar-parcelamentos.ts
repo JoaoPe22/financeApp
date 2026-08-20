@@ -65,7 +65,10 @@ const listarParcelamentos = async (app: FastifyInstance) => {
         .groupBy(parcela.parcelamentoId)
 
       const parcelasPagasMap = new Map(
-        parcelasPagasPorParcelamento.map((item) => [item.parcelamentoId, item.total]),
+        parcelasPagasPorParcelamento.map((item) => [
+          item.parcelamentoId,
+          item.total,
+        ]),
       )
 
       return parcelamentos.map((item) => ({

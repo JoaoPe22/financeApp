@@ -22,9 +22,7 @@ const signUpSchema = z
       .email('Formato de e-mail inválido')
       .min(1, 'O e-mail é obrigatório'),
     password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres'),
-    confirmPassword: z
-      .string()
-      .min(1, 'A confirmação de senha é obrigatória'),
+    confirmPassword: z.string().min(1, 'A confirmação de senha é obrigatória'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não coincidem',

@@ -2,6 +2,11 @@ import { Text, View } from '@react-pdf/renderer'
 
 import { styles } from './styles'
 
+// View/Text aqui não são elementos de DOM: são primitivos do @react-pdf/renderer,
+// que percorre essa árvore de componentes e desenha um PDF de verdade (via
+// yoga-layout, um motor de layout em WASM) em vez de renderizar HTML. Tabela
+// genérica e reaproveitada por todos os *-documento.tsx desta pasta.
+
 interface ColunaTabela<T> {
   cabecalho: string
   largura: string
@@ -30,7 +35,10 @@ function TabelaRelatorio<T>({
             key={coluna.cabecalho}
             style={[
               styles.celulaCabecalho,
-              { width: coluna.largura, textAlign: coluna.alinhamento ?? 'left' },
+              {
+                width: coluna.largura,
+                textAlign: coluna.alinhamento ?? 'left',
+              },
             ]}
           >
             {coluna.cabecalho}
@@ -55,7 +63,10 @@ function TabelaRelatorio<T>({
               key={coluna.cabecalho}
               style={[
                 styles.celula,
-                { width: coluna.largura, textAlign: coluna.alinhamento ?? 'left' },
+                {
+                  width: coluna.largura,
+                  textAlign: coluna.alinhamento ?? 'left',
+                },
               ]}
             >
               {coluna.render(item)}

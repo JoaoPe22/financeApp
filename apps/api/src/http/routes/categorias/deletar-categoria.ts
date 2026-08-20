@@ -20,11 +20,27 @@ import { BadRequestError } from '../_errors/bad-request-error'
 // Todas as FKs que apontam para categoria são ON DELETE CASCADE: apagar uma
 // categoria em uso apagaria junto os lançamentos do usuário, silenciosamente.
 const TABELAS_VINCULADAS = [
-  { tabela: despesaFixa, coluna: despesaFixa.categoriaId, rotulo: 'despesa(s) fixa(s)' },
-  { tabela: despesaMensal, coluna: despesaMensal.categoriaId, rotulo: 'despesa(s) do mês' },
+  {
+    tabela: despesaFixa,
+    coluna: despesaFixa.categoriaId,
+    rotulo: 'despesa(s) fixa(s)',
+  },
+  {
+    tabela: despesaMensal,
+    coluna: despesaMensal.categoriaId,
+    rotulo: 'despesa(s) do mês',
+  },
   { tabela: receita, coluna: receita.categoriaId, rotulo: 'receita(s)' },
-  { tabela: parcelamento, coluna: parcelamento.categoriaId, rotulo: 'parcelamento(s)' },
-  { tabela: investimento, coluna: investimento.categoriaId, rotulo: 'investimento(s)' },
+  {
+    tabela: parcelamento,
+    coluna: parcelamento.categoriaId,
+    rotulo: 'parcelamento(s)',
+  },
+  {
+    tabela: investimento,
+    coluna: investimento.categoriaId,
+    rotulo: 'investimento(s)',
+  },
 ]
 
 const deletarCategoria = async (app: FastifyInstance) => {

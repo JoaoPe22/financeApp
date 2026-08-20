@@ -19,7 +19,8 @@ const listarMensagens = async (app: FastifyInstance) => {
       schema: {
         tags: ['Chat Financeiro'],
         summary: 'Listar histórico do chat',
-        description: 'Lista as mensagens mais recentes do chat financeiro do usuário autenticado.',
+        description:
+          'Lista as mensagens mais recentes do chat financeiro do usuário autenticado.',
         response: {
           200: z.object({ mensagens: z.array(mensagemResponseSchema) }),
         },

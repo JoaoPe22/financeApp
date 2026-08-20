@@ -8,7 +8,9 @@ const dividirEmParcelas = (valorTotal: number, quantidade: number) => {
 
   return Array.from({ length: quantidade }, (_, indice) => {
     const centavos =
-      indice === quantidade - 1 ? parcelaEmCentavos + residuo : parcelaEmCentavos
+      indice === quantidade - 1
+        ? parcelaEmCentavos + residuo
+        : parcelaEmCentavos
 
     return centavos / 100
   })

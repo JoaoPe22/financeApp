@@ -14,6 +14,10 @@ import { formatCurrency } from './format'
 import { styles } from './styles'
 import { ColunaTabela, TabelaRelatorio } from './tabela'
 
+// O mais completo dos documentos desta pasta: junta num único PDF os dados já
+// carregados pela página de relatórios (dashboard, planejamento mensal,
+// parcelamentos, investimentos, objetivos e reservas) — não faz nenhuma
+// chamada própria à API, só recebe tudo pronto via props.
 interface RelatorioGeralDocumentoProps {
   mes: number
   ano: number
@@ -45,7 +49,11 @@ const colunasParcelamentos: ColunaTabela<Parcelamento>[] = [
 
 const colunasInvestimentos: ColunaTabela<Investimento>[] = [
   { cabecalho: 'Descrição', largura: '30%', render: (i) => i.descricao },
-  { cabecalho: 'Instituição', largura: '30%', render: (i) => i.instituicaoFinanceira },
+  {
+    cabecalho: 'Instituição',
+    largura: '30%',
+    render: (i) => i.instituicaoFinanceira,
+  },
   {
     cabecalho: 'Valor aplicado',
     largura: '40%',
@@ -84,7 +92,10 @@ const RelatorioGeralDocumento = ({
 }: RelatorioGeralDocumentoProps) => {
   const { receitaVsDespesa, metaReserva } = dashboard
   const saldo = receitaVsDespesa.salario - receitaVsDespesa.totalDespesas
-  const totalInvestido = investimentos.reduce((soma, i) => soma + i.valorAplicado, 0)
+  const totalInvestido = investimentos.reduce(
+    (soma, i) => soma + i.valorAplicado,
+    0,
+  )
   const totalReservas = reservas.reduce((soma, r) => soma + r.valor, 0)
 
   return (
@@ -99,7 +110,10 @@ const RelatorioGeralDocumento = ({
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Resumo</Text>
           <View style={styles.resumoLinha}>
-            <CardResumo label="Salário" valor={formatCurrency(receitaVsDespesa.salario)} />
+            <CardResumo
+              label="Salário"
+              valor={formatCurrency(receitaVsDespesa.salario)}
+            />
             <CardResumo
               label="Despesas do mês"
               valor={formatCurrency(receitaVsDespesa.totalDespesas)}
@@ -109,8 +123,14 @@ const RelatorioGeralDocumento = ({
               valor={formatCurrency(saldo)}
               negativo={saldo < 0}
             />
-            <CardResumo label="Investido" valor={formatCurrency(totalInvestido)} />
-            <CardResumo label="Reservas" valor={formatCurrency(totalReservas)} />
+            <CardResumo
+              label="Investido"
+              valor={formatCurrency(totalInvestido)}
+            />
+            <CardResumo
+              label="Reservas"
+              valor={formatCurrency(totalReservas)}
+            />
             {metaReserva && (
               <CardResumo
                 label="Meta de reserva"
@@ -124,13 +144,23 @@ const RelatorioGeralDocumento = ({
           <Text style={styles.tituloSecao}>Despesas do mês</Text>
           <TabelaRelatorio
             colunas={[
-              { cabecalho: 'Descrição', largura: '30%', render: (d) => d.descricao },
-              { cabecalho: 'Categoria', largura: '25%', render: (d) => d.categoriaNome },
+              {
+                cabecalho: 'Descrição',
+                largura: '30%',
+                render: (d) => d.descricao,
+              },
+              {
+                cabecalho: 'Categoria',
+                largura: '25%',
+                render: (d) => d.categoriaNome,
+              },
               {
                 cabecalho: 'Vencimento',
                 largura: '20%',
                 render: (d) =>
-                  new Date(`${d.dataVencimento}T00:00:00`).toLocaleDateString('pt-BR'),
+                  new Date(`${d.dataVencimento}T00:00:00`).toLocaleDateString(
+                    'pt-BR',
+                  ),
               },
               { cabecalho: 'Status', largura: '10%', render: (d) => d.status },
               {

@@ -40,7 +40,9 @@ const listarParcelas = async (app: FastifyInstance) => {
       const [parcelamentoExistente] = await db
         .select({ id: parcelamento.id })
         .from(parcelamento)
-        .where(and(eq(parcelamento.id, params.id), eq(parcelamento.userId, userId)))
+        .where(
+          and(eq(parcelamento.id, params.id), eq(parcelamento.userId, userId)),
+        )
         .limit(1)
 
       if (!parcelamentoExistente) {

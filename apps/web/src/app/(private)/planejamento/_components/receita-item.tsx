@@ -20,8 +20,16 @@ interface ReceitaItemProps {
   ano: number
 }
 
-const ReceitaItem = ({ receita, planejamentoMensalId, mes, ano }: ReceitaItemProps) => {
-  const { mutate: deletarReceita, isPending: isDeleting } = useDeletarReceita(mes, ano)
+const ReceitaItem = ({
+  receita,
+  planejamentoMensalId,
+  mes,
+  ano,
+}: ReceitaItemProps) => {
+  const { mutate: deletarReceita, isPending: isDeleting } = useDeletarReceita(
+    mes,
+    ano,
+  )
 
   return (
     <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
@@ -34,7 +42,9 @@ const ReceitaItem = ({ receita, planejamentoMensalId, mes, ano }: ReceitaItemPro
           <p className="font-medium">{receita.descricao}</p>
           <p className="text-muted-foreground text-sm">
             {receita.categoriaNome} · recebida em{' '}
-            {new Date(`${receita.dataRecebimento}T00:00:00`).toLocaleDateString('pt-BR')}
+            {new Date(`${receita.dataRecebimento}T00:00:00`).toLocaleDateString(
+              'pt-BR',
+            )}
           </p>
         </div>
       </div>

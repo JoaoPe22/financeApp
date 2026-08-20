@@ -70,7 +70,8 @@ const enviarMensagem = async (app: FastifyInstance) => {
       // O Gemini exige que o histórico comece com 'user': ao cortar uma janela
       // no meio da conversa ela pode começar com uma resposta do assistente.
       const inicioValido = historico.findIndex((item) => item.role === 'USER')
-      const historicoAnterior = inicioValido === -1 ? [] : historico.slice(inicioValido)
+      const historicoAnterior =
+        inicioValido === -1 ? [] : historico.slice(inicioValido)
 
       const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY })
       const chat = ai.chats.create({

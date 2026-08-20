@@ -11,8 +11,7 @@ const useDashboard = (mes?: number, ano?: number) =>
     queryFn: () =>
       apiClient
         .get('dashboard', {
-          searchParams:
-            mes != null && ano != null ? { mes, ano } : undefined,
+          searchParams: mes != null && ano != null ? { mes, ano } : undefined,
         })
         .json<DashboardResponse>(),
   })

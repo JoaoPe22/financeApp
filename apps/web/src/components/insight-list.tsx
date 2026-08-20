@@ -12,7 +12,8 @@ const ICONE_POR_TIPO: Record<TipoInsight, typeof AlertTriangle> = {
 
 const ESTILO_POR_TIPO: Record<TipoInsight, string> = {
   [TIPO_INSIGHT.ALERTA]: 'border-destructive/30 text-destructive',
-  [TIPO_INSIGHT.SUGESTAO]: 'border-amber-500/30 text-amber-600 dark:text-amber-400',
+  [TIPO_INSIGHT.SUGESTAO]:
+    'border-amber-500/30 text-amber-600 dark:text-amber-400',
   [TIPO_INSIGHT.INFO]: 'border-border text-muted-foreground',
 }
 
@@ -23,7 +24,11 @@ interface InsightListProps {
 
 const InsightList = ({ insights, vazio }: InsightListProps) => {
   if (insights.length === 0) {
-    return vazio ? <p className="text-muted-foreground text-sm">{vazio}</p> : null
+    return vazio
+      ? (
+        <p className="text-muted-foreground text-sm">{vazio}</p>
+        )
+      : null
   }
 
   return (
@@ -39,7 +44,9 @@ const InsightList = ({ insights, vazio }: InsightListProps) => {
             <Icone className="mt-0.5 size-4 shrink-0" />
             <div>
               <p className="font-medium">{insight.titulo}</p>
-              <p className="text-foreground/80 font-normal">{insight.descricao}</p>
+              <p className="text-foreground/80 font-normal">
+                {insight.descricao}
+              </p>
             </div>
           </div>
         )

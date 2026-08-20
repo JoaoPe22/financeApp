@@ -66,9 +66,4 @@ const useDeletarReserva = () => {
   })
 }
 
-export {
-  useAtualizarReserva,
-  useDeletarReserva,
-  useReservas,
-  useSalvarReserva,
-}
+export { useAtualizarReserva, useDeletarReserva, useReservas, useSalvarReserva }

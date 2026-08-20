@@ -5,6 +5,14 @@ import { apiClient } from '@/lib/api-client'
 import { extractErrorMessage } from '@/lib/error-handler'
 import { Categoria, TipoCategoria } from '@/types/categoria'
 
+// Padrão repetido em quase todo hook de src/hooks (use-despesas-fixas,
+// use-investimentos, use-objetivos, use-reservas, use-perfil...): useQuery
+// pra leitura, useMutation + queryClient.invalidateQueries pra escrita (o
+// invalidate força o useQuery a rebuscar e refletir a mudança na tela), toast
+// pra feedback e extractErrorMessage (src/lib/error-handler.ts) pra
+// transformar o erro do ky numa mensagem legível. Documentado aqui uma única
+// vez — os demais hooks de CRUD não repetem o comentário.
+
 interface CategoriaPayload {
   nome: string
   tipo: TipoCategoria

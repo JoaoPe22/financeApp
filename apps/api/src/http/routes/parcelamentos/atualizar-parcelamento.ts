@@ -66,7 +66,10 @@ const atualizarParcelamento = async (app: FastifyInstance) => {
         .select({ id: parcela.id })
         .from(parcela)
         .where(
-          and(eq(parcela.parcelamentoId, params.id), eq(parcela.status, 'PAGA')),
+          and(
+            eq(parcela.parcelamentoId, params.id),
+            eq(parcela.status, 'PAGA'),
+          ),
         )
         .limit(1)
 

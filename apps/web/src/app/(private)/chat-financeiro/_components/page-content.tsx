@@ -38,7 +38,11 @@ const PageContent = () => {
   // ponytail: confirm() nativo — o projeto não tem wrapper de AlertDialog e
   // isso é uma ação destrutiva rara. Trocar por Dialog se virar padrão no app.
   const handleLimpar = () => {
-    if (!window.confirm('Apagar todo o histórico do chat? Isso não pode ser desfeito.')) {
+    if (
+      !window.confirm(
+        'Apagar todo o histórico do chat? Isso não pode ser desfeito.',
+      )
+    ) {
       return
     }
 
@@ -85,8 +89,8 @@ const PageContent = () => {
 
           {!carregandoHistorico && mensagens.length === 0 && (
             <p className="text-muted-foreground text-sm">
-              Pergunte algo como &quot;se eu comprar uma TV de R$ 2.000 parcelada,
-              qual o impacto nas minhas finanças?&quot;
+              Pergunte algo como &quot;se eu comprar uma TV de R$ 2.000
+              parcelada, qual o impacto nas minhas finanças?&quot;
             </p>
           )}
 

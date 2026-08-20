@@ -60,7 +60,10 @@ const ParcelamentosDocumento = ({
         />
 
         <View style={styles.resumoLinha}>
-          <CardResumo label="Parcelamentos" valor={String(parcelamentos.length)} />
+          <CardResumo
+            label="Parcelamentos"
+            valor={String(parcelamentos.length)}
+          />
           <CardResumo label="Quitados" valor={String(quitados)} />
           <CardResumo
             label="Em andamento"

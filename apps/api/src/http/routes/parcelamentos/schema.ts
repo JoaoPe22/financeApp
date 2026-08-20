@@ -9,12 +9,9 @@ const parcelamentoBodySchema = z
     quantidadeParcelas: z.coerce.number().int().min(1),
     dataPrimeiraParcela: z.iso.date(),
   })
-  .refine(
-    (data) => (data.valorEntrada ?? 0) <= data.valorTotal,
-    {
-      message: 'O valor de entrada não pode ser maior que o valor total',
-      path: ['valorEntrada'],
-    },
-  )
+  .refine((data) => (data.valorEntrada ?? 0) <= data.valorTotal, {
+    message: 'O valor de entrada não pode ser maior que o valor total',
+    path: ['valorEntrada'],
+  })
 
 export { parcelamentoBodySchema }

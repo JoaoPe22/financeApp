@@ -6,7 +6,8 @@ import { env } from '@/lib/env'
 import { extractErrorMessage } from '@/lib/error-handler'
 import { CHAT_ROLE, ChatMensagem } from '@/types/chat-mensagem'
 
-const ERRO_CONEXAO = 'Erro de conexão. Verifique sua internet e tente novamente.'
+const ERRO_CONEXAO =
+  'Erro de conexão. Verifique sua internet e tente novamente.'
 
 // Diverge de propósito do padrão useQuery/useMutation do resto do app:
 // streaming exige estado manual (não há cache/invalidação envolvidos aqui).
@@ -36,15 +37,27 @@ const useChatFinanceiro = () => {
 
     setMensagens((prev) => [
       ...prev,
-      { id: idUsuario, role: CHAT_ROLE.USER, conteudo: texto, createdAt: agora },
-      { id: idAssistente, role: CHAT_ROLE.ASSISTANT, conteudo: '', createdAt: agora },
+      {
+        id: idUsuario,
+        role: CHAT_ROLE.USER,
+        conteudo: texto,
+        createdAt: agora,
+      },
+      {
+        id: idAssistente,
+        role: CHAT_ROLE.ASSISTANT,
+        conteudo: '',
+        createdAt: agora,
+      },
     ])
     setEnviando(true)
 
     const escreverNoAssistente = (conteudo: string) =>
       setMensagens((prev) =>
         prev.map((item) =>
-          item.id === idAssistente ? { ...item, conteudo } : item))
+          item.id === idAssistente ? { ...item, conteudo } : item,
+        ),
+      )
 
     // Um evento SSE malformado não pode derrubar o stream inteiro
     const processarEvento = (evento: string) => {
@@ -54,7 +67,7 @@ const useChatFinanceiro = () => {
 
       if (!linhaDeDados) return
 
-      let payload: { delta?: string, error?: string, done?: boolean }
+      let payload: { delta?: string; error?: string; done?: boolean }
 
       try {
         payload = JSON.parse(linhaDeDados.replace(/^data:\s*/, ''))
@@ -74,7 +87,9 @@ const useChatFinanceiro = () => {
           prev.map((item) =>
             item.id === idAssistente
               ? { ...item, conteudo: item.conteudo + payload.delta }
-              : item))
+              : item,
+          ),
+        )
       }
     }
 

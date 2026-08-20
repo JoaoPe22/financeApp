@@ -1,3 +1,8 @@
+// Motor de insights: cada "Regra" olha o snapshot financeiro (resumo-financeiro.ts)
+// e decide, sozinha, se tem algo relevante a dizer (retorna Insight) ou nada
+// (retorna null). gerarInsights roda todas as regras e devolve só as que
+// "dispararam" — pra adicionar um aviso novo, basta escrever mais uma Regra e
+// listá-la em REGRAS, sem tocar no restante do arquivo.
 import type { ResumoFinanceiro } from './resumo-financeiro'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
@@ -18,8 +23,10 @@ type Regra = (resumo: ResumoFinanceiro) => Insight | null
 const regraMesSeguintePesado: Regra = (resumo) => {
   const { mesSeguinte, perfil, mesAtual } = resumo
   const totalFixoProximoMes =
-    mesSeguinte.totalDespesasFixasAtivas + mesSeguinte.totalParcelasPendentesNoMes
-  const baseline = perfil?.salarioFixo ?? mesAtual.planejamento?.salarioPrevisto ?? 0
+    mesSeguinte.totalDespesasFixasAtivas +
+    mesSeguinte.totalParcelasPendentesNoMes
+  const baseline =
+    perfil?.salarioFixo ?? mesAtual.planejamento?.salarioPrevisto ?? 0
 
   if (baseline <= 0 || totalFixoProximoMes <= baseline * 0.7) return null
 
@@ -38,9 +45,10 @@ const regraSaldoNegativo: Regra = (resumo) => {
     .sort((a, b) => a.valor - b.valor)
     .slice(0, 3)
 
-  const sugestaoCorte = maisBaratas.length > 0
-    ? ` Despesas ainda pendentes que podem ser adiadas: ${maisBaratas.map((item) => `${item.descricao} (${currencyFormatter.format(item.valor)})`).join(', ')}.`
-    : ''
+  const sugestaoCorte =
+    maisBaratas.length > 0
+      ? ` Despesas ainda pendentes que podem ser adiadas: ${maisBaratas.map((item) => `${item.descricao} (${currencyFormatter.format(item.valor)})`).join(', ')}.`
+      : ''
 
   return {
     tipo: 'ALERTA',
@@ -51,14 +59,21 @@ const regraSaldoNegativo: Regra = (resumo) => {
 
 const regraAntecipacaoParcelas: Regra = (resumo) => {
   const { mesAtual, parcelasPendentes } = resumo
-  if (!mesAtual.planejamento || mesAtual.saldo <= 0 || parcelasPendentes.length === 0) {
+  if (
+    !mesAtual.planejamento ||
+    mesAtual.saldo <= 0 ||
+    parcelasPendentes.length === 0
+  ) {
     return null
   }
 
   const lista = [...parcelasPendentes]
     .sort((a, b) => a.valor - b.valor)
     .slice(0, 3)
-    .map((item) => `${item.descricao} (${currencyFormatter.format(item.valor)} restantes)`)
+    .map(
+      (item) =>
+        `${item.descricao} (${currencyFormatter.format(item.valor)} restantes)`,
+    )
     .join(', ')
 
   return {
@@ -96,9 +111,10 @@ const regraSemReservaEmergencia: Regra = (resumo) => {
   return {
     tipo: 'INFO',
     titulo: 'Sem reserva de emergência',
-    descricao: alvo > 0
-      ? `Você ainda não tem nenhuma reserva cadastrada. Uma meta comum é guardar de 3 a 6 vezes suas contas fixas mensais — no seu caso, algo em torno de ${currencyFormatter.format(alvo)}.`
-      : 'Você ainda não tem nenhuma reserva cadastrada. Considere começar guardando um valor fixo por mês, mesmo que pequeno.',
+    descricao:
+      alvo > 0
+        ? `Você ainda não tem nenhuma reserva cadastrada. Uma meta comum é guardar de 3 a 6 vezes suas contas fixas mensais — no seu caso, algo em torno de ${currencyFormatter.format(alvo)}.`
+        : 'Você ainda não tem nenhuma reserva cadastrada. Considere começar guardando um valor fixo por mês, mesmo que pequeno.',
   }
 }
 
@@ -111,7 +127,9 @@ const REGRAS: Regra[] = [
 ]
 
 const gerarInsights = (resumo: ResumoFinanceiro): Insight[] =>
-  REGRAS.map((regra) => regra(resumo)).filter((insight): insight is Insight => insight !== null)
+  REGRAS.map((regra) => regra(resumo)).filter(
+    (insight): insight is Insight => insight !== null,
+  )
 
 export { gerarInsights }
 export type { Insight, TipoInsight }

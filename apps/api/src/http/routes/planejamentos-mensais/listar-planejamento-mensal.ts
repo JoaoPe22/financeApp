@@ -184,7 +184,9 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
         })),
         receitas: receitas.map((receitaItem) => ({
           ...receitaItem,
-          valorBruto: receitaItem.valorBruto ? Number(receitaItem.valorBruto) : null,
+          valorBruto: receitaItem.valorBruto
+            ? Number(receitaItem.valorBruto)
+            : null,
           valorLiquido: Number(receitaItem.valorLiquido),
         })),
         parcelas: parcelas.map((parcelaItem) => ({

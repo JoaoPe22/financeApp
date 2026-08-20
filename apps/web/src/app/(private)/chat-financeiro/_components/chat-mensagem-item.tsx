@@ -7,7 +7,10 @@ interface ChatMensagemItemProps {
   aguardandoResposta: boolean
 }
 
-const ChatMensagemItem = ({ mensagem, aguardandoResposta }: ChatMensagemItemProps) => {
+const ChatMensagemItem = ({
+  mensagem,
+  aguardandoResposta,
+}: ChatMensagemItemProps) => {
   const doUsuario = mensagem.role === CHAT_ROLE.USER
 
   return (

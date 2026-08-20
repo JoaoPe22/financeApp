@@ -19,7 +19,8 @@ const paraCsv = <T>(colunas: ColunaCsv<T>[], linhas: T[]) =>
   [
     colunas.map((coluna) => escapar(coluna.cabecalho)).join(SEPARADOR),
     ...linhas.map((linha) =>
-      colunas.map((coluna) => escapar(coluna.valor(linha))).join(SEPARADOR)),
+      colunas.map((coluna) => escapar(coluna.valor(linha))).join(SEPARADOR),
+    ),
   ].join('\r\n')
 
 const baixarCsv = <T>(

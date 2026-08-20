@@ -41,7 +41,9 @@ const DespesasPesadasList = ({ dados }: DespesasPesadasListProps) => {
                 style={{ width: `${(item.valor / maiorValor) * 100}%` }}
               />
             </div>
-            <p className="text-muted-foreground text-xs">{item.categoriaNome}</p>
+            <p className="text-muted-foreground text-xs">
+              {item.categoriaNome}
+            </p>
           </div>
         ))}
       </CardContent>

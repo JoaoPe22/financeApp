@@ -15,7 +15,10 @@ const AvisosSection = ({ avisos }: AvisosSectionProps) => {
         <CardTitle>Avisos de atenção</CardTitle>
       </CardHeader>
       <CardContent>
-        <InsightList insights={avisos} vazio="Nada chamando atenção por enquanto." />
+        <InsightList
+          insights={avisos}
+          vazio="Nada chamando atenção por enquanto."
+        />
       </CardContent>
     </Card>
   )

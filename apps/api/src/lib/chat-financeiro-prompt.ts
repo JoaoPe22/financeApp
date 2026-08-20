@@ -4,7 +4,8 @@ import type { ResumoFinanceiro } from './resumo-financeiro'
 // que é apoio informativo (não substitui aconselhamento financeiro
 // profissional) e o snapshot financeiro real do usuário, pra o modelo
 // responder com base em números reais em vez de inventar valores.
-const montarSystemPrompt = (resumo: ResumoFinanceiro) => `
+const montarSystemPrompt = (resumo: ResumoFinanceiro) =>
+  `
 Você é um assistente financeiro dentro de um app de controle de finanças pessoais.
 Seu papel é ajudar o usuário a entender o impacto de decisões (compras, investimentos,
 parcelamentos) nas finanças dele, usando ESTRITAMENTE os números fornecidos abaixo.

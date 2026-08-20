@@ -51,7 +51,10 @@ const desfazerParcelasPagas = async (app: FastifyInstance) => {
         .select({ id: parcela.id })
         .from(parcela)
         .where(
-          and(eq(parcela.parcelamentoId, params.id), eq(parcela.status, 'PAGA')),
+          and(
+            eq(parcela.parcelamentoId, params.id),
+            eq(parcela.status, 'PAGA'),
+          ),
         )
         .orderBy(desc(parcela.numero))
         .limit(body.quantidade)

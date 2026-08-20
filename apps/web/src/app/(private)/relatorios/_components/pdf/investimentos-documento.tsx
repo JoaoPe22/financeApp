@@ -19,7 +19,11 @@ interface InvestimentosDocumentoProps {
 
 const colunasInvestimentos: ColunaTabela<Investimento>[] = [
   { cabecalho: 'Descrição', largura: '22%', render: (i) => i.descricao },
-  { cabecalho: 'Instituição', largura: '18%', render: (i) => i.instituicaoFinanceira },
+  {
+    cabecalho: 'Instituição',
+    largura: '18%',
+    render: (i) => i.instituicaoFinanceira,
+  },
   { cabecalho: 'Indexador', largura: '14%', render: (i) => i.indexador },
   {
     cabecalho: 'Rentab.',
@@ -30,7 +34,8 @@ const colunasInvestimentos: ColunaTabela<Investimento>[] = [
   {
     cabecalho: 'Vencimento',
     largura: '14%',
-    render: (i) => new Date(`${i.dataVencimento}T00:00:00`).toLocaleDateString('pt-BR'),
+    render: (i) =>
+      new Date(`${i.dataVencimento}T00:00:00`).toLocaleDateString('pt-BR'),
   },
   {
     cabecalho: 'Valor aplicado',
@@ -93,12 +98,18 @@ const InvestimentosDocumento = ({
   reservas,
   nomeUsuario,
 }: InvestimentosDocumentoProps) => {
-  const totalInvestido = investimentos.reduce((soma, i) => soma + i.valorAplicado, 0)
+  const totalInvestido = investimentos.reduce(
+    (soma, i) => soma + i.valorAplicado,
+    0,
+  )
   const totalReservas = reservas.reduce((soma, r) => soma + r.valor, 0)
   const totalPatrimonio = totalInvestido + totalReservas
 
   return (
-    <Document title="Relatório de Investimentos e Objetivos" author="Relatórios">
+    <Document
+      title="Relatório de Investimentos e Objetivos"
+      author="Relatórios"
+    >
       <Page size="A4" style={styles.pagina}>
         <CabecalhoRelatorio
           titulo="Relatório de Investimentos e Objetivos"
@@ -106,10 +117,19 @@ const InvestimentosDocumento = ({
         />
 
         <View style={styles.resumoLinha}>
-          <CardResumo label="Investido" valor={formatCurrency(totalInvestido)} />
+          <CardResumo
+            label="Investido"
+            valor={formatCurrency(totalInvestido)}
+          />
           <CardResumo label="Reservas" valor={formatCurrency(totalReservas)} />
-          <CardResumo label="Patrimônio total" valor={formatCurrency(totalPatrimonio)} />
-          <CardResumo label="Objetivos ativos" valor={String(objetivos.length)} />
+          <CardResumo
+            label="Patrimônio total"
+            valor={formatCurrency(totalPatrimonio)}
+          />
+          <CardResumo
+            label="Objetivos ativos"
+            valor={String(objetivos.length)}
+          />
         </View>
 
         <View style={styles.secao}>

@@ -35,7 +35,9 @@ const RodapeRelatorio = () => (
   <Text
     style={styles.rodape}
     fixed
-    render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`}
+    render={({ pageNumber, totalPages }) =>
+      `Página ${pageNumber} de ${totalPages}`
+    }
   />
 )
 

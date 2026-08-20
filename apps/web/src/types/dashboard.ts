@@ -42,9 +42,13 @@ export interface DashboardResponse {
   historicoSaldo: PontoHistoricoSaldo[]
   gastosPorCategoria: GastoPorCategoria[]
   parcelamentos: ParcelamentoResumo[]
-  metaReserva: { totalReservado: number, meta: number } | null
+  metaReserva: { totalReservado: number; meta: number } | null
   despesasPesadas: DespesaPesada[]
-  receitaVsDespesa: { totalReceitas: number, totalDespesas: number, salario: number }
+  receitaVsDespesa: {
+    totalReceitas: number
+    totalDespesas: number
+    salario: number
+  }
   lembretes: Lembrete[]
   avisos: Insight[]
 }

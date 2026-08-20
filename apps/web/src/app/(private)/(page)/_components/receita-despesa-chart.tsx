@@ -20,7 +20,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 interface ReceitaDespesaChartProps {
-  dados: { totalReceitas: number, totalDespesas: number, salario: number }
+  dados: { totalReceitas: number; totalDespesas: number; salario: number }
 }
 
 const ReceitaDespesaChart = ({ dados }: ReceitaDespesaChartProps) => {

@@ -1,6 +1,12 @@
 'use client'
 
-import { Label, PolarAngleAxis, PolarRadiusAxis, RadialBar, RadialBarChart } from 'recharts'
+import {
+  Label,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  RadialBar,
+  RadialBarChart,
+} from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartConfig, ChartContainer } from '@/components/ui/chart'
@@ -16,7 +22,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 interface MetaReservaGaugeProps {
-  meta: { totalReservado: number, meta: number } | null
+  meta: { totalReservado: number; meta: number } | null
 }
 
 const MetaReservaGauge = ({ meta }: MetaReservaGaugeProps) => {
@@ -35,7 +41,10 @@ const MetaReservaGauge = ({ meta }: MetaReservaGaugeProps) => {
     )
   }
 
-  const percentual = Math.min(100, Math.round((meta.totalReservado / meta.meta) * 100))
+  const percentual = Math.min(
+    100,
+    Math.round((meta.totalReservado / meta.meta) * 100),
+  )
   const reservado = Math.min(meta.totalReservado, meta.meta)
   const chartData = [{ reservado, fill: 'var(--color-reservado)' }]
 
@@ -45,7 +54,10 @@ const MetaReservaGauge = ({ meta }: MetaReservaGaugeProps) => {
         <CardTitle>Reserva de emergência</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="mx-auto aspect-square h-55">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square h-55"
+        >
           <RadialBarChart
             data={chartData}
             startAngle={180}
@@ -53,8 +65,18 @@ const MetaReservaGauge = ({ meta }: MetaReservaGaugeProps) => {
             innerRadius={80}
             outerRadius={110}
           >
-            <PolarAngleAxis type="number" domain={[0, meta.meta]} tick={false} axisLine={false} />
-            <RadialBar dataKey="reservado" background cornerRadius={10} isAnimationActive={false} />
+            <PolarAngleAxis
+              type="number"
+              domain={[0, meta.meta]}
+              tick={false}
+              axisLine={false}
+            />
+            <RadialBar
+              dataKey="reservado"
+              background
+              cornerRadius={10}
+              isAnimationActive={false}
+            />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {

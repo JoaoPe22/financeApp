@@ -30,19 +30,45 @@ type DadosMes = {
 
 type ResumoFinanceiro = {
   perfil: { salarioFixo: number | null } | null
-  mesAtual: DadosMes & { mes: number, ano: number }
+  mesAtual: DadosMes & { mes: number; ano: number }
   mesSeguinte: {
     mes: number
     ano: number
     totalDespesasFixasAtivas: number
     totalParcelasPendentesNoMes: number
   }
-  despesasFixasAtivas: { id: string, descricao: string, valor: number, diaVencimento: number }[]
-  despesasAvulsasPendentes: { descricao: string, valor: number }[]
-  parcelasPendentes: { parcelamentoId: string, descricao: string, valor: number }[]
-  objetivosAtivos: { id: string, titulo: string, valorMeta: number, valorAtual: number, prazo: string }[]
-  reservas: { id: string, instituicao: string, valor: number, rentabilidade: number }[]
-  investimentos: { id: string, descricao: string, valorAplicado: number, rentabilidade: number, liquidez: string }[]
+  despesasFixasAtivas: {
+    id: string
+    descricao: string
+    valor: number
+    diaVencimento: number
+  }[]
+  despesasAvulsasPendentes: { descricao: string; valor: number }[]
+  parcelasPendentes: {
+    parcelamentoId: string
+    descricao: string
+    valor: number
+  }[]
+  objetivosAtivos: {
+    id: string
+    titulo: string
+    valorMeta: number
+    valorAtual: number
+    prazo: string
+  }[]
+  reservas: {
+    id: string
+    instituicao: string
+    valor: number
+    rentabilidade: number
+  }[]
+  investimentos: {
+    id: string
+    descricao: string
+    valorAplicado: number
+    rentabilidade: number
+    liquidez: string
+  }[]
 }
 
 const somar = (valores: string[]) =>
@@ -93,7 +119,8 @@ const buscarDadosMes = async (
   const totalDespesas = somar(despesas.map((d) => d.valor))
   const totalReceitas = somar(receitas.map((r) => r.valorLiquido))
   const totalParcelas = somar(parcelas.map((p) => p.valor))
-  const salarioBase = planejamentoDoMes.salarioRecebido ?? planejamentoDoMes.salarioPrevisto
+  const salarioBase =
+    planejamentoDoMes.salarioRecebido ?? planejamentoDoMes.salarioPrevisto
 
   return {
     planejamento: {
@@ -108,7 +135,8 @@ const buscarDadosMes = async (
     totalDespesas,
     totalReceitas,
     totalParcelas,
-    saldo: Number(salarioBase ?? 0) + totalReceitas - totalDespesas - totalParcelas,
+    saldo:
+      Number(salarioBase ?? 0) + totalReceitas - totalDespesas - totalParcelas,
   }
 }
 
@@ -199,7 +227,10 @@ const montarResumoFinanceiro = async (
       .where(eq(investimento.userId, userId)),
   ])
 
-  const parcelasPorParcelamento = new Map<string, { descricao: string, total: number }>()
+  const parcelasPorParcelamento = new Map<
+    string,
+    { descricao: string; total: number }
+  >()
   for (const item of parcelasPendentesRaw) {
     const acumulado = parcelasPorParcelamento.get(item.parcelamentoId)
     parcelasPorParcelamento.set(item.parcelamentoId, {
@@ -210,19 +241,26 @@ const montarResumoFinanceiro = async (
 
   const despesasAvulsasPendentes = mesAtual.planejamento
     ? await db
-      .select({ descricao: despesaMensal.descricao, valor: despesaMensal.valor })
-      .from(despesaMensal)
-      .where(
-        and(
-          eq(despesaMensal.planejamentoMensalId, mesAtual.planejamento.id),
-          inArray(despesaMensal.status, ['PENDENTE', 'ATRASADA']),
-        ),
-      )
+        .select({
+          descricao: despesaMensal.descricao,
+          valor: despesaMensal.valor,
+        })
+        .from(despesaMensal)
+        .where(
+          and(
+            eq(despesaMensal.planejamentoMensalId, mesAtual.planejamento.id),
+            inArray(despesaMensal.status, ['PENDENTE', 'ATRASADA']),
+          ),
+        )
     : []
 
   return {
     perfil: perfilUsuario
-      ? { salarioFixo: perfilUsuario.salarioFixo ? Number(perfilUsuario.salarioFixo) : null }
+      ? {
+          salarioFixo: perfilUsuario.salarioFixo
+            ? Number(perfilUsuario.salarioFixo)
+            : null,
+        }
       : null,
     mesAtual: { ...mesAtual, mes, ano },
     mesSeguinte: {
@@ -237,7 +275,10 @@ const montarResumoFinanceiro = async (
     })),
     despesasAvulsasPendentes: despesasAvulsasPendentes
       .filter((item) => item.descricao)
-      .map((item) => ({ descricao: item.descricao, valor: Number(item.valor) })),
+      .map((item) => ({
+        descricao: item.descricao,
+        valor: Number(item.valor),
+      })),
     parcelasPendentes: Array.from(parcelasPorParcelamento.entries()).map(
       ([parcelamentoId, item]) => ({
         parcelamentoId,

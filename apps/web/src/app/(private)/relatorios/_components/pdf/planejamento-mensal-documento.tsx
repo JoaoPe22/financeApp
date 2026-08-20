@@ -27,7 +27,8 @@ const colunasReceitas: ColunaTabela<Receita>[] = [
   {
     cabecalho: 'Recebimento',
     largura: '18%',
-    render: (r) => new Date(`${r.dataRecebimento}T00:00:00`).toLocaleDateString('pt-BR'),
+    render: (r) =>
+      new Date(`${r.dataRecebimento}T00:00:00`).toLocaleDateString('pt-BR'),
   },
   {
     cabecalho: 'Valor',
@@ -43,7 +44,8 @@ const colunasDespesas: ColunaTabela<DespesaMensal>[] = [
   {
     cabecalho: 'Vencimento',
     largura: '16%',
-    render: (d) => new Date(`${d.dataVencimento}T00:00:00`).toLocaleDateString('pt-BR'),
+    render: (d) =>
+      new Date(`${d.dataVencimento}T00:00:00`).toLocaleDateString('pt-BR'),
   },
   { cabecalho: 'Status', largura: '12%', render: (d) => d.status },
   {
@@ -66,7 +68,8 @@ const colunasParcelas: ColunaTabela<ParcelaMensal>[] = [
   {
     cabecalho: 'Vencimento',
     largura: '14%',
-    render: (p) => new Date(`${p.dataVencimento}T00:00:00`).toLocaleDateString('pt-BR'),
+    render: (p) =>
+      new Date(`${p.dataVencimento}T00:00:00`).toLocaleDateString('pt-BR'),
   },
   { cabecalho: 'Status', largura: '10%', render: (p) => p.status },
   {
@@ -88,7 +91,8 @@ const PlanejamentoMensalDocumento = ({
   const totalReceitas = receitas.reduce((soma, r) => soma + r.valorLiquido, 0)
   const totalDespesas = despesas.reduce((soma, d) => soma + d.valor, 0)
   const totalParcelas = parcelas.reduce((soma, p) => soma + p.valor, 0)
-  const salario = planejamento?.salarioRecebido ?? planejamento?.salarioPrevisto ?? 0
+  const salario =
+    planejamento?.salarioRecebido ?? planejamento?.salarioPrevisto ?? 0
   const saldo = salario + totalReceitas - totalDespesas - totalParcelas
 
   return (
@@ -105,7 +109,10 @@ const PlanejamentoMensalDocumento = ({
 
         <View style={styles.resumoLinha}>
           <CardResumo label="Salário" valor={formatCurrency(salario)} />
-          <CardResumo label="Outras receitas" valor={formatCurrency(totalReceitas)} />
+          <CardResumo
+            label="Outras receitas"
+            valor={formatCurrency(totalReceitas)}
+          />
           <CardResumo label="Despesas" valor={formatCurrency(totalDespesas)} />
           <CardResumo label="Parcelas" valor={formatCurrency(totalParcelas)} />
           <CardResumo

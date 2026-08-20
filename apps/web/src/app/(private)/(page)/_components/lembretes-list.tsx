@@ -37,12 +37,17 @@ const LembretesList = ({ dados }: LembretesListProps) => {
               <div>
                 <p className="font-medium">{item.descricao}</p>
                 <p className="text-muted-foreground text-xs">
-                  {item.tipo === TIPO_LEMBRETE.PARCELA ? 'Parcela' : 'Despesa'} · vence em{' '}
-                  {new Date(`${item.dataVencimento}T00:00:00`).toLocaleDateString('pt-BR')}
+                  {item.tipo === TIPO_LEMBRETE.PARCELA ? 'Parcela' : 'Despesa'}{' '}
+                  · vence em{' '}
+                  {new Date(
+                    `${item.dataVencimento}T00:00:00`,
+                  ).toLocaleDateString('pt-BR')}
                 </p>
               </div>
             </div>
-            <span className="font-medium">{currencyFormatter.format(item.valor)}</span>
+            <span className="font-medium">
+              {currencyFormatter.format(item.valor)}
+            </span>
           </div>
         ))}
       </CardContent>
