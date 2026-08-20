@@ -1,0 +1,11 @@
+import { PageContent } from './_components/page-content'
+
+const ReservasPage = () => {
+  return (
+    <main className="flex flex-col items-center gap-4 p-10">
+      <PageContent />
+    </main>
+  )
+}
+
+export default ReservasPage
