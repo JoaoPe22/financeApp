@@ -1,12 +1,13 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useMarcarParcelasPagas } from '@/hooks/use-parcelamentos'
-import { ParcelaMensal, STATUS_DESPESA_MENSAL } from '@/types/planejamento-mensal'
+import { useMarcarParcelaPaga } from '@/hooks/use-parcelamentos'
+import {
+  ParcelaMensal,
+  STATUS_DESPESA_MENSAL,
+} from '@/types/planejamento-mensal'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -21,14 +22,17 @@ const STATUS_LABEL: Record<string, string> = {
 
 interface ParcelaMensalItemProps {
   parcela: ParcelaMensal
+  parcelasPagas: number
 }
 
-// Usa a mesma mutation da página de Parcelamentos (marca as N parcelas
-// pendentes mais antigas do parcelamento como pagas) — qualquer alteração
-// feita aqui ou lá reflete nos dois lugares, já que invalidam as mesmas queries.
-const ParcelaMensalItem = ({ parcela }: ParcelaMensalItemProps) => {
-  const [quantidade, setQuantidade] = useState('1')
-  const { mutate: marcarParcelasPagas, isPending } = useMarcarParcelasPagas()
+// Marca especificamente esta parcela como paga (não "as N mais antigas do
+// parcelamento" como na página de Parcelamentos) — senão, se houver parcelas
+// de meses anteriores ainda pendentes, pagar aqui marcaria a parcela errada.
+const ParcelaMensalItem = ({
+  parcela,
+  parcelasPagas,
+}: ParcelaMensalItemProps) => {
+  const { mutate: marcarParcelaPaga, isPending } = useMarcarParcelaPaga()
   const paga = parcela.status === STATUS_DESPESA_MENSAL.PAGA
 
   return (
@@ -42,10 +46,11 @@ const ParcelaMensalItem = ({ parcela }: ParcelaMensalItemProps) => {
           <p
             className={`font-medium ${paga ? 'text-muted-foreground line-through' : ''}`}
           >
-            {parcela.descricao} ({parcela.numero}/{parcela.quantidadeParcelas})
+            {parcela.descricao} ({parcelasPagas}/{parcela.quantidadeParcelas}{' '}
+            pagas)
           </p>
           <p className="text-muted-foreground text-sm">
-            {parcela.categoriaNome} · vence em{' '}
+            {parcela.categoriaNome} · parcela {parcela.numero} · vence em{' '}
             {new Date(`${parcela.dataVencimento}T00:00:00`).toLocaleDateString(
               'pt-BR',
             )}{' '}
@@ -60,29 +65,21 @@ const ParcelaMensalItem = ({ parcela }: ParcelaMensalItemProps) => {
         </span>
 
         {!paga && (
-          <>
-            <Input
-              type="number"
-              min="1"
-              value={quantidade}
-              onChange={(event) => setQuantidade(event.target.value)}
-              className="w-16"
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              disabled={isPending}
-              onClick={() =>
-                marcarParcelasPagas({
-                  id: parcela.parcelamentoId,
-                  quantidade: Number(quantidade),
-                })}
-            >
-              {isPending && <Loader2 className="animate-spin" />}
-              Marcar como paga(s)
-            </Button>
-          </>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={isPending}
+            onClick={() =>
+              marcarParcelaPaga({
+                parcelamentoId: parcela.parcelamentoId,
+                parcelaId: parcela.id,
+              })
+            }
+          >
+            {isPending && <Loader2 className="animate-spin" />}
+            Marcar como paga
+          </Button>
         )}
       </div>
     </div>
