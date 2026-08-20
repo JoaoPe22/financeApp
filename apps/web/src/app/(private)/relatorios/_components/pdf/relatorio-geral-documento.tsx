@@ -1,5 +1,6 @@
 import { Document, Page, Text, View } from '@react-pdf/renderer'
 
+import { MESES } from '@/components/mes-ano-select'
 import { DashboardResponse } from '@/types/dashboard'
 import { Investimento } from '@/types/investimento'
 import { Objetivo } from '@/types/objetivo'
@@ -7,7 +8,6 @@ import { Parcelamento } from '@/types/parcelamento'
 import { PlanejamentoMensalResponse } from '@/types/planejamento-mensal'
 import { Reserva } from '@/types/reserva'
 
-import { MESES } from '../mes-ano-select'
 import { CabecalhoRelatorio, RodapeRelatorio } from './cabecalho'
 import { CardResumo } from './card-resumo'
 import { formatCurrency } from './format'

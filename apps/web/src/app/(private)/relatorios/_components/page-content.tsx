@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 
 import { authClient } from '@/auth/client'
+import { MesAnoSelect, MESES } from '@/components/mes-ano-select'
 import {
   Card,
   CardDescription,
@@ -18,8 +19,13 @@ import { useObjetivos } from '@/hooks/use-objetivos'
 import { useParcelamentos } from '@/hooks/use-parcelamentos'
 import { usePlanejamentoMensal } from '@/hooks/use-planejamento-mensal'
 import { useReservas } from '@/hooks/use-reservas'
+import { type ColunaCsv } from '@/lib/csv'
+import { formatDate } from '@/lib/dayjs'
+import { Investimento } from '@/types/investimento'
+import { Parcelamento } from '@/types/parcelamento'
+import { DespesaMensal, Receita } from '@/types/planejamento-mensal'
 
-import { MesAnoSelect, MESES } from './mes-ano-select'
+import { DownloadCsvButton } from './download-csv-button'
 import { InvestimentosDocumento } from './pdf/investimentos-documento'
 import { ParcelamentosDocumento } from './pdf/parcelamentos-documento'
 import { PlanejamentoMensalDocumento } from './pdf/planejamento-mensal-documento'
@@ -31,6 +37,44 @@ const DownloadRelatorioButton = dynamic(
 )
 
 const hoje = new Date()
+
+const COLUNAS_DESPESAS: ColunaCsv<DespesaMensal>[] = [
+  { cabecalho: 'Descrição', valor: (item) => item.descricao },
+  { cabecalho: 'Categoria', valor: (item) => item.categoriaNome },
+  { cabecalho: 'Vencimento', valor: (item) => formatDate(item.dataVencimento) },
+  { cabecalho: 'Valor', valor: (item) => item.valor },
+  { cabecalho: 'Status', valor: (item) => item.status },
+]
+
+const COLUNAS_RECEITAS: ColunaCsv<Receita>[] = [
+  { cabecalho: 'Descrição', valor: (item) => item.descricao },
+  { cabecalho: 'Categoria', valor: (item) => item.categoriaNome },
+  { cabecalho: 'Recebimento', valor: (item) => formatDate(item.dataRecebimento) },
+  { cabecalho: 'Valor líquido', valor: (item) => item.valorLiquido },
+]
+
+const COLUNAS_PARCELAMENTOS: ColunaCsv<Parcelamento>[] = [
+  { cabecalho: 'Descrição', valor: (item) => item.descricao },
+  { cabecalho: 'Categoria', valor: (item) => item.categoriaNome },
+  { cabecalho: 'Valor total', valor: (item) => item.valorTotal },
+  { cabecalho: 'Entrada', valor: (item) => item.valorEntrada ?? 0 },
+  { cabecalho: 'Parcelas', valor: (item) => item.quantidadeParcelas },
+  { cabecalho: 'Parcelas pagas', valor: (item) => item.parcelasPagas },
+  {
+    cabecalho: 'Primeira parcela',
+    valor: (item) => formatDate(item.dataPrimeiraParcela),
+  },
+]
+
+const COLUNAS_INVESTIMENTOS: ColunaCsv<Investimento>[] = [
+  { cabecalho: 'Descrição', valor: (item) => item.descricao },
+  { cabecalho: 'Instituição', valor: (item) => item.instituicaoFinanceira },
+  { cabecalho: 'Valor aplicado', valor: (item) => item.valorAplicado },
+  { cabecalho: 'Rentabilidade', valor: (item) => item.rentabilidade },
+  { cabecalho: 'Indexador', valor: (item) => item.indexador },
+  { cabecalho: 'Liquidez', valor: (item) => item.liquidez },
+  { cabecalho: 'Aplicação', valor: (item) => formatDate(item.dataAplicacao) },
+]
 
 const PageContent = () => {
   const [mes, setMes] = useState(hoje.getMonth() + 1)
@@ -47,7 +91,7 @@ const PageContent = () => {
     useInvestimentos()
   const { data: objetivos, isLoading: isLoadingObjetivos } = useObjetivos()
   const { data: reservas, isLoading: isLoadingReservas } = useReservas()
-  const { data: dashboard, isLoading: isLoadingDashboard } = useDashboard()
+  const { data: dashboard, isLoading: isLoadingDashboard } = useDashboard(mes, ano)
 
   const investimentosProntos =
     !isLoadingInvestimentos &&
@@ -90,23 +134,35 @@ const PageContent = () => {
             onChangeAno={setAno}
           />
         </CardHeader>
-        <CardFooter>
+        <CardFooter className="flex flex-wrap gap-2">
           {isLoadingPlanejamento || !planejamento
             ? (
               <Skeleton className="h-9 w-32" />
               )
             : (
-              <DownloadRelatorioButton
-                document={
-                  <PlanejamentoMensalDocumento
-                    dados={planejamento}
-                    mes={mes}
-                    ano={ano}
-                    nomeUsuario={nomeUsuario}
-                  />
-              }
-                fileName={`planejamento-mensal-${MESES[mes - 1].toLowerCase()}-${ano}.pdf`}
-              />
+              <>
+                <DownloadRelatorioButton
+                  document={
+                    <PlanejamentoMensalDocumento
+                      dados={planejamento}
+                      mes={mes}
+                      ano={ano}
+                      nomeUsuario={nomeUsuario}
+                    />
+                }
+                  fileName={`planejamento-mensal-${MESES[mes - 1].toLowerCase()}-${ano}.pdf`}
+                />
+                <DownloadCsvButton
+                  colunas={COLUNAS_DESPESAS}
+                  linhas={planejamento.despesas}
+                  fileName={`despesas-${MESES[mes - 1].toLowerCase()}-${ano}.csv`}
+                />
+                <DownloadCsvButton
+                  colunas={COLUNAS_RECEITAS}
+                  linhas={planejamento.receitas}
+                  fileName={`receitas-${MESES[mes - 1].toLowerCase()}-${ano}.csv`}
+                />
+              </>
               )}
         </CardFooter>
       </Card>
@@ -118,21 +174,28 @@ const PageContent = () => {
             Todos os parcelamentos cadastrados e seu progresso.
           </CardDescription>
         </CardHeader>
-        <CardFooter>
+        <CardFooter className="flex flex-wrap gap-2">
           {isLoadingParcelamentos || !parcelamentos
             ? (
               <Skeleton className="h-9 w-32" />
               )
             : (
-              <DownloadRelatorioButton
-                document={
-                  <ParcelamentosDocumento
-                    parcelamentos={parcelamentos}
-                    nomeUsuario={nomeUsuario}
-                  />
-              }
-                fileName="parcelamentos.pdf"
-              />
+              <>
+                <DownloadRelatorioButton
+                  document={
+                    <ParcelamentosDocumento
+                      parcelamentos={parcelamentos}
+                      nomeUsuario={nomeUsuario}
+                    />
+                }
+                  fileName="parcelamentos.pdf"
+                />
+                <DownloadCsvButton
+                  colunas={COLUNAS_PARCELAMENTOS}
+                  linhas={parcelamentos}
+                  fileName="parcelamentos.csv"
+                />
+              </>
               )}
         </CardFooter>
       </Card>
@@ -144,23 +207,30 @@ const PageContent = () => {
             Investimentos, objetivos e reservas cadastrados.
           </CardDescription>
         </CardHeader>
-        <CardFooter>
+        <CardFooter className="flex flex-wrap gap-2">
           {!investimentosProntos
             ? (
               <Skeleton className="h-9 w-32" />
               )
             : (
-              <DownloadRelatorioButton
-                document={
-                  <InvestimentosDocumento
-                    investimentos={investimentos}
-                    objetivos={objetivos}
-                    reservas={reservas}
-                    nomeUsuario={nomeUsuario}
-                  />
-              }
-                fileName="investimentos-e-objetivos.pdf"
-              />
+              <>
+                <DownloadRelatorioButton
+                  document={
+                    <InvestimentosDocumento
+                      investimentos={investimentos}
+                      objetivos={objetivos}
+                      reservas={reservas}
+                      nomeUsuario={nomeUsuario}
+                    />
+                }
+                  fileName="investimentos-e-objetivos.pdf"
+                />
+                <DownloadCsvButton
+                  colunas={COLUNAS_INVESTIMENTOS}
+                  linhas={investimentos}
+                  fileName="investimentos.csv"
+                />
+              </>
               )}
         </CardFooter>
       </Card>

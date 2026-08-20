@@ -3,6 +3,7 @@
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 
+import { MesAnoSelect } from '@/components/mes-ano-select'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -21,7 +22,6 @@ import { STATUS_DESPESA_MENSAL } from '@/types/planejamento-mensal'
 import { DespesaMensalFormDialog } from './despesa-mensal-form-dialog'
 import { DespesaMensalItem } from './despesa-mensal-item'
 import { InsightsSection } from './insights-section'
-import { MesAnoSelect } from './mes-ano-select'
 import { ParcelaMensalItem } from './parcela-mensal-item'
 import { ReceitaFormDialog } from './receita-form-dialog'
 import { ReceitaItem } from './receita-item'

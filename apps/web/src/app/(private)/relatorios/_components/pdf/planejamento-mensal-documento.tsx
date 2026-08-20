@@ -1,5 +1,6 @@
 import { Document, Page, Text, View } from '@react-pdf/renderer'
 
+import { MESES } from '@/components/mes-ano-select'
 import {
   DespesaMensal,
   ParcelaMensal,
@@ -7,7 +8,6 @@ import {
   Receita,
 } from '@/types/planejamento-mensal'
 
-import { MESES } from '../mes-ano-select'
 import { CabecalhoRelatorio, RodapeRelatorio } from './cabecalho'
 import { CardResumo } from './card-resumo'
 import { formatCurrency } from './format'
