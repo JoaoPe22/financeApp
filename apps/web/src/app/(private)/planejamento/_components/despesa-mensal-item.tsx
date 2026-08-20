@@ -13,7 +13,9 @@ import {
   STATUS_DESPESA_MENSAL,
 } from '@/types/planejamento-mensal'
 
+import { DespesaMensalDetalhesDialog } from './despesa-mensal-detalhes-dialog'
 import { DespesaMensalFormDialog } from './despesa-mensal-form-dialog'
+import { DespesaMensalMoverDialog } from './despesa-mensal-mover-dialog'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -49,18 +51,22 @@ const DespesaMensalItem = ({
               status: checked
                 ? STATUS_DESPESA_MENSAL.PAGA
                 : STATUS_DESPESA_MENSAL.PENDENTE,
-            })}
+            })
+          }
         />
         <span
           className="size-2.5 shrink-0 rounded-full"
           style={{ backgroundColor: despesaMensal.categoriaCor }}
         />
         <div>
-          <p
-            className={`font-medium ${paga ? 'text-muted-foreground line-through' : ''}`}
-          >
-            {despesaMensal.descricao}
-          </p>
+          <DespesaMensalDetalhesDialog despesaMensal={despesaMensal}>
+            <button
+              type="button"
+              className={`font-medium hover:underline ${paga ? 'text-muted-foreground line-through' : ''}`}
+            >
+              {despesaMensal.descricao}
+            </button>
+          </DespesaMensalDetalhesDialog>
           <p className="text-muted-foreground text-sm">
             {despesaMensal.categoriaNome} · vence em{' '}
             {new Date(
@@ -81,6 +87,7 @@ const DespesaMensalItem = ({
           ano={ano}
           despesaMensal={despesaMensal}
         />
+        <DespesaMensalMoverDialog despesaMensal={despesaMensal} />
         <Button
           type="button"
           variant="ghost"

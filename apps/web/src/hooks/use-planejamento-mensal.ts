@@ -164,6 +164,28 @@ const useDeletarDespesaMensal = (mes: number, ano: number) => {
   })
 }
 
+const useMoverDespesaMensal = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, { id: string; dataVencimento: string }>({
+    mutationFn: ({ id, dataVencimento }) =>
+      apiClient
+        .patch(`despesas-mensais/${id}/mover`, { json: { dataVencimento } })
+        .json(),
+    onSuccess: () => {
+      toast.success('Despesa movida com sucesso!')
+      // A despesa pode ter saído do mês atual e entrado em outro —
+      // invalida todos os meses de planejamento, não só o atual.
+      queryClient.invalidateQueries({ queryKey: ['planejamento-mensal'] })
+      queryClient.invalidateQueries({ queryKey: ['insights-mensais'] })
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
 const useSalvarReceita = (mes: number, ano: number) => {
   const invalidar = useInvalidarPlanejamentoMensal(mes, ano)
 
@@ -225,6 +247,7 @@ export {
   useAtualizarStatusDespesaMensal,
   useDeletarDespesaMensal,
   useDeletarReceita,
+  useMoverDespesaMensal,
   usePlanejamentoMensal,
   useSalvarDespesaMensal,
   useSalvarReceita,
