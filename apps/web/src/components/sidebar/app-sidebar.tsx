@@ -3,11 +3,12 @@
 import {
   BanknoteArrowDown,
   FileText,
-  HandCoins,
   House,
-  Landmark,
+  MessageCircle,
   PiggyBank,
+  ShieldCheck,
   SquareChartGantt,
+  Target,
   User,
   Wallet,
 } from 'lucide-react'
@@ -49,19 +50,24 @@ const AppSidebar = () => {
             label="Parcelamentos"
           />
           <SideBarMenuItemSimple
-            href="/receitas"
-            icon={Landmark}
-            label="Receitas"
-          />
-          <SideBarMenuItemSimple
             href="/investimentos"
             icon={PiggyBank}
             label="Investimentos"
           />
           <SideBarMenuItemSimple
-            href="/recomendacoes"
-            icon={HandCoins}
-            label="Recomendacoes"
+            href="/objetivos"
+            icon={Target}
+            label="Objetivos"
+          />
+          <SideBarMenuItemSimple
+            href="/reservas"
+            icon={ShieldCheck}
+            label="Reservas"
+          />
+          <SideBarMenuItemSimple
+            href="/chat-financeiro"
+            icon={MessageCircle}
+            label="Chat Financeiro"
           />
           <SideBarMenuItemSimple
             href="/relatorios"
