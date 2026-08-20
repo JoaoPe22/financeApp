@@ -20,7 +20,9 @@ import { STATUS_DESPESA_MENSAL } from '@/types/planejamento-mensal'
 
 import { DespesaMensalFormDialog } from './despesa-mensal-form-dialog'
 import { DespesaMensalItem } from './despesa-mensal-item'
+import { InsightsSection } from './insights-section'
 import { MesAnoSelect } from './mes-ano-select'
+import { ParcelaMensalItem } from './parcela-mensal-item'
 import { ReceitaFormDialog } from './receita-form-dialog'
 import { ReceitaItem } from './receita-item'
 import { SalarioSection } from './salario-section'
@@ -43,14 +45,23 @@ const PageContent = () => {
   const planejamento = data?.planejamento ?? null
   const despesas = data?.despesas ?? []
   const receitas = data?.receitas ?? []
+  const parcelas = data?.parcelas ?? []
 
   const totalDespesas = despesas.reduce(
     (soma, despesa) => soma + despesa.valor,
     0,
   )
-  const totalPago = despesas
-    .filter((despesa) => despesa.status === STATUS_DESPESA_MENSAL.PAGA)
-    .reduce((soma, despesa) => soma + despesa.valor, 0)
+  const totalParcelas = parcelas.reduce(
+    (soma, parcela) => soma + parcela.valor,
+    0,
+  )
+  const totalPago =
+    despesas
+      .filter((despesa) => despesa.status === STATUS_DESPESA_MENSAL.PAGA)
+      .reduce((soma, despesa) => soma + despesa.valor, 0) +
+    parcelas
+      .filter((parcela) => parcela.status === STATUS_DESPESA_MENSAL.PAGA)
+      .reduce((soma, parcela) => soma + parcela.valor, 0)
   const totalReceitas = receitas.reduce(
     (soma, receita) => soma + receita.valorLiquido,
     0,
@@ -58,7 +69,8 @@ const PageContent = () => {
   const saldo =
     (planejamento?.salarioRecebido ?? planejamento?.salarioPrevisto ?? 0) +
     totalReceitas -
-    totalDespesas
+    totalDespesas -
+    totalParcelas
 
   return (
     <Card className="w-full max-w-3xl rounded-xl shadow-xl">
@@ -73,6 +85,8 @@ const PageContent = () => {
       </CardHeader>
 
       <CardContent className="space-y-4">
+        <InsightsSection mes={mes} ano={ano} />
+
         {isLoading && (
           <>
             <Skeleton className="h-16 w-full" />
@@ -129,11 +143,23 @@ const PageContent = () => {
 
             <div className="flex items-center justify-between">
               <p className="text-muted-foreground text-sm">Despesas do mês</p>
-              <DespesaMensalFormDialog
-                planejamentoMensalId={planejamento.id}
-                mes={mes}
-                ano={ano}
-              />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isAbrindo}
+                  onClick={() => abrirPlanejamentoMensal()}
+                >
+                  {isAbrindo && <Loader2 className="animate-spin" />}
+                  Puxar despesas fixas
+                </Button>
+                <DespesaMensalFormDialog
+                  planejamentoMensalId={planejamento.id}
+                  mes={mes}
+                  ano={ano}
+                />
+              </div>
             </div>
 
             {despesas.length === 0 && (
@@ -153,6 +179,20 @@ const PageContent = () => {
                 />
               ))}
             </div>
+
+            {parcelas.length > 0 && (
+              <>
+                <p className="text-muted-foreground text-sm">
+                  Parcelamentos do mês
+                </p>
+
+                <div className="space-y-3">
+                  {parcelas.map((parcela) => (
+                    <ParcelaMensalItem key={parcela.id} parcela={parcela} />
+                  ))}
+                </div>
+              </>
+            )}
           </>
         )}
       </CardContent>
@@ -169,6 +209,12 @@ const PageContent = () => {
             <p className="text-muted-foreground text-sm">Total de despesas</p>
             <p className="font-medium">
               {currencyFormatter.format(totalDespesas)}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground text-sm">Total de parcelas</p>
+            <p className="font-medium">
+              {currencyFormatter.format(totalParcelas)}
             </p>
           </div>
           <div>

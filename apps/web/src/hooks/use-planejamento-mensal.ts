@@ -42,10 +42,16 @@ const usePlanejamentoMensal = (mes: number, ano: number) =>
 
 const useInvalidarPlanejamentoMensal = (mes: number, ano: number) => {
   const queryClient = useQueryClient()
-  return () =>
+  return () => {
     queryClient.invalidateQueries({
       queryKey: planejamentoMensalQueryKey(mes, ano),
     })
+    // Insights dependem dos mesmos dados (despesas, receitas, salário) —
+    // sem isso ficam desatualizados até a página ser recarregada.
+    queryClient.invalidateQueries({
+      queryKey: ['insights-mensais', mes, ano],
+    })
+  }
 }
 
 const useAbrirPlanejamentoMensal = (mes: number, ano: number) => {

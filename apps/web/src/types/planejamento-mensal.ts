@@ -42,8 +42,24 @@ export interface Receita {
   observacao: string | null
 }
 
+export interface ParcelaMensal {
+  id: string
+  parcelamentoId: string
+  categoriaId: string
+  categoriaNome: string
+  categoriaCor: string
+  descricao: string
+  numero: number
+  quantidadeParcelas: number
+  valor: number
+  dataVencimento: string
+  status: StatusDespesaMensal
+  dataPagamento: string | null
+}
+
 export interface PlanejamentoMensalResponse {
   planejamento: Planejamento | null
   despesas: DespesaMensal[]
   receitas: Receita[]
+  parcelas: ParcelaMensal[]
 }

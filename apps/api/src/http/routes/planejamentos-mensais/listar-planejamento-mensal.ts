@@ -4,7 +4,14 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 import { db } from '@/database'
-import { categoria, despesaMensal, planejamentoMensal, receita } from '@/database/schema'
+import {
+  categoria,
+  despesaMensal,
+  parcela,
+  parcelamento,
+  planejamentoMensal,
+  receita,
+} from '@/database/schema'
 import { authenticate } from '@/http/middlewares/auth'
 
 const planejamentoResponseSchema = z.object({
@@ -42,6 +49,21 @@ const receitaResponseSchema = z.object({
   observacao: z.string().nullable(),
 })
 
+const parcelaResponseSchema = z.object({
+  id: z.uuid(),
+  parcelamentoId: z.uuid(),
+  categoriaId: z.uuid(),
+  categoriaNome: z.string(),
+  categoriaCor: z.string(),
+  descricao: z.string(),
+  numero: z.number(),
+  quantidadeParcelas: z.number(),
+  valor: z.number(),
+  dataVencimento: z.string(),
+  status: z.string(),
+  dataPagamento: z.string().nullable(),
+})
+
 const listarPlanejamentoMensal = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().get(
     '/planejamentos-mensais/:mes/:ano',
@@ -61,6 +83,7 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
             planejamento: planejamentoResponseSchema.nullable(),
             despesas: z.array(despesaMensalResponseSchema),
             receitas: z.array(receitaResponseSchema),
+            parcelas: z.array(parcelaResponseSchema),
           }),
         },
       },
@@ -82,7 +105,7 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
         .limit(1)
 
       if (!planejamento) {
-        return { planejamento: null, despesas: [], receitas: [] }
+        return { planejamento: null, despesas: [], receitas: [], parcelas: [] }
       }
 
       const despesas = await db
@@ -121,6 +144,27 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
         .where(eq(receita.planejamentoMensalId, planejamento.id))
         .orderBy(receita.dataRecebimento)
 
+      const parcelas = await db
+        .select({
+          id: parcela.id,
+          parcelamentoId: parcela.parcelamentoId,
+          categoriaId: parcelamento.categoriaId,
+          categoriaNome: categoria.nome,
+          categoriaCor: categoria.cor,
+          descricao: parcelamento.descricao,
+          numero: parcela.numero,
+          quantidadeParcelas: parcelamento.quantidadeParcelas,
+          valor: parcela.valor,
+          dataVencimento: parcela.dataVencimento,
+          status: parcela.status,
+          dataPagamento: parcela.dataPagamento,
+        })
+        .from(parcela)
+        .innerJoin(parcelamento, eq(parcelamento.id, parcela.parcelamentoId))
+        .innerJoin(categoria, eq(categoria.id, parcelamento.categoriaId))
+        .where(eq(parcela.planejamentoMensalId, planejamento.id))
+        .orderBy(parcela.dataVencimento)
+
       return {
         planejamento: {
           id: planejamento.id,
@@ -142,6 +186,10 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
           ...receitaItem,
           valorBruto: receitaItem.valorBruto ? Number(receitaItem.valorBruto) : null,
           valorLiquido: Number(receitaItem.valorLiquido),
+        })),
+        parcelas: parcelas.map((parcelaItem) => ({
+          ...parcelaItem,
+          valor: Number(parcelaItem.valor),
         })),
       }
     },
