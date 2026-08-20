@@ -3,6 +3,7 @@
 import fastifyCors from '@fastify/cors'
 import fastifyHelmet from '@fastify/helmet'
 import fastifyRateLimit from '@fastify/rate-limit'
+import fastifySse from '@fastify/sse'
 import fastify from 'fastify'
 import {
   serializerCompiler,
@@ -14,12 +15,17 @@ import { env } from '@/lib/env'
 
 import { errorHandler } from './error-handler'
 import { categoriasRoutes } from './routes/categorias'
+import { chatFinanceiroRoutes } from './routes/chat-financeiro'
+import { dashboardRoutes } from './routes/dashboard'
 import { despesasFixasRoutes } from './routes/despesas-fixas'
 import { despesasMensaisRoutes } from './routes/despesas-mensais'
+import { investimentosRoutes } from './routes/investimentos'
+import { objetivosRoutes } from './routes/objetivos'
 import { parcelamentosRoutes } from './routes/parcelamentos'
 import { perfilRoutes } from './routes/perfil'
 import { planejamentosMensaisRoutes } from './routes/planejamentos-mensais'
 import { receitasRoutes } from './routes/receitas'
+import { reservasRoutes } from './routes/reservas'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -39,6 +45,9 @@ app.register(fastifyCors, {
 // Headers de segurança padrão (CSP, X-Frame-Options etc.)
 app.register(fastifyHelmet)
 
+// Server-Sent Events, usado pelo streaming do chat financeiro
+app.register(fastifySse)
+
 // Limite global de requisições por IP, independente do rate limit próprio do better-auth
 app.register(fastifyRateLimit, {
   global: true,
@@ -54,6 +63,11 @@ app.register(planejamentosMensaisRoutes)
 app.register(despesasMensaisRoutes)
 app.register(receitasRoutes)
 app.register(parcelamentosRoutes)
+app.register(investimentosRoutes)
+app.register(objetivosRoutes)
+app.register(reservasRoutes)
+app.register(chatFinanceiroRoutes)
+app.register(dashboardRoutes)
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log(`Server está rodando no host http://0.0.0.0:${env.PORT}`)
