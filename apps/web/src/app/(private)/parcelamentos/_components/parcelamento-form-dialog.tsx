@@ -28,8 +28,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useCategorias } from '@/hooks/use-categorias'
-import { useSalvarParcelamento } from '@/hooks/use-parcelamentos'
+import {
+  useAtualizarParcelamento,
+  useSalvarParcelamento,
+} from '@/hooks/use-parcelamentos'
 import { TIPOCATEGORIA } from '@/types/categoria'
+import { Parcelamento } from '@/types/parcelamento'
 
 const parcelamentoSchema = z
   .object({
@@ -56,11 +60,22 @@ const parcelamentoSchema = z
 
 type ParcelamentoFormData = z.infer<typeof parcelamentoSchema>
 
-const ParcelamentoFormDialog = () => {
+interface ParcelamentoFormDialogProps {
+  parcelamento?: Parcelamento
+}
+
+const ParcelamentoFormDialog = ({
+  parcelamento,
+}: ParcelamentoFormDialogProps) => {
   const [open, setOpen] = useState(false)
   const [dataPrimeiraParcela, setDataPrimeiraParcela] = useState<Date | undefined>()
+  const isEditing = !!parcelamento
   const { data: categorias } = useCategorias('DESPESA')
-  const { mutateAsync: salvarParcelamento, isPending } = useSalvarParcelamento()
+  const { mutateAsync: salvarParcelamento, isPending: isSaving } =
+    useSalvarParcelamento()
+  const { mutateAsync: atualizarParcelamento, isPending: isUpdating } =
+    useAtualizarParcelamento()
+  const isPending = isSaving || isUpdating
 
   const {
     register,
@@ -72,34 +87,67 @@ const ParcelamentoFormDialog = () => {
   } = useForm<ParcelamentoFormData>({
     resolver: zodResolver(parcelamentoSchema),
     defaultValues: {
-      categoriaId: '',
-      descricao: '',
-      valorTotal: 0,
-      valorEntrada: null,
-      quantidadeParcelas: 2,
-      dataPrimeiraParcela: '',
+      categoriaId: parcelamento?.categoriaId ?? '',
+      descricao: parcelamento?.descricao ?? '',
+      valorTotal: parcelamento?.valorTotal ?? 0,
+      valorEntrada: parcelamento?.valorEntrada ?? null,
+      quantidadeParcelas: parcelamento?.quantidadeParcelas ?? 2,
+      dataPrimeiraParcela: parcelamento?.dataPrimeiraParcela ?? '',
     },
   })
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen)
+
+    if (nextOpen) {
+      reset({
+        categoriaId: parcelamento?.categoriaId ?? '',
+        descricao: parcelamento?.descricao ?? '',
+        valorTotal: parcelamento?.valorTotal ?? 0,
+        valorEntrada: parcelamento?.valorEntrada ?? null,
+        quantidadeParcelas: parcelamento?.quantidadeParcelas ?? 2,
+        dataPrimeiraParcela: parcelamento?.dataPrimeiraParcela ?? '',
+      })
+      setDataPrimeiraParcela(
+        parcelamento?.dataPrimeiraParcela
+          ? dayjs(parcelamento.dataPrimeiraParcela).toDate()
+          : undefined,
+      )
+    }
+  }
+
   const onSubmit = async (data: ParcelamentoFormData) => {
-    await salvarParcelamento(data)
-    reset()
-    setDataPrimeiraParcela(undefined)
+    if (isEditing) {
+      await atualizarParcelamento({ id: parcelamento.id, ...data })
+    } else {
+      await salvarParcelamento(data)
+    }
+
     setOpen(false)
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button type="button">
-          <Plus />
-          Novo parcelamento
-        </Button>
+        {isEditing
+          ? (
+            <Button type="button" variant="ghost" size="sm">
+              Editar
+            </Button>
+            )
+          : (
+            <Button type="button">
+              <Plus />
+              Novo parcelamento
+            </Button>
+            )}
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Novo parcelamento</DialogTitle>
+          <DialogTitle>
+            {isEditing ? 'Editar parcelamento' : 'Novo parcelamento'}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)}>

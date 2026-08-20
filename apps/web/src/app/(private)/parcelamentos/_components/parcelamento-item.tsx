@@ -7,10 +7,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   useDeletarParcelamento,
+  useDesfazerParcelasPagas,
   useMarcarParcelasPagas,
   useParcelas,
 } from '@/hooks/use-parcelamentos'
+import { formatDate } from '@/lib/dayjs'
 import { Parcelamento } from '@/types/parcelamento'
+
+import { ParcelamentoFormDialog } from './parcelamento-form-dialog'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -30,6 +34,8 @@ const ParcelamentoItem = ({ parcelamento }: ParcelamentoItemProps) => {
   )
   const { mutate: marcarParcelasPagas, isPending: isPagando } = useMarcarParcelasPagas()
   const { mutate: deletarParcelamento, isPending: isDeleting } = useDeletarParcelamento()
+  const { mutate: desfazerParcelasPagas, isPending: isDesfazendo } =
+    useDesfazerParcelasPagas()
 
   const quitado = parcelamento.parcelasPagas >= parcelamento.quantidadeParcelas
   const parcelasRestantes = parcelamento.quantidadeParcelas - parcelamento.parcelasPagas
@@ -55,6 +61,7 @@ const ParcelamentoItem = ({ parcelamento }: ParcelamentoItemProps) => {
           <span className="font-medium">
             {currencyFormatter.format(parcelamento.valorTotal)}
           </span>
+          <ParcelamentoFormDialog parcelamento={parcelamento} />
           <Button
             type="button"
             variant="ghost"
@@ -106,6 +113,22 @@ const ParcelamentoItem = ({ parcelamento }: ParcelamentoItemProps) => {
         </div>
       )}
 
+      {parcelamento.parcelasPagas > 0 && (
+        <div className="mt-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={isDesfazendo}
+            onClick={() =>
+              desfazerParcelasPagas({ id: parcelamento.id, quantidade: 1 })}
+          >
+            {isDesfazendo && <Loader2 className="animate-spin" />}
+            Desfazer último pagamento
+          </Button>
+        </div>
+      )}
+
       {expandido && (
         <div className="mt-3 space-y-1 border-t pt-3">
           {isLoadingParcelas && (
@@ -118,7 +141,7 @@ const ParcelamentoItem = ({ parcelamento }: ParcelamentoItemProps) => {
             >
               <span className={parcelaItem.status === 'PAGA' ? 'text-muted-foreground line-through' : ''}>
                 Parcela {parcelaItem.numero} · vence em{' '}
-                {new Date(`${parcelaItem.dataVencimento}T00:00:00`).toLocaleDateString('pt-BR')}
+                {formatDate(parcelaItem.dataVencimento)}
               </span>
               <span>{currencyFormatter.format(parcelaItem.valor)}</span>
             </div>

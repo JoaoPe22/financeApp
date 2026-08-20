@@ -13,25 +13,38 @@ import { BadRequestError } from '../_errors/bad-request-error'
 import { dividirEmParcelas } from './dividir-em-parcelas'
 import { parcelamentoBodySchema } from './schema'
 
-const cadastrarParcelamento = async (app: FastifyInstance) => {
-  app.withTypeProvider<ZodTypeProvider>().post(
-    '/parcelamentos',
+const atualizarParcelamento = async (app: FastifyInstance) => {
+  app.withTypeProvider<ZodTypeProvider>().patch(
+    '/parcelamentos/:id',
     {
       preHandler: authenticate,
       schema: {
         tags: ['Parcelamentos'],
-        summary: 'Cadastrar parcelamento',
+        summary: 'Atualizar parcelamento',
         description:
-          'Cria um parcelamento e gera automaticamente todas as parcelas, uma por mês a partir da data da primeira parcela. Cria o planejamento mensal de cada mês envolvido, se ainda não existir.',
+          'Atualiza um parcelamento e regera todas as parcelas. Bloqueado se alguma parcela já foi paga, para não descartar o histórico de pagamento.',
+        params: z.object({ id: z.uuid() }),
         body: parcelamentoBodySchema,
         response: {
-          201: z.object({ id: z.uuid() }),
+          200: z.void(),
         },
       },
     },
     async (request, reply) => {
-      const { body } = request
+      const { body, params } = request
       const userId = request.user!.id
+
+      const [parcelamentoExistente] = await db
+        .select({ id: parcelamento.id })
+        .from(parcelamento)
+        .where(
+          and(eq(parcelamento.id, params.id), eq(parcelamento.userId, userId)),
+        )
+        .limit(1)
+
+      if (!parcelamentoExistente) {
+        throw new BadRequestError('Parcelamento não encontrado')
+      }
 
       const [categoriaExistente] = await db
         .select({ id: categoria.id })
@@ -49,25 +62,43 @@ const cadastrarParcelamento = async (app: FastifyInstance) => {
         throw new BadRequestError('Categoria de despesa inválida')
       }
 
+      const [parcelaPaga] = await db
+        .select({ id: parcela.id })
+        .from(parcela)
+        .where(
+          and(eq(parcela.parcelamentoId, params.id), eq(parcela.status, 'PAGA')),
+        )
+        .limit(1)
+
+      if (parcelaPaga) {
+        throw new BadRequestError(
+          'Este parcelamento já tem parcelas pagas e não pode ser editado. Desfaça os pagamentos primeiro.',
+        )
+      }
+
       const valorFinanciado = body.valorTotal - (body.valorEntrada ?? 0)
       const valoresDasParcelas = dividirEmParcelas(
         valorFinanciado,
         body.quantidadeParcelas,
       )
 
-      const novoParcelamento = await db.transaction(async (tx) => {
-        const [parcelamentoCriado] = await tx
-          .insert(parcelamento)
-          .values({
-            userId,
+      await db.transaction(async (tx) => {
+        await tx
+          .update(parcelamento)
+          .set({
             categoriaId: body.categoriaId,
             descricao: body.descricao,
             valorTotal: body.valorTotal.toString(),
-            valorEntrada: body.valorEntrada != null ? body.valorEntrada.toString() : null,
+            valorEntrada:
+              body.valorEntrada != null ? body.valorEntrada.toString() : null,
             quantidadeParcelas: body.quantidadeParcelas,
             dataPrimeiraParcela: body.dataPrimeiraParcela,
           })
-          .returning({ id: parcelamento.id })
+          .where(eq(parcelamento.id, params.id))
+
+        // Regera do zero: a quantidade e as datas podem ter mudado, e nenhuma
+        // parcela está paga (checado acima), então nada de histórico se perde.
+        await tx.delete(parcela).where(eq(parcela.parcelamentoId, params.id))
 
         const dataPrimeiraParcela = dayjs(body.dataPrimeiraParcela)
 
@@ -81,28 +112,26 @@ const cadastrarParcelamento = async (app: FastifyInstance) => {
           )
 
           await tx.insert(parcela).values({
-            parcelamentoId: parcelamentoCriado.id,
+            parcelamentoId: params.id,
             planejamentoMensalId,
             numero,
             valor: valoresDasParcelas[numero - 1].toString(),
             dataVencimento: dataVencimento.format('YYYY-MM-DD'),
           })
         }
-
-        return parcelamentoCriado
       })
 
       await db.insert(log).values({
         usuarioId: userId,
         entidade: 'parcelamento',
-        entidadeId: novoParcelamento.id,
-        acao: 'CADASTRAR',
-        descricao: `Parcelamento "${body.descricao}" cadastrado com ${body.quantidadeParcelas} parcelas`,
+        entidadeId: params.id,
+        acao: 'ATUALIZAR',
+        descricao: `Parcelamento "${body.descricao}" atualizado com ${body.quantidadeParcelas} parcelas`,
       })
 
-      return reply.status(201).send({ id: novoParcelamento.id })
+      return reply.status(200).send()
     },
   )
 }
 
-export { cadastrarParcelamento }
+export { atualizarParcelamento }

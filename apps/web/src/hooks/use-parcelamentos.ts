@@ -66,6 +66,48 @@ const useMarcarParcelasPagas = () => {
   })
 }
 
+const useAtualizarParcelamento = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, ParcelamentoPayload & { id: string }>({
+    mutationFn: ({ id, ...data }) =>
+      apiClient.patch(`parcelamentos/${id}`, { json: data }).json(),
+    onSuccess: () => {
+      toast.success('Parcelamento atualizado com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['parcelamentos'] })
+      // As parcelas são regeradas: os meses afetados mudam junto
+      queryClient.invalidateQueries({ queryKey: ['planejamento-mensal'] })
+      queryClient.invalidateQueries({ queryKey: ['insights-mensais'] })
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
+const useDesfazerParcelasPagas = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, { id: string, quantidade: number }>({
+    mutationFn: ({ id, quantidade }) =>
+      apiClient
+        .patch(`parcelamentos/${id}/desfazer-pagamento`, { json: { quantidade } })
+        .json(),
+    onSuccess: (_data, { id }) => {
+      toast.success('Pagamento desfeito!')
+      queryClient.invalidateQueries({ queryKey: ['parcelamentos'] })
+      queryClient.invalidateQueries({ queryKey: ['parcelamentos', id, 'parcelas'] })
+      queryClient.invalidateQueries({ queryKey: ['planejamento-mensal'] })
+      queryClient.invalidateQueries({ queryKey: ['insights-mensais'] })
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
 const useDeletarParcelamento = () => {
   const queryClient = useQueryClient()
 
@@ -83,7 +125,9 @@ const useDeletarParcelamento = () => {
 }
 
 export {
+  useAtualizarParcelamento,
   useDeletarParcelamento,
+  useDesfazerParcelasPagas,
   useMarcarParcelasPagas,
   useParcelamentos,
   useParcelas,
