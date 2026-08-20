@@ -54,6 +54,10 @@ const useMarcarParcelasPagas = () => {
       toast.success('Parcelas marcadas como pagas!')
       queryClient.invalidateQueries({ queryKey: ['parcelamentos'] })
       queryClient.invalidateQueries({ queryKey: ['parcelamentos', id, 'parcelas'] })
+      // Parcelas aparecem também no planejamento mensal (qualquer mês em que
+      // caiam) — invalida todas as queries de planejamento pra refletir lá também.
+      queryClient.invalidateQueries({ queryKey: ['planejamento-mensal'] })
+      queryClient.invalidateQueries({ queryKey: ['insights-mensais'] })
     },
     async onError(error) {
       const message = await extractErrorMessage(error)

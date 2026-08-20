@@ -31,18 +31,28 @@ import { useCategorias } from '@/hooks/use-categorias'
 import { useSalvarParcelamento } from '@/hooks/use-parcelamentos'
 import { TIPOCATEGORIA } from '@/types/categoria'
 
-const parcelamentoSchema = z.object({
-  categoriaId: z.string().nonempty('Categoria é obrigatória'),
-  descricao: z.string().nonempty('Descrição é obrigatória'),
-  valorTotal: z.coerce.number().min(0, 'Valor deve ser maior ou igual a 0'),
-  valorEntrada: z.coerce
-    .number()
-    .min(0, 'Entrada deve ser maior ou igual a 0')
-    .nullable()
-    .optional(),
-  quantidadeParcelas: z.coerce.number().int().min(1, 'Deve ter pelo menos 1 parcela'),
-  dataPrimeiraParcela: z.iso.date({ message: 'Data da primeira parcela é obrigatória' }),
-})
+const parcelamentoSchema = z
+  .object({
+    categoriaId: z.string().nonempty('Categoria é obrigatória'),
+    descricao: z.string().nonempty('Descrição é obrigatória'),
+    valorTotal: z.coerce.number().min(0, 'Valor deve ser maior ou igual a 0'),
+    valorEntrada: z.coerce
+      .number()
+      .min(0, 'Entrada deve ser maior ou igual a 0')
+      .nullable()
+      .optional(),
+    quantidadeParcelas: z.coerce
+      .number()
+      .int()
+      .min(1, 'Deve ter pelo menos 1 parcela'),
+    dataPrimeiraParcela: z.iso.date({
+      message: 'Data da primeira parcela é obrigatória',
+    }),
+  })
+  .refine((data) => (data.valorEntrada ?? 0) <= data.valorTotal, {
+    message: 'O valor de entrada não pode ser maior que o valor total',
+    path: ['valorEntrada'],
+  })
 
 type ParcelamentoFormData = z.infer<typeof parcelamentoSchema>
 
