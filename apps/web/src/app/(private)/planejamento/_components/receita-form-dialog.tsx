@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { Loader2, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -44,7 +44,9 @@ const receitaSchema = z.object({
     .min(0, 'Valor bruto deve ser maior ou igual a 0')
     .nullable()
     .optional(),
-  valorLiquido: z.coerce.number().min(0, 'Valor líquido deve ser maior ou igual a 0'),
+  valorLiquido: z.coerce
+    .number()
+    .min(0, 'Valor líquido deve ser maior ou igual a 0'),
   dataRecebimento: z.iso.date({ message: 'Data de recebimento é obrigatória' }),
   observacao: z
     .string()
@@ -69,12 +71,20 @@ const ReceitaFormDialog = ({
   receita,
 }: ReceitaFormDialogProps) => {
   const [open, setOpen] = useState(false)
-  const [dataRecebimento, setDataRecebimento] = useState<Date | undefined>(() =>
-    receita?.dataRecebimento ? parseDateOnly(receita.dataRecebimento) ?? undefined : undefined)
+  const [dataRecebimento, setDataRecebimento] = useState<Date | undefined>(
+    () =>
+      receita?.dataRecebimento
+        ? (parseDateOnly(receita.dataRecebimento) ?? undefined)
+        : undefined,
+  )
   const isEditing = !!receita
   const { data: categorias } = useCategorias('RECEITA')
-  const { mutateAsync: salvarReceita, isPending: isSaving } = useSalvarReceita(mes, ano)
-  const { mutateAsync: atualizarReceita, isPending: isUpdating } = useAtualizarReceita(mes, ano)
+  const { mutateAsync: salvarReceita, isPending: isSaving } = useSalvarReceita(
+    mes,
+    ano,
+  )
+  const { mutateAsync: atualizarReceita, isPending: isUpdating } =
+    useAtualizarReceita(mes, ano)
   const isPending = isSaving || isUpdating
 
   const {
@@ -96,8 +106,10 @@ const ReceitaFormDialog = ({
     },
   })
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen)
+
+    if (nextOpen) {
       reset({
         categoriaId: receita?.categoriaId ?? '',
         descricao: receita?.descricao ?? '',
@@ -106,9 +118,13 @@ const ReceitaFormDialog = ({
         dataRecebimento: receita?.dataRecebimento ?? '',
         observacao: receita?.observacao ?? '',
       })
+      setDataRecebimento(
+        receita?.dataRecebimento
+          ? (parseDateOnly(receita.dataRecebimento) ?? undefined)
+          : undefined,
+      )
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
+  }
 
   const onSubmit = async (data: ReceitaFormData) => {
     if (isEditing) {
@@ -120,20 +136,18 @@ const ReceitaFormDialog = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        {isEditing
-          ? (
-            <Button type="button" variant="ghost" size="sm">
-              Editar
-            </Button>
-            )
-          : (
-            <Button type="button" variant="secondary">
-              <Plus />
-              Nova receita
-            </Button>
-            )}
+        {isEditing ? (
+          <Button type="button" variant="ghost" size="sm">
+            Editar
+          </Button>
+        ) : (
+          <Button type="button" variant="secondary">
+            <Plus />
+            Nova receita
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent>
@@ -153,7 +167,10 @@ const ReceitaFormDialog = ({
                     name="categoriaId"
                     control={control}
                     render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Selecione a categoria" />
                         </SelectTrigger>
@@ -174,7 +191,9 @@ const ReceitaFormDialog = ({
                   <CategoriaDialog
                     tipo={TIPOCATEGORIA.RECEITA}
                     label="receita"
-                    onCreated={(categoriaId) => setValue('categoriaId', categoriaId)}
+                    onCreated={(categoriaId) =>
+                      setValue('categoriaId', categoriaId)
+                    }
                   />
                 </div>
                 {errors.categoriaId && (
@@ -235,7 +254,10 @@ const ReceitaFormDialog = ({
                   setDate={(date) => {
                     setDataRecebimento(date)
                     if (date) {
-                      setValue('dataRecebimento', dayjs(date).format('YYYY-MM-DD'))
+                      setValue(
+                        'dataRecebimento',
+                        dayjs(date).format('YYYY-MM-DD'),
+                      )
                     }
                   }}
                   placeholder="Selecione a data de recebimento"

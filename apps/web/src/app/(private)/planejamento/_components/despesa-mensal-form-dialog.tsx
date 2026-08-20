@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { Loader2, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -88,8 +88,10 @@ const DespesaMensalFormDialog = ({
     },
   })
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen)
+
+    if (nextOpen) {
       reset({
         categoriaId: despesaMensal?.categoriaId ?? '',
         descricao: despesaMensal?.descricao ?? '',
@@ -97,9 +99,13 @@ const DespesaMensalFormDialog = ({
         dataVencimento: despesaMensal?.dataVencimento ?? '',
         observacao: despesaMensal?.observacao ?? '',
       })
+      setdataVencimento(
+        despesaMensal
+          ? new Date(`${despesaMensal.dataVencimento}T00:00:00`)
+          : undefined,
+      )
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
+  }
 
   const onSubmit = async (data: DespesaMensalFormData) => {
     if (isEditing) {
@@ -111,20 +117,18 @@ const DespesaMensalFormDialog = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        {isEditing
-          ? (
-            <Button type="button" variant="ghost" size="sm">
-              Editar
-            </Button>
-            )
-          : (
-            <Button type="button" variant="secondary">
-              <Plus />
-              Nova despesa avulsa
-            </Button>
-            )}
+        {isEditing ? (
+          <Button type="button" variant="ghost" size="sm">
+            Editar
+          </Button>
+        ) : (
+          <Button type="button" variant="secondary">
+            <Plus />
+            Nova despesa avulsa
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent>
