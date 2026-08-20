@@ -37,4 +37,46 @@ const useSalvarCategoria = () => {
   })
 }
 
-export { useCategorias, useSalvarCategoria }
+const useAtualizarCategoria = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    void,
+    Error,
+    Omit<CategoriaPayload, 'tipo'> & { id: string }
+  >({
+    mutationFn: ({ id, ...data }) =>
+      apiClient.patch(`categorias/${id}`, { json: data }).json(),
+    onSuccess: () => {
+      toast.success('Categoria atualizada com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['categorias'] })
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
+const useDeletarCategoria = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, string>({
+    mutationFn: (id) => apiClient.delete(`categorias/${id}`).json(),
+    onSuccess: () => {
+      toast.success('Categoria removida com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['categorias'] })
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
+export {
+  useAtualizarCategoria,
+  useCategorias,
+  useDeletarCategoria,
+  useSalvarCategoria,
+}
