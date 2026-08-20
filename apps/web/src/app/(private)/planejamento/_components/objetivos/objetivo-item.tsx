@@ -27,9 +27,13 @@ const ObjetivoItem = ({ objetivo }: ObjetivoItemProps) => {
   const { mutate: deletarObjetivo, isPending: isDeleting } =
     useDeletarObjetivo()
 
-  const progresso = objetivo.valorMeta > 0
-    ? Math.min(100, Math.round((objetivo.valorAtual / objetivo.valorMeta) * 100))
-    : 0
+  const progresso =
+    objetivo.valorMeta > 0
+      ? Math.min(
+        100,
+        Math.round((objetivo.valorAtual / objetivo.valorMeta) * 100),
+      )
+      : 0
 
   return (
     <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
@@ -38,8 +42,8 @@ const ObjetivoItem = ({ objetivo }: ObjetivoItemProps) => {
         <p className="text-muted-foreground text-sm">
           {currencyFormatter.format(objetivo.valorAtual)} de{' '}
           {currencyFormatter.format(objetivo.valorMeta)} ({progresso}%) · prazo{' '}
-          {new Date(`${objetivo.prazo}T00:00:00`).toLocaleDateString('pt-BR')}{' '}
-          · {STATUS_LABEL[objetivo.status] ?? objetivo.status}
+          {new Date(`${objetivo.prazo}T00:00:00`).toLocaleDateString('pt-BR')} ·{' '}
+          {STATUS_LABEL[objetivo.status] ?? objetivo.status}
         </p>
       </div>
 

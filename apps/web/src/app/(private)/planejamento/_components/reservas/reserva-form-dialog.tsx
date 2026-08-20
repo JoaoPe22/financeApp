@@ -37,8 +37,7 @@ interface ReservaFormDialogProps {
 const ReservaFormDialog = ({ reserva }: ReservaFormDialogProps) => {
   const [open, setOpen] = useState(false)
   const isEditing = !!reserva
-  const { mutateAsync: salvarReserva, isPending: isSaving } =
-    useSalvarReserva()
+  const { mutateAsync: salvarReserva, isPending: isSaving } = useSalvarReserva()
   const { mutateAsync: atualizarReserva, isPending: isUpdating } =
     useAtualizarReserva()
   const isPending = isSaving || isUpdating

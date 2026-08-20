@@ -2,6 +2,9 @@ import { AppSidebar } from '@/components/sidebar'
 import { Topbar } from '@/components/topbar'
 import { SidebarProvider } from '@/components/ui/sidebar'
 
+// Layout compartilhado por toda rota dentro de (private): só monta a casca
+// visual (sidebar + topbar). A checagem de sessão que impede acesso sem login
+// não acontece aqui — é feita antes, em src/proxy.ts.
 const PrivateLayout = async ({
   children,
 }: Readonly<{ children: React.ReactNode }>) => {

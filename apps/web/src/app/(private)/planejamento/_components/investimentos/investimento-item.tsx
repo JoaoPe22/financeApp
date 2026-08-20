@@ -57,7 +57,9 @@ const InvestimentoItem = ({ investimento }: InvestimentoItemProps) => {
           size="sm"
           disabled={isDeleting}
           onClick={() => {
-            if (confirm(`Remover o investimento "${investimento.descricao}"?`)) {
+            if (
+              confirm(`Remover o investimento "${investimento.descricao}"?`)
+            ) {
               deletarInvestimento(investimento.id)
             }
           }}

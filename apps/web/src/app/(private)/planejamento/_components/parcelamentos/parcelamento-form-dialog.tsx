@@ -68,7 +68,9 @@ const ParcelamentoFormDialog = ({
   parcelamento,
 }: ParcelamentoFormDialogProps) => {
   const [open, setOpen] = useState(false)
-  const [dataPrimeiraParcela, setDataPrimeiraParcela] = useState<Date | undefined>()
+  const [dataPrimeiraParcela, setDataPrimeiraParcela] = useState<
+    Date | undefined
+  >()
   const isEditing = !!parcelamento
   const { data: categorias } = useCategorias('DESPESA')
   const { mutateAsync: salvarParcelamento, isPending: isSaving } =
@@ -136,7 +138,7 @@ const ParcelamentoFormDialog = ({
             </Button>
             )
           : (
-            <Button type="button">
+            <Button type="button" variant="secondary">
               <Plus />
               Novo parcelamento
             </Button>
@@ -160,7 +162,10 @@ const ParcelamentoFormDialog = ({
                     name="categoriaId"
                     control={control}
                     render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Selecione a categoria" />
                         </SelectTrigger>
@@ -181,7 +186,8 @@ const ParcelamentoFormDialog = ({
                   <CategoriaDialog
                     tipo={TIPOCATEGORIA.DESPESA}
                     label="despesa"
-                    onCreated={(categoriaId) => setValue('categoriaId', categoriaId)}
+                    onCreated={(categoriaId) =>
+                      setValue('categoriaId', categoriaId)}
                   />
                 </div>
                 {errors.categoriaId && (
@@ -259,7 +265,10 @@ const ParcelamentoFormDialog = ({
                   setDate={(date) => {
                     setDataPrimeiraParcela(date)
                     if (date) {
-                      setValue('dataPrimeiraParcela', dayjs(date).format('YYYY-MM-DD'))
+                      setValue(
+                        'dataPrimeiraParcela',
+                        dayjs(date).format('YYYY-MM-DD'),
+                      )
                     }
                   }}
                   placeholder="Selecione a data da primeira parcela"

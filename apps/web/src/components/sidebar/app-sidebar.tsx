@@ -1,16 +1,11 @@
 'use client'
 
 import {
-  BanknoteArrowDown,
   FileText,
   House,
   MessageCircle,
-  PiggyBank,
-  ShieldCheck,
   SquareChartGantt,
-  Target,
   User,
-  Wallet,
 } from 'lucide-react'
 
 import {
@@ -35,31 +30,6 @@ const AppSidebar = () => {
             href="/planejamento"
             icon={SquareChartGantt}
             label="Planejamento"
-          />
-          <SideBarMenuItemSimple
-            href="/despesas-fixas"
-            icon={BanknoteArrowDown}
-            label="Despesas Fixas"
-          />
-          <SideBarMenuItemSimple
-            href="/parcelamentos"
-            icon={Wallet}
-            label="Parcelamentos"
-          />
-          <SideBarMenuItemSimple
-            href="/investimentos"
-            icon={PiggyBank}
-            label="Investimentos"
-          />
-          <SideBarMenuItemSimple
-            href="/objetivos"
-            icon={Target}
-            label="Objetivos"
-          />
-          <SideBarMenuItemSimple
-            href="/reservas"
-            icon={ShieldCheck}
-            label="Reservas"
           />
           <SideBarMenuItemSimple
             href="/chat-financeiro"

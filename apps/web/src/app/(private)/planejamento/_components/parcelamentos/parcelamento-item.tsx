@@ -32,13 +32,16 @@ const ParcelamentoItem = ({ parcelamento }: ParcelamentoItemProps) => {
     parcelamento.id,
     expandido,
   )
-  const { mutate: marcarParcelasPagas, isPending: isPagando } = useMarcarParcelasPagas()
-  const { mutate: deletarParcelamento, isPending: isDeleting } = useDeletarParcelamento()
+  const { mutate: marcarParcelasPagas, isPending: isPagando } =
+    useMarcarParcelasPagas()
+  const { mutate: deletarParcelamento, isPending: isDeleting } =
+    useDeletarParcelamento()
   const { mutate: desfazerParcelasPagas, isPending: isDesfazendo } =
     useDesfazerParcelasPagas()
 
   const quitado = parcelamento.parcelasPagas >= parcelamento.quantidadeParcelas
-  const parcelasRestantes = parcelamento.quantidadeParcelas - parcelamento.parcelasPagas
+  const parcelasRestantes =
+    parcelamento.quantidadeParcelas - parcelamento.parcelasPagas
 
   return (
     <div className="rounded-lg border p-4">
@@ -76,7 +79,9 @@ const ParcelamentoItem = ({ parcelamento }: ParcelamentoItemProps) => {
             size="sm"
             disabled={isDeleting}
             onClick={() => {
-              if (confirm(`Remover o parcelamento "${parcelamento.descricao}"?`)) {
+              if (
+                confirm(`Remover o parcelamento "${parcelamento.descricao}"?`)
+              ) {
                 deletarParcelamento(parcelamento.id)
               }
             }}
@@ -132,14 +137,22 @@ const ParcelamentoItem = ({ parcelamento }: ParcelamentoItemProps) => {
       {expandido && (
         <div className="mt-3 space-y-1 border-t pt-3">
           {isLoadingParcelas && (
-            <p className="text-muted-foreground text-sm">Carregando parcelas...</p>
+            <p className="text-muted-foreground text-sm">
+              Carregando parcelas...
+            </p>
           )}
           {parcelas?.map((parcelaItem) => (
             <div
               key={parcelaItem.id}
               className="flex items-center justify-between text-sm"
             >
-              <span className={parcelaItem.status === 'PAGA' ? 'text-muted-foreground line-through' : ''}>
+              <span
+                className={
+                  parcelaItem.status === 'PAGA'
+                    ? 'text-muted-foreground line-through'
+                    : ''
+                }
+              >
                 Parcela {parcelaItem.numero} · vence em{' '}
                 {formatDate(parcelaItem.dataVencimento)}
               </span>

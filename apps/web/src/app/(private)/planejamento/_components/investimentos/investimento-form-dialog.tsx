@@ -236,7 +236,9 @@ const InvestimentoFormDialog = ({
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="valorAplicado">Valor aplicado *</FieldLabel>
+                <FieldLabel htmlFor="valorAplicado">
+                  Valor aplicado *
+                </FieldLabel>
                 <Input
                   id="valorAplicado"
                   type="number"
@@ -306,7 +308,10 @@ const InvestimentoFormDialog = ({
                   setDate={(date) => {
                     setDataAplicacao(date)
                     if (date) {
-                      setValue('dataAplicacao', dayjs(date).format('YYYY-MM-DD'))
+                      setValue(
+                        'dataAplicacao',
+                        dayjs(date).format('YYYY-MM-DD'),
+                      )
                     }
                   }}
                   placeholder="Selecione a data de aplicação"
