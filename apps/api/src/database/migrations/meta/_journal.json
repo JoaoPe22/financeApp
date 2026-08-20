@@ -15,6 +15,13 @@
       "when": 1786486041840,
       "tag": "0001_add_log_acao",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787190053386,
+      "tag": "0002_confused_ravenous",
+      "breakpoints": true
     }
   ]
 }

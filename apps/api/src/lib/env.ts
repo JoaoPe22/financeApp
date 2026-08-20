@@ -16,6 +16,9 @@ const envSchema = z.object({
   SMTP_FROM_NAME: z.string(),
   SMTP_FROM_EMAIL: z.email(),
   APPLICATION_TIMEZONE: z.string().default('America/Cuiaba'),
+  // Opcional: a rota de chat retorna erro amigável em runtime se ausente,
+  // em vez de derrubar a API inteira no boot.
+  GEMINI_API_KEY: z.string().optional(),
 })
 
 const env = envSchema.parse(process.env)

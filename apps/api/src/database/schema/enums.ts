@@ -28,6 +28,9 @@ const acaoLogSchemaEnum = z.enum([
 ])
 type AcaoLog = z.infer<typeof acaoLogSchemaEnum>
 
+const chatRoleEnum = z.enum(['USER', 'ASSISTANT'])
+type ChatRole = z.infer<typeof chatRoleEnum>
+
 export {
   tipoCategoriaEnum,
   tipoRendaEnum,
@@ -35,6 +38,7 @@ export {
   statusParcelaEnum,
   statusObjetivoEnum,
   acaoLogSchemaEnum,
+  chatRoleEnum,
 }
 
 export type {
@@ -44,4 +48,5 @@ export type {
   StatusParcela,
   StatusObjetivo,
   AcaoLog,
+  ChatRole,
 }
