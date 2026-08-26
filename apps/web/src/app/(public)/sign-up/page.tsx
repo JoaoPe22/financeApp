@@ -5,13 +5,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { authClient } from '@/auth/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
@@ -23,6 +24,10 @@ const signUpSchema = z
       .min(1, 'O e-mail é obrigatório'),
     password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres'),
     confirmPassword: z.string().min(1, 'A confirmação de senha é obrigatória'),
+    acceptedTerms: z.boolean().refine((value) => value === true, {
+      message:
+        'Você precisa aceitar os Termos de Uso e a Política de Privacidade',
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não coincidem',
@@ -35,6 +40,7 @@ const Page = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const {
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
     register,
@@ -45,6 +51,7 @@ const Page = () => {
       email: '',
       password: '',
       confirmPassword: '',
+      acceptedTerms: false,
     },
   })
 
@@ -66,8 +73,10 @@ const Page = () => {
 
       queryClient.clear()
 
-      toast.success('Conta criada com sucesso!')
-      router.push('/perfil')
+      toast.success(
+        'Conta criada! Enviamos um link de confirmação para o seu e-mail.',
+      )
+      router.push('/sign-in')
       router.refresh()
     } catch (error) {
       console.error('Erro ao criar conta:', error)
@@ -137,6 +146,45 @@ const Page = () => {
                       <span>{errors.confirmPassword.message}</span>
                     )}
                   </Field>
+
+                  <Field orientation="horizontal">
+                    <Controller
+                      name="acceptedTerms"
+                      control={control}
+                      render={({ field }) => (
+                        <Checkbox
+                          id="acceptedTerms"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSubmitting}
+                        />
+                      )}
+                    />
+                    <FieldLabel
+                      htmlFor="acceptedTerms"
+                      className="font-normal"
+                    >
+                      Li e concordo com os{' '}
+                      <Link
+                        href="/termos-de-uso"
+                        className="underline"
+                        target="_blank"
+                      >
+                        Termos de Uso
+                      </Link>{' '}
+                      e a{' '}
+                      <Link
+                        href="/politica-de-privacidade"
+                        className="underline"
+                        target="_blank"
+                      >
+                        Política de Privacidade
+                      </Link>
+                    </FieldLabel>
+                  </Field>
+                  {errors.acceptedTerms && (
+                    <span>{errors.acceptedTerms.message}</span>
+                  )}
                 </FieldGroup>
               </FieldSet>
 

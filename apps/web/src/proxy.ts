@@ -30,6 +30,14 @@ const publicRoutes = [
     path: '/redefinir-senha',
     whenAuthenticated: 'next',
   },
+  {
+    path: '/politica-de-privacidade',
+    whenAuthenticated: 'next',
+  },
+  {
+    path: '/termos-de-uso',
+    whenAuthenticated: 'next',
+  },
 ] as const
 
 const REDIRECT_WHEN_NOT_AUTHENTICATED = '/sign-in'
