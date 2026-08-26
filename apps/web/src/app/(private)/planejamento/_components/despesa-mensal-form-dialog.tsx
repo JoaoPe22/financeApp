@@ -46,6 +46,11 @@ const despesaMensalSchema = z.object({
 })
 
 type DespesaMensalFormData = z.infer<typeof despesaMensalSchema>
+// z.coerce.number() aceita qualquer valor de entrada (unknown) e produz um
+// number na saída — precisamos dos dois tipos porque useForm usa o de
+// entrada (o input aceita string/undefined até o submit) e handleSubmit
+// entrega o de saída (já coagido) pro onSubmit.
+type DespesaMensalFormInput = z.input<typeof despesaMensalSchema>
 
 interface DespesaMensalFormDialogProps {
   planejamentoMensalId: string
@@ -77,7 +82,7 @@ const DespesaMensalFormDialog = ({
     control,
     setValue,
     formState: { errors },
-  } = useForm<DespesaMensalFormData>({
+  } = useForm<DespesaMensalFormInput, unknown, DespesaMensalFormData>({
     resolver: zodResolver(despesaMensalSchema),
     defaultValues: {
       categoriaId: despesaMensal?.categoriaId ?? '',
@@ -119,16 +124,18 @@ const DespesaMensalFormDialog = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        {isEditing ? (
-          <Button type="button" variant="ghost" size="sm">
-            Editar
-          </Button>
-        ) : (
-          <Button type="button" variant="secondary">
-            <Plus />
-            Nova despesa avulsa
-          </Button>
-        )}
+        {isEditing
+          ? (
+            <Button type="button" variant="ghost" size="sm">
+              Editar
+            </Button>
+            )
+          : (
+            <Button type="button" variant="secondary">
+              <Plus />
+              Nova despesa avulsa
+            </Button>
+            )}
       </DialogTrigger>
 
       <DialogContent>

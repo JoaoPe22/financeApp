@@ -1,6 +1,6 @@
 'use client'
 
-import { PDFDownloadLink } from '@react-pdf/renderer'
+import { DocumentProps, PDFDownloadLink } from '@react-pdf/renderer'
 import { Download, Loader2 } from 'lucide-react'
 import { ReactElement } from 'react'
 
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 // 'wasm-unsafe-eval' em script-src, senão a geração trava em silêncio e o
 // clique não baixa nada.
 interface DownloadRelatorioButtonProps {
-  document: ReactElement
+  document: ReactElement<DocumentProps>
   fileName: string
 }
 

@@ -59,6 +59,7 @@ const parcelamentoSchema = z
   })
 
 type ParcelamentoFormData = z.infer<typeof parcelamentoSchema>
+type ParcelamentoFormInput = z.input<typeof parcelamentoSchema>
 
 interface ParcelamentoFormDialogProps {
   parcelamento?: Parcelamento
@@ -86,7 +87,7 @@ const ParcelamentoFormDialog = ({
     control,
     setValue,
     formState: { errors },
-  } = useForm<ParcelamentoFormData>({
+  } = useForm<ParcelamentoFormInput, unknown, ParcelamentoFormData>({
     resolver: zodResolver(parcelamentoSchema),
     defaultValues: {
       categoriaId: parcelamento?.categoriaId ?? '',

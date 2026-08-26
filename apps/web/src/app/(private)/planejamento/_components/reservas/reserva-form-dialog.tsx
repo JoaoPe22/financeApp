@@ -29,6 +29,7 @@ const reservaSchema = z.object({
 })
 
 type ReservaFormData = z.infer<typeof reservaSchema>
+type ReservaFormInput = z.input<typeof reservaSchema>
 
 interface ReservaFormDialogProps {
   reserva?: Reserva
@@ -47,7 +48,7 @@ const ReservaFormDialog = ({ reserva }: ReservaFormDialogProps) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ReservaFormData>({
+  } = useForm<ReservaFormInput, unknown, ReservaFormData>({
     resolver: zodResolver(reservaSchema),
     defaultValues: {
       instituicao: reserva?.instituicao ?? '',

@@ -49,6 +49,7 @@ const objetivoSchema = z.object({
 })
 
 type ObjetivoFormData = z.infer<typeof objetivoSchema>
+type ObjetivoFormInput = z.input<typeof objetivoSchema>
 
 interface ObjetivoFormDialogProps {
   objetivo?: Objetivo
@@ -71,7 +72,7 @@ const ObjetivoFormDialog = ({ objetivo }: ObjetivoFormDialogProps) => {
     control,
     setValue,
     formState: { errors },
-  } = useForm<ObjetivoFormData>({
+  } = useForm<ObjetivoFormInput, unknown, ObjetivoFormData>({
     resolver: zodResolver(objetivoSchema),
     defaultValues: {
       titulo: objetivo?.titulo ?? '',

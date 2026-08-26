@@ -56,6 +56,7 @@ const receitaSchema = z.object({
 })
 
 type ReceitaFormData = z.infer<typeof receitaSchema>
+type ReceitaFormInput = z.input<typeof receitaSchema>
 
 interface ReceitaFormDialogProps {
   planejamentoMensalId: string
@@ -94,7 +95,7 @@ const ReceitaFormDialog = ({
     control,
     setValue,
     formState: { errors },
-  } = useForm<ReceitaFormData>({
+  } = useForm<ReceitaFormInput, unknown, ReceitaFormData>({
     resolver: zodResolver(receitaSchema),
     defaultValues: {
       categoriaId: receita?.categoriaId ?? '',
@@ -138,16 +139,18 @@ const ReceitaFormDialog = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        {isEditing ? (
-          <Button type="button" variant="ghost" size="sm">
-            Editar
-          </Button>
-        ) : (
-          <Button type="button" variant="secondary">
-            <Plus />
-            Nova receita
-          </Button>
-        )}
+        {isEditing
+          ? (
+            <Button type="button" variant="ghost" size="sm">
+              Editar
+            </Button>
+            )
+          : (
+            <Button type="button" variant="secondary">
+              <Plus />
+              Nova receita
+            </Button>
+            )}
       </DialogTrigger>
 
       <DialogContent>
@@ -192,8 +195,7 @@ const ReceitaFormDialog = ({
                     tipo={TIPOCATEGORIA.RECEITA}
                     label="receita"
                     onCreated={(categoriaId) =>
-                      setValue('categoriaId', categoriaId)
-                    }
+                      setValue('categoriaId', categoriaId)}
                   />
                 </div>
                 {errors.categoriaId && (

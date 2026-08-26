@@ -48,6 +48,7 @@ const despesaFixaSchema = z.object({
 })
 
 type DespesaFixaFormData = z.infer<typeof despesaFixaSchema>
+type DespesaFixaFormInput = z.input<typeof despesaFixaSchema>
 
 interface DespesaFixaFormDialogProps {
   despesaFixa?: DespesaFixa
@@ -70,7 +71,7 @@ const DespesaFixaFormDialog = ({ despesaFixa }: DespesaFixaFormDialogProps) => {
     control,
     setValue,
     formState: { errors },
-  } = useForm<DespesaFixaFormData>({
+  } = useForm<DespesaFixaFormInput, unknown, DespesaFixaFormData>({
     resolver: zodResolver(despesaFixaSchema),
     defaultValues: {
       categoriaId: despesaFixa?.categoriaId ?? '',

@@ -63,6 +63,7 @@ const investimentoSchema = z
   })
 
 type InvestimentoFormData = z.infer<typeof investimentoSchema>
+type InvestimentoFormInput = z.input<typeof investimentoSchema>
 
 interface InvestimentoFormDialogProps {
   investimento?: Investimento
@@ -89,7 +90,7 @@ const InvestimentoFormDialog = ({
     control,
     setValue,
     formState: { errors },
-  } = useForm<InvestimentoFormData>({
+  } = useForm<InvestimentoFormInput, unknown, InvestimentoFormData>({
     resolver: zodResolver(investimentoSchema),
     defaultValues: {
       categoriaId: investimento?.categoriaId ?? '',
