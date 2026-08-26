@@ -5,3 +5,6 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+overrides:
+  '@fastify/ajv-compiler>fast-uri': '^3.1.5'
+  'fast-json-stringify>fast-uri': '^4.1.2'

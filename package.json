@@ -1,8 +1,9 @@
 {
-  "name": "projeto-saas",
+  "name": "financeApp",
   "version": "1.0.0",
-  "description": "Projeto SaaS de estudo",
-  "author": "",
+  "description": "Aplicação para auxiliar no gerenciamento financeiro pessoal, permitindo o controle de despesas, receitas e investimentos.",
+  "author": "João Canezin <joao.canezin22@gmail.com>",
+  "license": "MIT",
   "private": true,
   "workspaces": [
     "apps/*"

@@ -1,6 +1,6 @@
 services:
   pg:
-    container_name: projeto-saas-postgres
+    container_name: financeApp-postgres
     image: postgres:17
     ports:
       - '${DOCKER_PG_PORT}:5432'
