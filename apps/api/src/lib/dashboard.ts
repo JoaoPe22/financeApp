@@ -107,28 +107,28 @@ const montarDashboard = async (
     buscarHistoricoSaldo(userId, mes, ano),
     planejamentoId
       ? db
-          .select({
-            categoriaNome: categoria.nome,
-            categoriaCor: categoria.cor,
-            valor: sql<string>`sum(${despesaMensal.valor})`,
-          })
-          .from(despesaMensal)
-          .innerJoin(categoria, eq(categoria.id, despesaMensal.categoriaId))
-          .where(eq(despesaMensal.planejamentoMensalId, planejamentoId))
-          .groupBy(categoria.id, categoria.nome, categoria.cor)
+        .select({
+          categoriaNome: categoria.nome,
+          categoriaCor: categoria.cor,
+          valor: sql<string>`sum(${despesaMensal.valor})`,
+        })
+        .from(despesaMensal)
+        .innerJoin(categoria, eq(categoria.id, despesaMensal.categoriaId))
+        .where(eq(despesaMensal.planejamentoMensalId, planejamentoId))
+        .groupBy(categoria.id, categoria.nome, categoria.cor)
       : Promise.resolve([]),
     planejamentoId
       ? db
-          .select({
-            descricao: despesaMensal.descricao,
-            categoriaNome: categoria.nome,
-            valor: despesaMensal.valor,
-          })
-          .from(despesaMensal)
-          .innerJoin(categoria, eq(categoria.id, despesaMensal.categoriaId))
-          .where(eq(despesaMensal.planejamentoMensalId, planejamentoId))
-          .orderBy(desc(despesaMensal.valor))
-          .limit(5)
+        .select({
+          descricao: despesaMensal.descricao,
+          categoriaNome: categoria.nome,
+          valor: despesaMensal.valor,
+        })
+        .from(despesaMensal)
+        .innerJoin(categoria, eq(categoria.id, despesaMensal.categoriaId))
+        .where(eq(despesaMensal.planejamentoMensalId, planejamentoId))
+        .orderBy(desc(despesaMensal.valor))
+        .limit(5)
       : Promise.resolve([]),
     db
       .select({

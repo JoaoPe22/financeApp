@@ -193,8 +193,7 @@ const PlanejamentoMensalTab = () => {
                 <Select
                   value={campoOrdenacao}
                   onValueChange={(value) =>
-                    setCampoOrdenacao(value as CampoOrdenacao)
-                  }
+                    setCampoOrdenacao(value as CampoOrdenacao)}
                 >
                   <SelectTrigger size="sm" className="w-36">
                     <SelectValue />

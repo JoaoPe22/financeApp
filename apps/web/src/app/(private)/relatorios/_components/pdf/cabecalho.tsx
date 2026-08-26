@@ -36,8 +36,7 @@ const RodapeRelatorio = () => (
     style={styles.rodape}
     fixed
     render={({ pageNumber, totalPages }) =>
-      `Página ${pageNumber} de ${totalPages}`
-    }
+      `Página ${pageNumber} de ${totalPages}`}
   />
 )
 

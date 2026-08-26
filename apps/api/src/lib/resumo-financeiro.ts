@@ -241,17 +241,17 @@ const montarResumoFinanceiro = async (
 
   const despesasAvulsasPendentes = mesAtual.planejamento
     ? await db
-        .select({
-          descricao: despesaMensal.descricao,
-          valor: despesaMensal.valor,
-        })
-        .from(despesaMensal)
-        .where(
-          and(
-            eq(despesaMensal.planejamentoMensalId, mesAtual.planejamento.id),
-            inArray(despesaMensal.status, ['PENDENTE', 'ATRASADA']),
-          ),
-        )
+      .select({
+        descricao: despesaMensal.descricao,
+        valor: despesaMensal.valor,
+      })
+      .from(despesaMensal)
+      .where(
+        and(
+          eq(despesaMensal.planejamentoMensalId, mesAtual.planejamento.id),
+          inArray(despesaMensal.status, ['PENDENTE', 'ATRASADA']),
+        ),
+      )
     : []
 
   return {

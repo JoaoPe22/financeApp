@@ -40,42 +40,43 @@ const GastosCategoriaChart = ({ dados }: GastosCategoriaChartProps) => {
         <CardTitle>Gastos por categoria</CardTitle>
       </CardHeader>
       <CardContent>
-        {dados.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            Nenhuma despesa neste mês ainda.
-          </p>
-        ) : (
-          <ChartContainer
-            config={chartConfig}
-            className="mx-auto aspect-square h-65"
-          >
-            <PieChart>
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    nameKey="categoriaNome"
-                    formatter={(value) =>
-                      currencyFormatter.format(Number(value))
-                    }
-                  />
+        {dados.length === 0
+          ? (
+            <p className="text-muted-foreground text-sm">
+              Nenhuma despesa neste mês ainda.
+            </p>
+            )
+          : (
+            <ChartContainer
+              config={chartConfig}
+              className="mx-auto aspect-square h-65"
+            >
+              <PieChart>
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      nameKey="categoriaNome"
+                      formatter={(value) =>
+                        currencyFormatter.format(Number(value))}
+                    />
                 }
-              />
-              <Pie
-                data={chartData}
-                dataKey="valor"
-                nameKey="categoriaNome"
-                innerRadius={55}
-                outerRadius={85}
-                paddingAngle={2}
-                isAnimationActive={false}
-              />
-              <ChartLegend
-                content={<ChartLegendContent nameKey="categoriaNome" />}
-                verticalAlign="bottom"
-              />
-            </PieChart>
-          </ChartContainer>
-        )}
+                />
+                <Pie
+                  data={chartData}
+                  dataKey="valor"
+                  nameKey="categoriaNome"
+                  innerRadius={55}
+                  outerRadius={85}
+                  paddingAngle={2}
+                  isAnimationActive={false}
+                />
+                <ChartLegend
+                  content={<ChartLegendContent nameKey="categoriaNome" />}
+                  verticalAlign="bottom"
+                />
+              </PieChart>
+            </ChartContainer>
+            )}
       </CardContent>
     </Card>
   )

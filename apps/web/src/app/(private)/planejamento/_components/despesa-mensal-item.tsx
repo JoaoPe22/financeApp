@@ -51,8 +51,7 @@ const DespesaMensalItem = ({
               status: checked
                 ? STATUS_DESPESA_MENSAL.PAGA
                 : STATUS_DESPESA_MENSAL.PENDENTE,
-            })
-          }
+            })}
         />
         <span
           className="size-2.5 shrink-0 rounded-full"

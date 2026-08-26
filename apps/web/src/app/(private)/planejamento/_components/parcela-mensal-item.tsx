@@ -74,8 +74,7 @@ const ParcelaMensalItem = ({
               marcarParcelaPaga({
                 parcelamentoId: parcela.parcelamentoId,
                 parcelaId: parcela.id,
-              })
-            }
+              })}
           >
             {isPending && <Loader2 className="animate-spin" />}
             Marcar como paga
