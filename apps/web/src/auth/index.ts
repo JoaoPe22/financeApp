@@ -10,6 +10,8 @@ import { sendEmail } from '@/lib/mail'
 import {
   resetPasswordTemplate,
   resetPasswordTextTemplate,
+  verifyEmailTemplate,
+  verifyEmailTextTemplate,
 } from '@/lib/mail-templates'
 
 import * as authSchema from './schema'
@@ -88,12 +90,18 @@ const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
+    // Sem isso, requireEmailVerification só bloqueia um NOVO login — a sessão
+    // criada no próprio cadastro continuava valendo pra quem nunca verificou.
+    autoSignIn: false,
     resetPasswordTokenExpiresIn: 3600,
     sendResetPassword: async ({ user, url }) => {
-      const resetUrl = url.replace(
-        `${envServer.BETTER_AUTH_URL}/reset-password`,
-        `${envServer.BETTER_AUTH_URL}/redefinir-senha?token`,
-      )
+      // `url` já é o link de verificação do better-auth
+      // (/reset-password/:token?callbackURL=...) — ele confere o token e
+      // redireciona pra a página de destino (ver `redirectTo` em
+      // authClient.requestPasswordReset, em esqueci-a-senha/page.tsx) com
+      // ?token=... anexado. Não precisa (e não deve) ser reescrito aqui.
+      const resetUrl = url
 
       await logUsuario({
         acao: `Solicitação de redefinição de senha - ${user.name} (${user.email})`,
@@ -134,6 +142,41 @@ const auth = betterAuth({
     },
   },
 
+  emailVerification: {
+    sendOnSignUp: true,
+    sendOnSignIn: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await logUsuario({
+        acao: `E-mail de verificação enviado - ${user.name} (${user.email})`,
+        usuarioAfetadoId: user.id,
+        usuarioAfetadoEmail: user.email,
+        detalhes: 'Cadastro exige confirmação de e-mail antes do primeiro acesso',
+      })
+
+      sendEmail({
+        to: user.email,
+        subject: 'Confirme seu e-mail - Projeto Saas',
+        html: verifyEmailTemplate({
+          userName: user.name,
+          verificationUrl: url,
+        }),
+        text: verifyEmailTextTemplate({
+          userName: user.name,
+          verificationUrl: url,
+        }),
+      })
+    },
+    afterEmailVerification: async (user) => {
+      await logUsuario({
+        acao: `E-mail verificado com sucesso - ${user.name} (${user.email})`,
+        usuarioAfetadoId: user.id,
+        usuarioAfetadoEmail: user.email,
+        detalhes: 'Usuário confirmou o e-mail e liberou o acesso à conta',
+      })
+    },
+  },
+
   rateLimit: {
     enabled: true,
     storage: 'memory',
@@ -142,6 +185,23 @@ const auth = betterAuth({
     customRules: {
       '/sign-in/email': { window: 60, max: 10 },
       '/forget-password': { window: 60, max: 5 },
+    },
+  },
+
+  user: {
+    deleteUser: {
+      enabled: true,
+      afterDelete: async (user) => {
+        // Todas as tabelas do usuário (despesas, receitas, parcelamentos etc.)
+        // já usam onDelete: 'cascade' pro user.id — apagar a conta já apaga
+        // o resto. Aqui só registra que aconteceu.
+        await logUsuario({
+          acao: `Conta excluída - ${user.name} (${user.email})`,
+          usuarioAfetadoId: user.id,
+          usuarioAfetadoEmail: user.email,
+          detalhes: 'Usuário excluiu a própria conta e todos os dados vinculados',
+        })
+      },
     },
   },
 

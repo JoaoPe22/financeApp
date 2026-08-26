@@ -51,6 +51,14 @@ const Page = () => {
 
       if (response.error) {
         console.error('Erro ao fazer login:', response.error)
+
+        if (response.error.status === 403) {
+          toast.error(
+            'Confirme seu e-mail antes de entrar. Reenviamos o link de confirmação.',
+          )
+          return
+        }
+
         toast.error('Erro ao fazer login. Verifique suas credenciais.')
         return
       }
@@ -141,7 +149,7 @@ const Page = () => {
                 </Button>
 
                 <Link
-                  href="/esqueci-senha"
+                  href="/esqueci-a-senha"
                   className="text-muted-foreground block text-center text-sm hover:underline"
                   prefetch={false}
                 >
