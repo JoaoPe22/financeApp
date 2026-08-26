@@ -1,6 +1,7 @@
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
 
 import { AvatarUploader } from './_components/avatar-uploader'
+import { DeleteAccountButton } from './_components/delete-account-button'
 import { PageContent } from './_components/page-content'
 import { SignOutButton } from './_components/sign-out-button'
 
@@ -17,7 +18,10 @@ const PerfilPage = () => {
           <p className="text-muted-foreground text-sm">
             Em breve novas configurações estarão disponíveis por aqui.
           </p>
-          <SignOutButton />
+          <div className="flex flex-wrap gap-3">
+            <SignOutButton />
+            <DeleteAccountButton />
+          </div>
         </CardContent>
       </Card>
     </main>
