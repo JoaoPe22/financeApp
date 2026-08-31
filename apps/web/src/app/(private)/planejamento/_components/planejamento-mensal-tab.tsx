@@ -110,6 +110,7 @@ const PlanejamentoMensalTab = () => {
     (soma, receita) => soma + receita.valorLiquido,
     0,
   )
+  const totalGasto = totalDespesas + totalParcelas
   const saldo =
     (planejamento?.salarioRecebido ?? planejamento?.salarioPrevisto ?? 0) +
     totalReceitas -
@@ -156,7 +157,12 @@ const PlanejamentoMensalTab = () => {
 
         {planejamento && (
           <>
-            <SalarioSection planejamento={planejamento} mes={mes} ano={ano} />
+            <SalarioSection
+              key={planejamento.id}
+              planejamento={planejamento}
+              mes={mes}
+              ano={ano}
+            />
 
             <div className="flex items-center justify-between">
               <p className="text-muted-foreground text-sm">
@@ -278,9 +284,15 @@ const PlanejamentoMensalTab = () => {
       {planejamento && (
         <CardFooter className="flex flex-wrap gap-6 border-t pt-4">
           <div>
-            <p className="text-muted-foreground text-sm">Total de receitas</p>
+            <p className="text-muted-foreground text-sm">Total gasto no mês</p>
             <p className="font-medium">
-              {currencyFormatter.format(totalReceitas)}
+              {currencyFormatter.format(totalGasto)}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground text-sm">Total de receitas</p>
+            <p className="text-chart-2 font-medium">
+              +{currencyFormatter.format(totalReceitas)}
             </p>
           </div>
           <div>
@@ -301,7 +313,9 @@ const PlanejamentoMensalTab = () => {
           </div>
           <div>
             <p className="text-muted-foreground text-sm">Saldo</p>
-            <p className={`font-medium ${saldo < 0 ? 'text-destructive' : ''}`}>
+            <p
+              className={`font-medium ${saldo < 0 ? 'text-destructive' : 'text-chart-2'}`}
+            >
               {currencyFormatter.format(saldo)}
             </p>
           </div>
