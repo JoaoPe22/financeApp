@@ -32,6 +32,7 @@ export const TIPO_LEMBRETE = {
 export type TipoLembrete = (typeof TIPO_LEMBRETE)[keyof typeof TIPO_LEMBRETE]
 
 export interface Lembrete {
+  id: string
   descricao: string
   valor: number
   dataVencimento: string

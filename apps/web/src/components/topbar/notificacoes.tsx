@@ -1,6 +1,7 @@
 'use client'
 
-import { Bell } from 'lucide-react'
+import { Bell, Eye } from 'lucide-react'
+import { useState } from 'react'
 
 import {
   Popover,
@@ -16,6 +17,8 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
 })
 
+const CHAVE_VISTAS = 'notificacoes-vistas'
+
 // Reaproveita o `lembretes` que a rota /dashboard já calcula — mesmo queryKey
 // do useDashboard, então abrir o sino não dispara requisição nenhuma.
 const estaVencido = (lembrete: Lembrete) =>
@@ -23,8 +26,27 @@ const estaVencido = (lembrete: Lembrete) =>
 
 const Notificacoes = () => {
   const { data: dashboard, isLoading } = useDashboard()
+  const [vistas, setVistas] = useState<Set<string>>(() => {
+    if (typeof window === 'undefined') return new Set()
 
-  const lembretes = dashboard?.lembretes ?? []
+    try {
+      return new Set(JSON.parse(localStorage.getItem(CHAVE_VISTAS) ?? '[]'))
+    } catch {
+      return new Set()
+    }
+  })
+
+  const marcarComoVisto = (id: string) => {
+    setVistas((atual) => {
+      const proximo = new Set(atual).add(id)
+      localStorage.setItem(CHAVE_VISTAS, JSON.stringify([...proximo]))
+      return proximo
+    })
+  }
+
+  const lembretes = (dashboard?.lembretes ?? []).filter(
+    (item) => !vistas.has(item.id),
+  )
   const vencidos = lembretes.filter(estaVencido)
 
   return (
@@ -75,7 +97,7 @@ const Notificacoes = () => {
 
             return (
               <div
-                key={`${lembrete.tipo}-${lembrete.descricao}-${lembrete.dataVencimento}`}
+                key={lembrete.id}
                 className="flex items-start justify-between gap-3 border-b px-4 py-3 last:border-b-0"
               >
                 <div className="min-w-0">
@@ -90,9 +112,20 @@ const Notificacoes = () => {
                     {lembrete.tipo === TIPO_LEMBRETE.PARCELA && ' · parcela'}
                   </p>
                 </div>
-                <span className="shrink-0 text-sm font-medium">
-                  {currencyFormatter.format(lembrete.valor)}
-                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-sm font-medium">
+                    {currencyFormatter.format(lembrete.valor)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => marcarComoVisto(lembrete.id)}
+                    className="hover:bg-accent text-muted-foreground rounded-md p-1"
+                    aria-label="Marcar como visto"
+                    title="Marcar como visto"
+                  >
+                    <Eye className="size-4" />
+                  </button>
+                </div>
               </div>
             )
           })}

@@ -40,6 +40,7 @@ const dashboardResponseSchema = z.object({
   }),
   lembretes: z.array(
     z.object({
+      id: z.string(),
       descricao: z.string(),
       valor: z.number(),
       dataVencimento: z.string(),

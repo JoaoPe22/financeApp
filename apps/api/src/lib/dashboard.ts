@@ -29,6 +29,7 @@ type ParcelamentoResumo = {
 }
 type DespesaPesada = { descricao: string; categoriaNome: string; valor: number }
 type Lembrete = {
+  id: string
   descricao: string
   valor: number
   dataVencimento: string
@@ -142,6 +143,7 @@ const montarDashboard = async (
       .where(eq(parcelamento.userId, userId)),
     db
       .select({
+        id: despesaMensal.id,
         descricao: despesaMensal.descricao,
         valor: despesaMensal.valor,
         dataVencimento: despesaMensal.dataVencimento,
@@ -161,6 +163,7 @@ const montarDashboard = async (
       ),
     db
       .select({
+        id: parcela.id,
         descricao: parcelamento.descricao,
         valor: parcela.valor,
         dataVencimento: parcela.dataVencimento,
@@ -205,12 +208,14 @@ const montarDashboard = async (
 
   const lembretes: Lembrete[] = [
     ...despesasProximas.map((item) => ({
+      id: item.id,
       descricao: item.descricao,
       valor: Number(item.valor),
       dataVencimento: item.dataVencimento,
       tipo: 'DESPESA' as const,
     })),
     ...parcelasProximas.map((item) => ({
+      id: item.id,
       descricao: item.descricao,
       valor: Number(item.valor),
       dataVencimento: item.dataVencimento,
