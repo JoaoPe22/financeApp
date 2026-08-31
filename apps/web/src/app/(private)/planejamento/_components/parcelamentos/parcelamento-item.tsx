@@ -42,6 +42,9 @@ const ParcelamentoItem = ({ parcelamento }: ParcelamentoItemProps) => {
   const quitado = parcelamento.parcelasPagas >= parcelamento.quantidadeParcelas
   const parcelasRestantes =
     parcelamento.quantidadeParcelas - parcelamento.parcelasPagas
+  const valorParcela =
+    (parcelamento.valorTotal - (parcelamento.valorEntrada ?? 0)) /
+    parcelamento.quantidadeParcelas
 
   return (
     <div className="rounded-lg border p-4">
@@ -61,9 +64,15 @@ const ParcelamentoItem = ({ parcelamento }: ParcelamentoItemProps) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="font-medium">
-            {currencyFormatter.format(parcelamento.valorTotal)}
-          </span>
+          <div className="text-right">
+            <span className="font-medium">
+              {currencyFormatter.format(parcelamento.valorTotal)}
+            </span>
+            <p className="text-muted-foreground text-xs">
+              {parcelamento.quantidadeParcelas}x de{' '}
+              {currencyFormatter.format(valorParcela)}
+            </p>
+          </div>
           <ParcelamentoFormDialog parcelamento={parcelamento} />
           <Button
             type="button"

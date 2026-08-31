@@ -8,6 +8,7 @@ export interface Parcelamento {
   valorEntrada: number | null
   quantidadeParcelas: number
   parcelasPagas: number
+  valorPago: number
   dataPrimeiraParcela: string
 }
 

@@ -1,4 +1,4 @@
-import { count, eq } from 'drizzle-orm'
+import { count, eq, sql } from 'drizzle-orm'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -17,6 +17,7 @@ const parcelamentoResponseSchema = z.object({
   valorEntrada: z.number().nullable(),
   quantidadeParcelas: z.number(),
   parcelasPagas: z.number(),
+  valorPago: z.number(),
   dataPrimeiraParcela: z.string(),
 })
 
@@ -59,6 +60,7 @@ const listarParcelamentos = async (app: FastifyInstance) => {
         .select({
           parcelamentoId: parcela.parcelamentoId,
           total: count(),
+          valorPago: sql<string>`sum(${parcela.valor})`,
         })
         .from(parcela)
         .where(eq(parcela.status, 'PAGA'))
@@ -67,7 +69,7 @@ const listarParcelamentos = async (app: FastifyInstance) => {
       const parcelasPagasMap = new Map(
         parcelasPagasPorParcelamento.map((item) => [
           item.parcelamentoId,
-          item.total,
+          { total: item.total, valorPago: Number(item.valorPago) },
         ]),
       )
 
@@ -75,7 +77,8 @@ const listarParcelamentos = async (app: FastifyInstance) => {
         ...item,
         valorTotal: Number(item.valorTotal),
         valorEntrada: item.valorEntrada ? Number(item.valorEntrada) : null,
-        parcelasPagas: parcelasPagasMap.get(item.id) ?? 0,
+        parcelasPagas: parcelasPagasMap.get(item.id)?.total ?? 0,
+        valorPago: parcelasPagasMap.get(item.id)?.valorPago ?? 0,
       }))
     },
   )
