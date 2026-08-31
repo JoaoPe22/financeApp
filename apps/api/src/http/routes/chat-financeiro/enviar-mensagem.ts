@@ -39,7 +39,7 @@ const enviarMensagem = async (app: FastifyInstance) => {
 
       if (!env.GEMINI_API_KEY) {
         throw new BadRequestError(
-          'Chat com IA não está configurado. Defina GEMINI_API_KEY.',
+          'Não foi possível responder sua mensagem, por favor entre em contato com o suporte.',
         )
       }
 
