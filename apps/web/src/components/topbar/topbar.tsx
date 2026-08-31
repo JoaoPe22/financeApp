@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { useSignOut } from '@/hooks/use-sign-out'
 
 import { Notificacoes } from './notificacoes'
@@ -40,72 +41,79 @@ const Topbar = () => {
   const user = session?.user
 
   return (
-    <header className="flex items-center justify-end gap-1 p-2">
-      <Notificacoes />
+    <header className="flex items-center justify-between gap-1 p-2">
+      <SidebarTrigger />
 
-      <DropdownMenu>
-        <DropdownMenuTrigger className="hover:bg-accent flex items-center gap-2 rounded-md p-1.5 outline-none">
-          <Avatar className="size-7">
-            <AvatarImage src={user?.image ?? undefined} alt={user?.name} />
-            <AvatarFallback className="text-xs">
-              {iniciais(user?.name)}
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-sm font-medium">{user?.name}</span>
-          <ChevronDown className="size-4 opacity-50" />
-        </DropdownMenuTrigger>
+      <div className="flex items-center gap-1">
+        <Notificacoes />
 
-        <DropdownMenuContent align="end" className="w-64">
-          <DropdownMenuItem asChild>
-            <Link href="/perfil" className="flex items-center gap-2">
-              <Avatar className="size-8">
-                <AvatarImage src={user?.image ?? undefined} alt={user?.name} />
-                <AvatarFallback className="text-xs">
-                  {iniciais(user?.name)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium">{user?.name}</span>
-                <span className="text-muted-foreground text-xs">
-                  {user?.email}
-                </span>
-              </div>
-            </Link>
-          </DropdownMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="hover:bg-accent flex items-center gap-2 rounded-md p-1.5 outline-none">
+            <Avatar className="size-7">
+              <AvatarImage src={user?.image ?? undefined} alt={user?.name} />
+              <AvatarFallback className="text-xs">
+                {iniciais(user?.name)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-medium">{user?.name}</span>
+            <ChevronDown className="size-4 opacity-50" />
+          </DropdownMenuTrigger>
 
-          <DropdownMenuSeparator />
+          <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuItem asChild>
+              <Link href="/perfil" className="flex items-center gap-2">
+                <Avatar className="size-8">
+                  <AvatarImage
+                    src={user?.image ?? undefined}
+                    alt={user?.name}
+                  />
+                  <AvatarFallback className="text-xs">
+                    {iniciais(user?.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">{user?.name}</span>
+                  <span className="text-muted-foreground text-xs">
+                    {user?.email}
+                  </span>
+                </div>
+              </Link>
+            </DropdownMenuItem>
 
-          <div className="px-2 py-1.5">
-            <span className="text-muted-foreground mb-1.5 block text-xs">
-              Tema
-            </span>
-            <Select value={theme} onValueChange={setTheme}>
-              <SelectTrigger size="sm" className="w-full">
-                <SelectValue placeholder="Selecione o tema" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Claro</SelectItem>
-                <SelectItem value="dark">Escuro</SelectItem>
-                <SelectItem value="system">Sistema</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <DropdownMenuSeparator />
 
-          <DropdownMenuSeparator />
+            <div className="px-2 py-1.5">
+              <span className="text-muted-foreground mb-1.5 block text-xs">
+                Tema
+              </span>
+              <Select value={theme} onValueChange={setTheme}>
+                <SelectTrigger size="sm" className="w-full">
+                  <SelectValue placeholder="Selecione o tema" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">Claro</SelectItem>
+                  <SelectItem value="dark">Escuro</SelectItem>
+                  <SelectItem value="system">Sistema</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <DropdownMenuItem
-            variant="destructive"
-            disabled={isSigningOut}
-            onSelect={(event) => {
-              event.preventDefault()
-              signOut()
-            }}
-          >
-            {isSigningOut ? <Loader2 className="animate-spin" /> : <LogOut />}
-            Sair
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              variant="destructive"
+              disabled={isSigningOut}
+              onSelect={(event) => {
+                event.preventDefault()
+                signOut()
+              }}
+            >
+              {isSigningOut ? <Loader2 className="animate-spin" /> : <LogOut />}
+              Sair
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   )
 }
