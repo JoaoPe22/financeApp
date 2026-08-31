@@ -112,7 +112,7 @@ const auth = betterAuth({
 
       sendEmail({
         to: user.email,
-        subject: 'Redefinição de Senha - Projeto Saas',
+        subject: 'Redefinição de Senha - FinanceApp',
         html: resetPasswordTemplate({
           userName: user.name,
           resetUrl,
@@ -135,7 +135,7 @@ const auth = betterAuth({
 
       sendEmail({
         to: user.email,
-        subject: 'Senha Alterada - Projeto Saas',
+        subject: 'Senha Alterada - FinanceApp',
         html: `<p>Olá ${user.name},</p><p>Sua senha foi alterada com sucesso em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' })}.</p><p>Se você não realizou esta alteração, entre em contato conosco imediatamente.</p>`,
         text: `Sua senha foi alterada com sucesso em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' })}.`,
       })
@@ -156,7 +156,7 @@ const auth = betterAuth({
 
       sendEmail({
         to: user.email,
-        subject: 'Confirme seu e-mail - Projeto Saas',
+        subject: 'Confirme seu e-mail - FinanceApp',
         html: verifyEmailTemplate({
           userName: user.name,
           verificationUrl: url,

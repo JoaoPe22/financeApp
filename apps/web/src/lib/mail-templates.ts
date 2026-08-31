@@ -68,7 +68,7 @@ const resetPasswordTemplate = (data: ResetPasswordTemplateData) => {
 <body>
   <div class="container">
     <div class="logo">
-      <img src="${env.BETTER_AUTH_URL}/logotipo.png" alt="Projeto Saas" />
+      <img src="${env.BETTER_AUTH_URL}/logotipo.png" alt="FinanceApp" />
     </div>
     <h1>Redefinição de Senha</h1>
     <p>Olá ${data.userName},</p>
@@ -85,7 +85,7 @@ const resetPasswordTemplate = (data: ResetPasswordTemplateData) => {
     Se você não solicitou a redefinição de senha, pode ignorar este email com segurança. Sua senha permanecerá a mesma.</p>
     <div class="footer">
       <p>Este é um email automático, por favor não responda.</p>
-      <p>&copy; ${new Date().getFullYear()} Projeto Saas. Todos os direitos reservados.</p>
+      <p>&copy; ${new Date().getFullYear()} FinanceApp. Todos os direitos reservados.</p>
     </div>
   </div>
 </body>
@@ -109,7 +109,7 @@ Se você não solicitou a redefinição de senha, pode ignorar este email com se
 
 ---
 Este é um email automático, por favor não responda.
-© ${new Date().getFullYear()} Projeto Saas. Todos os direitos reservados.
+© ${new Date().getFullYear()} FinanceApp. Todos os direitos reservados.
   `
 }
 
@@ -172,7 +172,7 @@ const verifyEmailTemplate = (data: VerifyEmailTemplateData) => {
 <body>
   <div class="container">
     <div class="logo">
-      <img src="${env.BETTER_AUTH_URL}/logotipo.png" alt="Projeto Saas" />
+      <img src="${env.BETTER_AUTH_URL}/logotipo.png" alt="FinanceApp" />
     </div>
     <h1>Confirme seu e-mail</h1>
     <p>Olá ${data.userName},</p>
@@ -185,7 +185,7 @@ const verifyEmailTemplate = (data: VerifyEmailTemplateData) => {
     <p>Se você não criou uma conta, pode ignorar este email com segurança.</p>
     <div class="footer">
       <p>Este é um email automático, por favor não responda.</p>
-      <p>&copy; ${new Date().getFullYear()} Projeto Saas. Todos os direitos reservados.</p>
+      <p>&copy; ${new Date().getFullYear()} FinanceApp. Todos os direitos reservados.</p>
     </div>
   </div>
 </body>
@@ -206,7 +206,7 @@ Se você não criou uma conta, pode ignorar este email com segurança.
 
 ---
 Este é um email automático, por favor não responda.
-© ${new Date().getFullYear()} Projeto Saas. Todos os direitos reservados.
+© ${new Date().getFullYear()} FinanceApp. Todos os direitos reservados.
   `
 }
 

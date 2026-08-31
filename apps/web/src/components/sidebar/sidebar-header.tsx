@@ -1,9 +1,15 @@
+import Image from 'next/image'
+import Link from 'next/link'
+
+import logo from '@/assets/financeapplogowordmark.png'
 import { SidebarHeader } from '@/components/ui/sidebar'
 
 const AppSidebarHeader = () => {
   return (
     <SidebarHeader>
-      <h1 className="text-lg font-semibold">Finance App</h1>
+      <Link href="/">
+        <Image src={logo} alt="FinanceApp" priority width={250} height={50} />
+      </Link>
     </SidebarHeader>
   )
 }

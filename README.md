@@ -1,4 +1,6 @@
-# Finance App
+<p align="center">
+  <img src="apps/web/public/logotipo.png" alt="FinanceApp" width="380">
+</p>
 
 Aplicação de controle financeiro pessoal: organize despesas fixas e mensais, receitas, parcelamentos, investimentos, objetivos e reservas, acompanhe tudo num dashboard, gere relatórios em PDF/CSV e converse com um assistente financeiro por IA sobre suas próprias finanças.
 
@@ -42,7 +44,7 @@ pnpm install
 Se não tiver um Postgres rodando, a forma mais rápida é via Docker:
 
 ```bash
-docker run --name financeapp-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=projeto_saas -p 5432:5432 -d postgres:16
+docker run --name financeapp-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=finance_app -p 5432:5432 -d postgres:16
 ```
 
 ### 3. Configure as variáveis de ambiente
@@ -65,7 +67,7 @@ Gere um segredo forte para `BETTER_AUTH_SECRET` em `https://better-auth.com/docs
 
 | Variável | Descrição |
 |---|---|
-| `DATABASE_URL` | String de conexão do Postgres, ex.: `postgres://postgres:postgres@localhost:5432/projeto_saas` |
+| `DATABASE_URL` | String de conexão do Postgres, ex.: `postgres://postgres:postgres@localhost:5432/finance_app` |
 | `BETTER_AUTH_SECRET` | Segredo gerado no passo acima (igual ao do `apps/web/.env`) |
 | `BETTER_AUTH_URL` | URL da API, ex.: `http://localhost:3333` |
 | `FRONTEND_URL` | URL do front-end, ex.: `http://localhost:3000` (usada no CORS) |
