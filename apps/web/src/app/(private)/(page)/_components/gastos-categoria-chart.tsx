@@ -56,8 +56,22 @@ const GastosCategoriaChart = ({ dados }: GastosCategoriaChartProps) => {
                   content={
                     <ChartTooltipContent
                       nameKey="categoriaNome"
-                      formatter={(value) =>
-                        currencyFormatter.format(Number(value))}
+                      formatter={(value, name) => (
+                        <div className="flex w-full items-center justify-between gap-4">
+                          <span
+                            style={{
+                              color: dados.find(
+                                (item) => item.categoriaNome === name,
+                              )?.categoriaCor,
+                            }}
+                          >
+                            {name}
+                          </span>
+                          <span className="text-foreground font-mono font-medium tabular-nums">
+                            {currencyFormatter.format(Number(value))}
+                          </span>
+                        </div>
+                      )}
                     />
                 }
                 />
