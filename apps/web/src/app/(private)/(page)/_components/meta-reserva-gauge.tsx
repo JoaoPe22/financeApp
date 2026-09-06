@@ -53,7 +53,7 @@ const MetaReservaGauge = ({ meta }: MetaReservaGaugeProps) => {
       <CardHeader>
         <CardTitle>Reserva de emergência</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-1 items-center justify-center">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square h-55"

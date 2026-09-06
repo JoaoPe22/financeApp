@@ -39,7 +39,7 @@ const GastosCategoriaChart = ({ dados }: GastosCategoriaChartProps) => {
       <CardHeader>
         <CardTitle>Gastos por categoria</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-1 items-center justify-center">
         {dados.length === 0
           ? (
             <p className="text-muted-foreground text-sm">
@@ -47,10 +47,7 @@ const GastosCategoriaChart = ({ dados }: GastosCategoriaChartProps) => {
             </p>
             )
           : (
-            <ChartContainer
-              config={chartConfig}
-              className="mx-auto aspect-square h-65"
-            >
+            <ChartContainer config={chartConfig} className="h-70 w-full">
               <PieChart>
                 <ChartTooltip
                   content={

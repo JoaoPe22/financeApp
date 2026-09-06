@@ -50,7 +50,7 @@ const SaldoEvolucaoChart = ({ dados }: SaldoEvolucaoChartProps) => {
       <CardHeader>
         <CardTitle>Evolução do saldo</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-1 items-center justify-center">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[220px] w-full"

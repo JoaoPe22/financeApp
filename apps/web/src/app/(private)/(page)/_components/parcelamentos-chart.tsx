@@ -31,7 +31,7 @@ const ParcelamentosChart = ({ dados }: ParcelamentosChartProps) => {
       <CardHeader>
         <CardTitle>Parcelamentos</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-1 items-center justify-center">
         {dados.length === 0
           ? (
             <p className="text-muted-foreground text-sm">

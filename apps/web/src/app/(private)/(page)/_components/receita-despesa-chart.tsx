@@ -42,7 +42,7 @@ const ReceitaDespesaChart = ({ dados }: ReceitaDespesaChartProps) => {
       <CardHeader>
         <CardTitle>Receita vs. despesa do mês</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-1 items-center justify-center">
         <ChartContainer config={chartConfig} className="h-55 w-full">
           <BarChart data={chartData} layout="vertical" margin={{ left: 8 }}>
             <CartesianGrid horizontal={false} />
