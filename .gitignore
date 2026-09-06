@@ -147,3 +147,12 @@ minio_data/
 
 # macOS files
 .DS_Store
+
+# Windows image file caches
+.remember
+
+# Thumbnails
+.claude
+
+# Scripts
+apps/api/scripts/backup-db.sh
