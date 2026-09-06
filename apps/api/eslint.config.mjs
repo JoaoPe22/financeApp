@@ -1,4 +1,5 @@
 import eslint from '@eslint/js'
+import prettierConfig from 'eslint-config-prettier/flat'
 import importPlugin from 'eslint-plugin-import'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import globals from 'globals'
@@ -60,4 +61,7 @@ export default [
       ],
     },
   },
+  // Por último: desliga as regras de formatação do ESLint (@stylistic/*) que
+  // brigam com o Prettier. Formatação é responsabilidade só do Prettier.
+  prettierConfig,
 ]
