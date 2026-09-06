@@ -11,4 +11,10 @@ const objetivoBodySchema = z.object({
   status: statusObjetivoEnum.default('ATIVO'),
 })
 
-export { objetivoBodySchema }
+const objetivoHistoricoBodySchema = z.object({
+  valorAtual: z.coerce.number().min(0),
+  observacao: z.string().nullable().optional(),
+  data: z.iso.date(),
+})
+
+export { objetivoBodySchema, objetivoHistoricoBodySchema }

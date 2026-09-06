@@ -16,3 +16,11 @@ export interface Objetivo {
   prazo: string
   status: StatusObjetivo
 }
+
+export interface ObjetivoHistorico {
+  id: string
+  valorAtual: number
+  variacao: number
+  observacao: string | null
+  data: string
+}

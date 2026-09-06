@@ -6,4 +6,10 @@ const reservaBodySchema = z.object({
   rentabilidade: z.coerce.number().min(0),
 })
 
-export { reservaBodySchema }
+const reservaHistoricoBodySchema = z.object({
+  valor: z.coerce.number().min(0),
+  observacao: z.string().nullable().optional(),
+  data: z.iso.date(),
+})
+
+export { reservaBodySchema, reservaHistoricoBodySchema }

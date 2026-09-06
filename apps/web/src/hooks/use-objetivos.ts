@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { apiClient } from '@/lib/api-client'
 import { extractErrorMessage } from '@/lib/error-handler'
-import { Objetivo, StatusObjetivo } from '@/types/objetivo'
+import { Objetivo, ObjetivoHistorico, StatusObjetivo } from '@/types/objetivo'
 
 interface ObjetivoPayload {
   titulo: string
@@ -12,6 +12,13 @@ interface ObjetivoPayload {
   valorAtual: number
   prazo: string
   status: StatusObjetivo
+}
+
+interface ObjetivoHistoricoPayload {
+  id: string
+  valorAtual: number
+  observacao?: string | null
+  data: string
 }
 
 const useObjetivos = () =>
@@ -69,9 +76,41 @@ const useDeletarObjetivo = () => {
   })
 }
 
+const useHistoricoObjetivo = (objetivoId: string, enabled: boolean) =>
+  useQuery({
+    queryKey: ['objetivos', objetivoId, 'historico'],
+    queryFn: () =>
+      apiClient
+        .get(`objetivos/${objetivoId}/historico`)
+        .json<ObjetivoHistorico[]>(),
+    enabled,
+  })
+
+const useRegistrarHistoricoObjetivo = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<{ id: string }, Error, ObjetivoHistoricoPayload>({
+    mutationFn: ({ id, ...data }) =>
+      apiClient.post(`objetivos/${id}/historico`, { json: data }).json(),
+    onSuccess: (_data, { id }) => {
+      toast.success('Estado do objetivo atualizado!')
+      queryClient.invalidateQueries({ queryKey: ['objetivos'] })
+      queryClient.invalidateQueries({
+        queryKey: ['objetivos', id, 'historico'],
+      })
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
 export {
   useAtualizarObjetivo,
   useDeletarObjetivo,
+  useHistoricoObjetivo,
   useObjetivos,
+  useRegistrarHistoricoObjetivo,
   useSalvarObjetivo,
 }

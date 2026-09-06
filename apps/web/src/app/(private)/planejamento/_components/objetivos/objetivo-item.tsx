@@ -7,6 +7,7 @@ import { useDeletarObjetivo } from '@/hooks/use-objetivos'
 import { Objetivo, STATUS_OBJETIVO } from '@/types/objetivo'
 
 import { ObjetivoFormDialog } from './objetivo-form-dialog'
+import { ObjetivoHistoricoDialog } from './objetivo-historico-dialog'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -48,6 +49,7 @@ const ObjetivoItem = ({ objetivo }: ObjetivoItemProps) => {
       </div>
 
       <div className="flex items-center gap-2">
+        <ObjetivoHistoricoDialog objetivo={objetivo} />
         <ObjetivoFormDialog objetivo={objetivo} />
         <Button
           type="button"

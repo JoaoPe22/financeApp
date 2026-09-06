@@ -7,6 +7,7 @@ import { useDeletarReserva } from '@/hooks/use-reservas'
 import { Reserva } from '@/types/reserva'
 
 import { ReservaFormDialog } from './reserva-form-dialog'
+import { ReservaHistoricoDialog } from './reserva-historico-dialog'
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -38,6 +39,7 @@ const ReservaItem = ({ reserva }: ReservaItemProps) => {
         <span className="font-medium">
           {currencyFormatter.format(reserva.valor)}
         </span>
+        <ReservaHistoricoDialog reserva={reserva} />
         <ReservaFormDialog reserva={reserva} />
         <Button
           type="button"

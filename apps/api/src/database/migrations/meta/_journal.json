@@ -29,6 +29,20 @@
       "when": 1787238749397,
       "tag": "0003_log_usuario_set_null",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788653867401,
+      "tag": "0004_nice_vampiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788654271830,
+      "tag": "0005_slippery_vampiro",
+      "breakpoints": true
     }
   ]
 }

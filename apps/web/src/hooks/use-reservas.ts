@@ -3,12 +3,19 @@ import { toast } from 'sonner'
 
 import { apiClient } from '@/lib/api-client'
 import { extractErrorMessage } from '@/lib/error-handler'
-import { Reserva } from '@/types/reserva'
+import { Reserva, ReservaHistorico } from '@/types/reserva'
 
 interface ReservaPayload {
   instituicao: string
   valor: number
   rentabilidade: number
+}
+
+interface ReservaHistoricoPayload {
+  id: string
+  valor: number
+  observacao?: string | null
+  data: string
 }
 
 const useReservas = () =>
@@ -66,4 +73,37 @@ const useDeletarReserva = () => {
   })
 }
 
-export { useAtualizarReserva, useDeletarReserva, useReservas, useSalvarReserva }
+const useHistoricoReserva = (reservaId: string, enabled: boolean) =>
+  useQuery({
+    queryKey: ['reservas', reservaId, 'historico'],
+    queryFn: () =>
+      apiClient.get(`reservas/${reservaId}/historico`).json<ReservaHistorico[]>(),
+    enabled,
+  })
+
+const useRegistrarHistoricoReserva = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<{ id: string }, Error, ReservaHistoricoPayload>({
+    mutationFn: ({ id, ...data }) =>
+      apiClient.post(`reservas/${id}/historico`, { json: data }).json(),
+    onSuccess: (_data, { id }) => {
+      toast.success('Valor da reserva atualizado!')
+      queryClient.invalidateQueries({ queryKey: ['reservas'] })
+      queryClient.invalidateQueries({ queryKey: ['reservas', id, 'historico'] })
+    },
+    async onError(error) {
+      const message = await extractErrorMessage(error)
+      toast.error(message)
+    },
+  })
+}
+
+export {
+  useAtualizarReserva,
+  useDeletarReserva,
+  useHistoricoReserva,
+  useRegistrarHistoricoReserva,
+  useReservas,
+  useSalvarReserva,
+}
