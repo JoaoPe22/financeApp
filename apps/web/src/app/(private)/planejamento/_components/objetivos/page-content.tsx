@@ -11,7 +11,7 @@ const PageContent = () => {
   const { data: objetivos, isLoading } = useObjetivos()
 
   return (
-    <Card className="w-full max-w-3xl rounded-xl shadow-xl">
+    <Card className="mx-auto w-full max-w-3xl rounded-xl shadow-xl">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-2xl">Objetivos</CardTitle>
         <ObjetivoFormDialog />

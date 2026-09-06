@@ -25,6 +25,7 @@ import {
   useAbrirPlanejamentoMensal,
   usePlanejamentoMensal,
 } from '@/hooks/use-planejamento-mensal'
+import { FORMA_PAGAMENTO } from '@/types/conta-bancaria'
 import {
   DespesaMensal,
   STATUS_DESPESA_MENSAL,
@@ -67,6 +68,49 @@ const comparadores: Record<
   categoria: (a, b) => a.categoriaNome.localeCompare(b.categoriaNome, 'pt-BR'),
 }
 
+interface ColunaProps {
+  titulo: string
+  total: number
+  vazioTexto: string
+  quantidade: number
+  acao?: React.ReactNode
+  // Receitas são poucas e ficam na largura toda — as demais colunas empilham
+  corpoClassName?: string
+  children: React.ReactNode
+}
+
+// Cada tipo de lançamento ganha sua própria coluna com rolagem independente —
+// evita a página inteira virar um scroll único conforme o mês enche.
+const Coluna = ({
+  titulo,
+  total,
+  vazioTexto,
+  quantidade,
+  acao,
+  corpoClassName = 'max-h-[60vh] space-y-3 overflow-y-auto',
+  children,
+}: ColunaProps) => (
+  <section className="flex min-w-0 flex-col gap-3 rounded-lg border p-4">
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <p className="font-medium">{titulo}</p>
+        <p className="text-muted-foreground text-sm">
+          {currencyFormatter.format(total)}
+        </p>
+      </div>
+      {acao}
+    </div>
+
+    {quantidade === 0
+      ? (
+        <p className="text-muted-foreground text-sm">{vazioTexto}</p>
+        )
+      : (
+        <div className={corpoClassName}>{children}</div>
+        )}
+  </section>
+)
+
 const PlanejamentoMensalTab = () => {
   const [mes, setMes] = useState(hoje.getMonth() + 1)
   const [ano, setAno] = useState(hoje.getFullYear())
@@ -90,6 +134,19 @@ const PlanejamentoMensalTab = () => {
   })
   const receitas = data?.receitas ?? []
   const parcelas = data?.parcelas ?? []
+
+  // As despesas pagas no crédito saem da coluna de despesas e ganham a sua
+  // própria — os totais do rodapé continuam somando as duas.
+  const despesasCredito = despesas.filter(
+    (despesa) => despesa.formaPagamento === FORMA_PAGAMENTO.CREDITO,
+  )
+  const despesasComuns = despesas.filter(
+    (despesa) => despesa.formaPagamento !== FORMA_PAGAMENTO.CREDITO,
+  )
+  const totalCredito = despesasCredito.reduce(
+    (soma, despesa) => soma + despesa.valor,
+    0,
+  )
 
   const totalDespesas = despesas.reduce(
     (soma, despesa) => soma + despesa.valor,
@@ -164,37 +221,10 @@ const PlanejamentoMensalTab = () => {
               ano={ano}
             />
 
-            <div className="flex items-center justify-between">
-              <p className="text-muted-foreground text-sm">
-                Outras receitas do mês
-              </p>
-              <ReceitaFormDialog
-                planejamentoMensalId={planejamento.id}
-                mes={mes}
-                ano={ano}
-              />
-            </div>
-
-            {receitas.length === 0 && (
-              <p className="text-muted-foreground text-sm">
-                Nenhuma receita além do salário neste mês.
-              </p>
-            )}
-
-            <div className="space-y-3">
-              {receitas.map((receita) => (
-                <ReceitaItem
-                  key={receita.id}
-                  receita={receita}
-                  planejamentoMensalId={planejamento.id}
-                  mes={mes}
-                  ano={ano}
-                />
-              ))}
-            </div>
-
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-muted-foreground text-sm">Despesas do mês</p>
+              <p className="text-muted-foreground text-sm">
+                Ordenar despesas por
+              </p>
               <div className="flex flex-wrap items-center gap-2">
                 <Select
                   value={campoOrdenacao}
@@ -230,53 +260,95 @@ const PlanejamentoMensalTab = () => {
                   {isAbrindo && <Loader2 className="animate-spin" />}
                   Puxar despesas fixas
                 </Button>
-                <DespesaMensalFormDialog
+              </div>
+            </div>
+
+            <Coluna
+              titulo="Receitas"
+              total={totalReceitas}
+              quantidade={receitas.length}
+              vazioTexto="Nenhuma receita além do salário neste mês."
+              corpoClassName="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+              acao={
+                <ReceitaFormDialog
                   planejamentoMensalId={planejamento.id}
                   mes={mes}
                   ano={ano}
                 />
-              </div>
-            </div>
-
-            {despesas.length === 0 && (
-              <p className="text-muted-foreground text-sm">
-                Nenhuma despesa neste mês ainda.
-              </p>
-            )}
-
-            <div className="space-y-3">
-              {despesas.map((despesa) => (
-                <DespesaMensalItem
-                  key={despesa.id}
-                  despesaMensal={despesa}
+              }
+            >
+              {receitas.map((receita) => (
+                <ReceitaItem
+                  key={receita.id}
+                  receita={receita}
                   planejamentoMensalId={planejamento.id}
                   mes={mes}
                   ano={ano}
                 />
               ))}
+            </Coluna>
+
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <Coluna
+                titulo="Despesas do mês"
+                total={totalDespesas - totalCredito}
+                quantidade={despesasComuns.length}
+                vazioTexto="Nenhuma despesa neste mês ainda."
+                acao={
+                  <DespesaMensalFormDialog
+                    planejamentoMensalId={planejamento.id}
+                    mes={mes}
+                    ano={ano}
+                  />
+                }
+              >
+                {despesasComuns.map((despesa) => (
+                  <DespesaMensalItem
+                    key={despesa.id}
+                    despesaMensal={despesa}
+                    planejamentoMensalId={planejamento.id}
+                    mes={mes}
+                    ano={ano}
+                  />
+                ))}
+              </Coluna>
+
+              <Coluna
+                titulo="Parcelamentos"
+                total={totalParcelas}
+                quantidade={parcelas.length}
+                vazioTexto="Nenhuma parcela cai neste mês."
+              >
+                {parcelas.map((parcela) => (
+                  <ParcelaMensalItem
+                    key={parcela.id}
+                    parcela={parcela}
+                    parcelasPagas={
+                      parcelasPagasPorParcelamento.get(
+                        parcela.parcelamentoId,
+                      ) ?? 0
+                    }
+                  />
+                ))}
+              </Coluna>
+
+              <Coluna
+                titulo="Cartão de crédito"
+                total={totalCredito}
+                quantidade={despesasCredito.length}
+                vazioTexto="Nenhuma despesa no crédito neste mês."
+              >
+                {despesasCredito.map((despesa) => (
+                  <DespesaMensalItem
+                    key={despesa.id}
+                    despesaMensal={despesa}
+                    planejamentoMensalId={planejamento.id}
+                    mes={mes}
+                    ano={ano}
+                  />
+                ))}
+              </Coluna>
             </div>
-
-            {parcelas.length > 0 && (
-              <>
-                <p className="text-muted-foreground text-sm">
-                  Parcelamentos do mês
-                </p>
-
-                <div className="space-y-3">
-                  {parcelas.map((parcela) => (
-                    <ParcelaMensalItem
-                      key={parcela.id}
-                      parcela={parcela}
-                      parcelasPagas={
-                        parcelasPagasPorParcelamento.get(
-                          parcela.parcelamentoId,
-                        ) ?? 0
-                      }
-                    />
-                  ))}
-                </div>
-              </>
-            )}
           </>
         )}
       </CardContent>

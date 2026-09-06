@@ -26,7 +26,7 @@ const PageContent = () => {
     .reduce((soma, despesaFixa) => soma + despesaFixa.valor, 0)
 
   return (
-    <Card className="w-full max-w-3xl rounded-xl shadow-xl">
+    <Card className="mx-auto w-full max-w-3xl rounded-xl shadow-xl">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-2xl">Despesas fixas</CardTitle>
         <DespesaFixaFormDialog />
