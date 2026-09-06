@@ -41,8 +41,8 @@ const DespesaMensalItem = ({
   const paga = despesaMensal.status === STATUS_DESPESA_MENSAL.PAGA
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border p-4">
+      <div className="flex min-w-0 items-center gap-3">
         <Checkbox
           checked={paga}
           onCheckedChange={(checked) =>
@@ -72,6 +72,9 @@ const DespesaMensalItem = ({
               `${despesaMensal.dataVencimento}T00:00:00`,
             ).toLocaleDateString('pt-BR')}
             {despesaMensal.despesaFixaId === null && ' · avulsa'}
+            {despesaMensal.contaBancariaNome
+              ? ` · ${despesaMensal.contaBancariaNome}`
+              : ''}
           </p>
         </div>
       </div>

@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { FORMA_PAGAMENTO_LABEL } from '@/types/conta-bancaria'
 import {
   DespesaMensal,
   STATUS_DESPESA_MENSAL,
@@ -82,6 +83,24 @@ const DespesaMensalDetalhesDialog = ({
               <dt className="text-muted-foreground">Pago em</dt>
               <dd className="font-medium">
                 {formatarData(despesaMensal.dataPagamento)}
+              </dd>
+            </div>
+          )}
+
+          {despesaMensal.formaPagamento && (
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-muted-foreground">Forma de pagamento</dt>
+              <dd className="font-medium">
+                {FORMA_PAGAMENTO_LABEL[despesaMensal.formaPagamento]}
+              </dd>
+            </div>
+          )}
+
+          {despesaMensal.contaBancariaNome && (
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-muted-foreground">Conta do cartão</dt>
+              <dd className="font-medium">
+                {despesaMensal.contaBancariaNome}
               </dd>
             </div>
           )}

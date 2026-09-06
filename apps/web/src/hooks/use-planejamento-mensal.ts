@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { apiClient } from '@/lib/api-client'
 import { extractErrorMessage } from '@/lib/error-handler'
+import { FormaPagamento } from '@/types/conta-bancaria'
 import {
   PlanejamentoMensalResponse,
   StatusDespesaMensal,
@@ -13,6 +14,8 @@ interface DespesaMensalPayload {
   descricao: string
   valor: number
   dataVencimento: string
+  formaPagamento?: FormaPagamento | null
+  contaBancariaId?: string | null
   observacao?: string | null
 }
 

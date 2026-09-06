@@ -18,6 +18,18 @@ type StatusParcela = z.infer<typeof statusParcelaEnum>
 const statusObjetivoEnum = z.enum(['ATIVO', 'CONCLUIDO', 'CANCELADO'])
 type StatusObjetivo = z.infer<typeof statusObjetivoEnum>
 
+// Como a despesa foi (ou será) paga. CREDITO é o único que exige informar a
+// conta bancária/agência do cartão usado.
+const formaPagamentoEnum = z.enum([
+  'DINHEIRO',
+  'PIX',
+  'DEBITO',
+  'CREDITO',
+  'BOLETO',
+  'OUTRO',
+])
+type FormaPagamento = z.infer<typeof formaPagamentoEnum>
+
 const acaoLogSchemaEnum = z.enum([
   'CADASTRAR',
   'ATUALIZAR',
@@ -37,6 +49,7 @@ export {
   statusPlanejamentoEnum,
   statusParcelaEnum,
   statusObjetivoEnum,
+  formaPagamentoEnum,
   acaoLogSchemaEnum,
   chatRoleEnum,
 }
@@ -47,6 +60,7 @@ export type {
   StatusPlanejamento,
   StatusParcela,
   StatusObjetivo,
+  FormaPagamento,
   AcaoLog,
   ChatRole,
 }

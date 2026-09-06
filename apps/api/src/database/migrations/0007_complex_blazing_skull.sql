@@ -1,0 +1,1 @@
+ALTER TABLE "conta_bancaria" ALTER COLUMN "agencia" DROP NOT NULL;

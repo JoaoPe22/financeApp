@@ -1,6 +1,7 @@
 export * from './auth-schema'
 export * from './categorias-schema'
 export * from './chat-mensagens-schema'
+export * from './contas-bancarias-schema'
 export * from './despesas-fixas-schema'
 export * from './despesas-mensais-schema'
 export * from './enums'

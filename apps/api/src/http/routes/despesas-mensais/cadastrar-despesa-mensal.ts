@@ -13,6 +13,7 @@ import {
 import { authenticate } from '@/http/middlewares/auth'
 
 import { BadRequestError } from '../_errors/bad-request-error'
+import { resolverContaBancaria } from './resolver-conta-bancaria'
 import { despesaMensalBodySchema } from './schema'
 
 const cadastrarDespesaMensalBodySchema = despesaMensalBodySchema.extend({
@@ -70,6 +71,12 @@ const cadastrarDespesaMensal = async (app: FastifyInstance) => {
         throw new BadRequestError('Categoria de despesa inválida')
       }
 
+      const contaBancariaId = await resolverContaBancaria(
+        userId,
+        body.formaPagamento,
+        body.contaBancariaId,
+      )
+
       const [novaDespesaMensal] = await db
         .insert(despesaMensal)
         .values({
@@ -79,6 +86,8 @@ const cadastrarDespesaMensal = async (app: FastifyInstance) => {
           descricao: body.descricao,
           valor: body.valor.toString(),
           dataVencimento: body.dataVencimento,
+          formaPagamento: body.formaPagamento ?? null,
+          contaBancariaId,
           observacao: body.observacao ?? null,
         })
         .returning({ id: despesaMensal.id })

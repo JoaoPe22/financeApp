@@ -12,8 +12,9 @@ import {
 import { v7 as uuidv7 } from 'uuid'
 
 import { categoria } from './categorias-schema'
+import { contaBancaria } from './contas-bancarias-schema'
 import { despesaFixa } from './despesas-fixas-schema'
-import { StatusParcela } from './enums'
+import { FormaPagamento, StatusParcela } from './enums'
 import { planejamentoMensal } from './planejamentos-mensais-schema'
 
 const despesaMensal = pgTable(
@@ -40,6 +41,12 @@ const despesaMensal = pgTable(
     dataVencimento: date().notNull(),
     status: text().$type<StatusParcela>().notNull().default('PENDENTE'),
     dataPagamento: date(),
+    // Nulo nas despesas cadastradas antes desse campo existir — só é
+    // obrigatório informar a conta bancária quando a forma é CREDITO.
+    formaPagamento: text().$type<FormaPagamento>(),
+    contaBancariaId: uuid().references(() => contaBancaria.id, {
+      onDelete: 'set null',
+    }),
     observacao: text(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp({ withTimezone: true })
@@ -65,6 +72,10 @@ const despesaMensalRelations = relations(despesaMensal, ({ one }) => ({
   despesaFixa: one(despesaFixa, {
     fields: [despesaMensal.despesaFixaId],
     references: [despesaFixa.id],
+  }),
+  contaBancaria: one(contaBancaria, {
+    fields: [despesaMensal.contaBancariaId],
+    references: [contaBancaria.id],
   }),
 }))
 

@@ -16,6 +16,7 @@ import { env } from '@/lib/env'
 import { errorHandler } from './error-handler'
 import { categoriasRoutes } from './routes/categorias'
 import { chatFinanceiroRoutes } from './routes/chat-financeiro'
+import { contasBancariasRoutes } from './routes/contas-bancarias'
 import { dashboardRoutes } from './routes/dashboard'
 import { despesasFixasRoutes } from './routes/despesas-fixas'
 import { despesasMensaisRoutes } from './routes/despesas-mensais'
@@ -58,6 +59,7 @@ app.register(fastifyRateLimit, {
 
 app.register(perfilRoutes)
 app.register(categoriasRoutes)
+app.register(contasBancariasRoutes)
 app.register(despesasFixasRoutes)
 app.register(planejamentosMensaisRoutes)
 app.register(despesasMensaisRoutes)

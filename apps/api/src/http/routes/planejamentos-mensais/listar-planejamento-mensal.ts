@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { db } from '@/database'
 import {
   categoria,
+  contaBancaria,
   despesaMensal,
   parcela,
   parcelamento,
@@ -34,6 +35,9 @@ const despesaMensalResponseSchema = z.object({
   dataVencimento: z.string(),
   status: z.string(),
   dataPagamento: z.string().nullable(),
+  formaPagamento: z.string().nullable(),
+  contaBancariaId: z.uuid().nullable(),
+  contaBancariaNome: z.string().nullable(),
   observacao: z.string().nullable(),
 })
 
@@ -120,10 +124,19 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
           dataVencimento: despesaMensal.dataVencimento,
           status: despesaMensal.status,
           dataPagamento: despesaMensal.dataPagamento,
+          formaPagamento: despesaMensal.formaPagamento,
+          contaBancariaId: despesaMensal.contaBancariaId,
+          contaBancariaBanco: contaBancaria.banco,
+          contaBancariaAgencia: contaBancaria.agencia,
+          contaBancariaApelido: contaBancaria.apelido,
           observacao: despesaMensal.observacao,
         })
         .from(despesaMensal)
         .innerJoin(categoria, eq(categoria.id, despesaMensal.categoriaId))
+        .leftJoin(
+          contaBancaria,
+          eq(contaBancaria.id, despesaMensal.contaBancariaId),
+        )
         .where(eq(despesaMensal.planejamentoMensalId, planejamento.id))
         .orderBy(despesaMensal.dataVencimento)
 
@@ -178,10 +191,23 @@ const listarPlanejamentoMensal = async (app: FastifyInstance) => {
             : null,
           status: planejamento.status,
         },
-        despesas: despesas.map((despesa) => ({
-          ...despesa,
-          valor: Number(despesa.valor),
-        })),
+        despesas: despesas.map(
+          ({
+            contaBancariaBanco,
+            contaBancariaAgencia,
+            contaBancariaApelido,
+            ...despesa
+          }) => ({
+            ...despesa,
+            valor: Number(despesa.valor),
+            contaBancariaNome: contaBancariaBanco
+              ? (contaBancariaApelido ??
+                (contaBancariaAgencia
+                  ? `${contaBancariaBanco} · Ag. ${contaBancariaAgencia}`
+                  : contaBancariaBanco))
+              : null,
+          }),
+        ),
         receitas: receitas.map((receitaItem) => ({
           ...receitaItem,
           valorBruto: receitaItem.valorBruto

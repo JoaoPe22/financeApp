@@ -1,3 +1,5 @@
+import { FormaPagamento } from './conta-bancaria'
+
 export const STATUS_DESPESA_MENSAL = {
   PENDENTE: 'PENDENTE',
   PAGA: 'PAGA',
@@ -27,6 +29,9 @@ export interface DespesaMensal {
   dataVencimento: string
   status: StatusDespesaMensal
   dataPagamento: string | null
+  formaPagamento: FormaPagamento | null
+  contaBancariaId: string | null
+  contaBancariaNome: string | null
   observacao: string | null
 }
 
