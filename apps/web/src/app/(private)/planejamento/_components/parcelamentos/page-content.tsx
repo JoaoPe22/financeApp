@@ -8,8 +8,10 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useParcelamentos } from '@/hooks/use-parcelamentos'
 import { usePlanejamentoMensal } from '@/hooks/use-planejamento-mensal'
+import { Parcelamento } from '@/types/parcelamento'
 
 import { ParcelamentoFormDialog } from './parcelamento-form-dialog'
 import { ParcelamentoItem } from './parcelamento-item'
@@ -21,6 +23,29 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 
 const hoje = new Date()
 
+const estaQuitado = (parcelamento: Parcelamento) =>
+  parcelamento.parcelasPagas >= parcelamento.quantidadeParcelas
+
+interface ListaParcelamentosProps {
+  parcelamentos: Parcelamento[]
+  vazioTexto: string
+}
+
+const ListaParcelamentos = ({
+  parcelamentos,
+  vazioTexto,
+}: ListaParcelamentosProps) => (
+  <div className="space-y-3">
+    {parcelamentos.length === 0 && (
+      <p className="text-muted-foreground text-sm">{vazioTexto}</p>
+    )}
+
+    {parcelamentos.map((parcelamento) => (
+      <ParcelamentoItem key={parcelamento.id} parcelamento={parcelamento} />
+    ))}
+  </div>
+)
+
 const PageContent = () => {
   const { data: parcelamentos, isLoading } = useParcelamentos()
   // Cada parcela já nasce vinculada ao planejamento_mensal do mês em que
@@ -30,6 +55,11 @@ const PageContent = () => {
     hoje.getMonth() + 1,
     hoje.getFullYear(),
   )
+
+  const emAndamento = (parcelamentos ?? []).filter(
+    (item) => !estaQuitado(item),
+  )
+  const quitados = (parcelamentos ?? []).filter(estaQuitado)
 
   const totalIntegral = (parcelamentos ?? []).reduce(
     (soma, item) => soma + (item.valorTotal - item.valorPago),
@@ -41,7 +71,7 @@ const PageContent = () => {
   )
 
   return (
-    <Card className="w-full max-w-3xl rounded-xl shadow-xl">
+    <Card className="mx-auto w-full max-w-3xl rounded-xl shadow-xl">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-2xl">Parcelamentos</CardTitle>
         <ParcelamentoFormDialog />
@@ -55,15 +85,32 @@ const PageContent = () => {
           </>
         )}
 
-        {!isLoading && parcelamentos?.length === 0 && (
-          <p className="text-muted-foreground text-sm">
-            Nenhum parcelamento cadastrado ainda.
-          </p>
-        )}
+        {!isLoading && (
+          <Tabs defaultValue="em-andamento">
+            <TabsList variant="line">
+              <TabsTrigger value="em-andamento">
+                Em andamento ({emAndamento.length})
+              </TabsTrigger>
+              <TabsTrigger value="quitados">
+                Quitados ({quitados.length})
+              </TabsTrigger>
+            </TabsList>
 
-        {parcelamentos?.map((parcelamento) => (
-          <ParcelamentoItem key={parcelamento.id} parcelamento={parcelamento} />
-        ))}
+            <TabsContent value="em-andamento" className="pt-3">
+              <ListaParcelamentos
+                parcelamentos={emAndamento}
+                vazioTexto="Nenhum parcelamento em andamento."
+              />
+            </TabsContent>
+
+            <TabsContent value="quitados" className="pt-3">
+              <ListaParcelamentos
+                parcelamentos={quitados}
+                vazioTexto="Nenhum parcelamento quitado ainda."
+              />
+            </TabsContent>
+          </Tabs>
+        )}
       </CardContent>
 
       {!isLoading && parcelamentos && parcelamentos.length > 0 && (
