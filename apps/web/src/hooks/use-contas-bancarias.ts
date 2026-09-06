@@ -7,7 +7,7 @@ import { ContaBancaria } from '@/types/conta-bancaria'
 
 interface ContaBancariaPayload {
   banco: string
-  agencia: string
+  agencia?: string | null
   conta?: string | null
   apelido?: string | null
 }
