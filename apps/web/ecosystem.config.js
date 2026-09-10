@@ -4,7 +4,7 @@ module.exports = {
       name: 'web',
       script: '.next/standalone/web/server.js',
       env: {
-        PORT: process.env.PORT || 3000,
+        PORT: process.env.PORT || 4565,
         NODE_ENV: 'production',
       },
       instances: 1,
