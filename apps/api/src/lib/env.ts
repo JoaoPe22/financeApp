@@ -5,10 +5,14 @@ const envSchema = z.object({
     .enum(['development', 'production', 'test'])
     .default('development'),
   PORT: z.coerce.number().default(3333),
+  // Escuta apenas em loopback por padrão, para a API não ficar acessível a
+  // outras máquinas da rede durante o desenvolvimento. Em produção (container,
+  // proxy reverso) defina HOST=0.0.0.0 no ambiente.
+  HOST: z.string().default('127.0.0.1'),
   DATABASE_URL: z.url(),
   BETTER_AUTH_SECRET: z.string().nonempty(),
   BETTER_AUTH_URL: z.url(),
-  FRONTEND_URL: z.url().default('http://localhost:3000'),
+  FRONTEND_URL: z.url().default('http://localhost:4565'),
   SMTP_HOST: z.string(),
   SMTP_PORT: z.coerce.number().default(587),
   SMTP_USER: z.string().nonempty(),

@@ -36,7 +36,7 @@ app.setErrorHandler(errorHandler)
 
 // Libera apenas o front-end (Next.js) a chamar a API com cookies (credentials: true)
 app.register(fastifyCors, {
-  origin: env.FRONTEND_URL || 'http://localhost:3000',
+  origin: env.FRONTEND_URL || 'http://localhost:4565',
   credentials: true,
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -71,8 +71,8 @@ app.register(reservasRoutes)
 app.register(chatFinanceiroRoutes)
 app.register(dashboardRoutes)
 
-app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
-  console.log(`Server está rodando no host http://0.0.0.0:${env.PORT}`)
+app.listen({ port: env.PORT, host: env.HOST }).then(() => {
+  console.log(`Server está rodando no host http://${env.HOST}:${env.PORT}`)
 })
 
 export { app }

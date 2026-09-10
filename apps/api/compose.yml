@@ -2,8 +2,11 @@ services:
   pg:
     container_name: financeApp-postgres
     image: postgres:17
+    restart: unless-stopped
     ports:
-      - '${DOCKER_PG_PORT}:5432'
+      # Prefixo 127.0.0.1: sem ele o Docker publica a porta em todas as
+      # interfaces e o banco de desenvolvimento fica alcançável pela rede local.
+      - '127.0.0.1:${DOCKER_PG_PORT}:5432'
     env_file:
       - .env
     environment:
