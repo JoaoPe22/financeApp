@@ -13,7 +13,7 @@ Projeto de portfólio, aberto para a comunidade estudar, usar e contribuir.
 - **Parcelamentos, investimentos, objetivos e reservas** com formulários dedicados.
 - **Relatórios** exportáveis em PDF e CSV.
 - **Chat financeiro com IA** (Google Gemini): tira dúvidas sobre o impacto de decisões financeiras usando os dados reais do usuário. Recurso opcional — o app funciona normalmente sem configurar isso.
-- **Autenticação completa**: cadastro com verificação de e-mail obrigatória, login, recuperação de senha, exclusão de conta (com todos os dados 
+- **Autenticação completa**: cadastro com verificação de e-mail obrigatória, login, recuperação de senha, exclusão de conta (com todos os dados
 
 ## Tecnologias
 
@@ -62,32 +62,31 @@ Depois, edite os dois `.env` seguindo o guia abaixo.
 
 Gere um segredo forte para `BETTER_AUTH_SECRET` em `https://better-auth.com/docs/installation`. Procure por `Generate Secret` e coloque o código gerado no arquivo `.env` referente.
 
-
 #### `apps/api/.env`
 
-| Variável | Descrição |
-|---|---|
-| `DATABASE_URL` | String de conexão do Postgres, ex.: `postgres://postgres:postgres@localhost:5432/finance_app` |
-| `BETTER_AUTH_SECRET` | Segredo gerado no passo acima (igual ao do `apps/web/.env`) |
-| `BETTER_AUTH_URL` | URL da API, ex.: `http://localhost:3333` |
-| `FRONTEND_URL` | URL do front-end, ex.: `http://localhost:3000` (usada no CORS) |
+| Variável                                              | Descrição                                                                                                                                                                                        |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`                                        | String de conexão do Postgres, ex.: `postgres://postgres:postgres@localhost:5432/finance_app`                                                                                                    |
+| `BETTER_AUTH_SECRET`                                  | Segredo gerado no passo acima (igual ao do `apps/web/.env`)                                                                                                                                      |
+| `BETTER_AUTH_URL`                                     | URL da API, ex.: `http://localhost:3333`                                                                                                                                                         |
+| `FRONTEND_URL`                                        | URL do front-end, ex.: `http://localhost:4565` (usada no CORS)                                                                                                                                   |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | Credenciais SMTP para envio de e-mail (confirmação de cadastro, redefinição de senha). Com Gmail, use uma [senha de app](https://myaccount.google.com/apppasswords), não a senha normal da conta |
-| `SMTP_FROM_NAME` / `SMTP_FROM_EMAIL` | Nome/e-mail exibidos como remetente |
-| `APPLICATION_TIMEZONE` | Fuso horário usado nos cálculos de data, ex.: `America/Sao_Paulo` |
-| `GEMINI_API_KEY` | **Opcional.** Chave da [Google AI Studio](https://aistudio.google.com/apikey) para habilitar o chat financeiro. Sem ela, o chat retorna um erro amigável — o resto do app funciona normalmente |
+| `SMTP_FROM_NAME` / `SMTP_FROM_EMAIL`                  | Nome/e-mail exibidos como remetente                                                                                                                                                              |
+| `APPLICATION_TIMEZONE`                                | Fuso horário usado nos cálculos de data, ex.: `America/Sao_Paulo`                                                                                                                                |
+| `GEMINI_API_KEY`                                      | **Opcional.** Chave da [Google AI Studio](https://aistudio.google.com/apikey) para habilitar o chat financeiro. Sem ela, o chat retorna um erro amigável — o resto do app funciona normalmente   |
 
 #### `apps/web/.env`
 
-| Variável | Descrição |
-|---|---|
-| `DATABASE_URL` | Igual ao do `apps/api/.env` |
-| `BETTER_AUTH_SECRET` | Igual ao do `apps/api/.env` |
-| `BETTER_AUTH_URL` | URL do front-end, ex.: `http://localhost:3000` |
-| `SMTP_*` | Mesmas credenciais SMTP do `apps/api/.env` |
-| `NEXT_PUBLIC_BETTER_AUTH_BASE_URL` | Mesma URL do `BETTER_AUTH_URL` acima |
-| `NEXT_PUBLIC_API_URL` | URL da API, ex.: `http://localhost:3333` |
-| `NEXT_PUBLIC_APPLICATION_TIMEZONE` | Mesmo fuso horário do `apps/api/.env` |
-| `NEXT_PUBLIC_GEO_API_URL` | API pública usada para autocompletar estado/cidade a partir do CEP |
+| Variável                           | Descrição                                                          |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| `DATABASE_URL`                     | Igual ao do `apps/api/.env`                                        |
+| `BETTER_AUTH_SECRET`               | Igual ao do `apps/api/.env`                                        |
+| `BETTER_AUTH_URL`                  | URL do front-end, ex.: `http://localhost:4565`                     |
+| `SMTP_*`                           | Mesmas credenciais SMTP do `apps/api/.env`                         |
+| `NEXT_PUBLIC_BETTER_AUTH_BASE_URL` | Mesma URL do `BETTER_AUTH_URL` acima                               |
+| `NEXT_PUBLIC_API_URL`              | URL da API, ex.: `http://localhost:3333`                           |
+| `NEXT_PUBLIC_APPLICATION_TIMEZONE` | Mesmo fuso horário do `apps/api/.env`                              |
+| `NEXT_PUBLIC_GEO_API_URL`          | API pública usada para autocompletar estado/cidade a partir do CEP |
 
 ### 4. Rode as migrations do banco
 
@@ -103,29 +102,29 @@ Em dois terminais separados:
 
 ```bash
 pnpm --filter @financeApp/api dev    # API em http://localhost:3333
-pnpm --filter @financeApp/web dev    # Web em http://localhost:3000
+pnpm --filter @financeApp/web dev    # Web em http://localhost:4565
 ```
 
-Acesse [http://localhost:3000](http://localhost:3000), crie uma conta e confirme o e-mail (verifique o console da API se o SMTP não estiver configurado — a confirmação também é registrada por lá).
+Acesse [http://localhost:4565](http://localhost:4565), crie uma conta e confirme o e-mail (verifique o console da API se o SMTP não estiver configurado — a confirmação também é registrada por lá).
 
 ## Scripts úteis
 
 Rodar dentro de `apps/api` ou `apps/web`:
 
-| Comando | O que faz |
-|---|---|
-| `pnpm dev` | Sobe o servidor em modo desenvolvimento |
-| `pnpm build` | Build de produção |
-| `pnpm lint` / `pnpm lint:fix` | Lint (ESLint) |
-| `pnpm format` | Formata o código (Prettier) |
+| Comando                       | O que faz                               |
+| ----------------------------- | --------------------------------------- |
+| `pnpm dev`                    | Sobe o servidor em modo desenvolvimento |
+| `pnpm build`                  | Build de produção                       |
+| `pnpm lint` / `pnpm lint:fix` | Lint (ESLint)                           |
+| `pnpm format`                 | Formata o código (Prettier)             |
 
 Só em `apps/api`:
 
-| Comando | O que faz |
-|---|---|
+| Comando            | O que faz                                          |
+| ------------------ | -------------------------------------------------- |
 | `pnpm db:generate` | Gera uma nova migration a partir do schema Drizzle |
-| `pnpm db:migrate` | Aplica as migrations pendentes |
-| `pnpm db:studio` | Abre o Drizzle Studio para inspecionar o banco |
+| `pnpm db:migrate`  | Aplica as migrations pendentes                     |
+| `pnpm db:studio`   | Abre o Drizzle Studio para inspecionar o banco     |
 
 ## Estrutura do projeto
 
