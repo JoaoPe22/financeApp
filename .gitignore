@@ -155,4 +155,4 @@ minio_data/
 .claude
 
 # Scripts
-apps/api/scripts/backup-db.sh
+apps/api/scripts/backup-database.ps1
